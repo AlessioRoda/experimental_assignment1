@@ -1,9 +1,0 @@
-string person
-string place
-string weapons
----
-string person
-string place
-string weapons
-
-bool correct

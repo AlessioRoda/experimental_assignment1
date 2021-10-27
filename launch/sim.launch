@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+
+   <node name="oracle" pkg="experimental_assignment1" type ="oracle.py" />
+   
+   <node name="state_machine"  pkg="experimental_assignment1" type="state_machine.py" />
+   
+
+</launch>
