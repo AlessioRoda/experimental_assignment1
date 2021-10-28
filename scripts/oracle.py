@@ -1,9 +1,12 @@
+#! /usr/bin/env python
+
 import roslib
 import rospy
 import random
 from datetime import datetime
 from experimental_assignment1.srv import Solution, AskHint
 from armor_py_api.scripts.armor_api.armor_client import ArmorClient
+
 from os.path import dirname, realpath
 
 #people=['Col.Mustard', 'Miss.Scarlett', 'Mrs.Peacock', 'Mrs.White', 'Prof.Plum', 'Rev.Green']
