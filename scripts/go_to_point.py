@@ -4,7 +4,7 @@ import rospy
 import math
 import time
 from geometry_msgs.msg import Point
-from experimental_assignment1.srv import Move
+from experimental_assignment1.srv import Move, MoveResponse
 
 pub_move=None
 actual_pos=Point()
@@ -15,15 +15,16 @@ target=Point()
 def move(dist):
     global pub_move
 
-    print("\nDistance to the next position: " + dist)
+    print("\nDistance to the next position: " + str(dist))
     time.sleep(0.5*dist) 
     print("\nTarget reached!")
     
-    pub_move(True) ## Notify the target has been reached
+    return True ## Notify the target has been reached
 
 
 def get_target(pos):
     global target, actual_pos
+
     actual_pos.x=pos.x_start
     actual_pos.y=pos.y_start
     actual_pos.z=0 ## don't care
@@ -35,7 +36,12 @@ def get_target(pos):
     ## Compute Euclidean distance
     dist = math.sqrt(pow(target.x-actual_pos.x, 2)+pow(target.y-actual_pos.y, 2))
 
-    move(dist)
+    res=move(dist)
+    msg=MoveResponse()
+    msg.reached=res
+
+    return msg
+
 
     
 
@@ -43,7 +49,8 @@ def main():
     global pub_move
 
     rospy.init_node('go_to_point') 
-    pub_move= rospy.Service('/move_point', Move, get_target)
+    pub_move=rospy.Service('/move_point', Move, get_target)
+    #pub2=rospy.ServiceProxy('/move_point', Move)
 
     rospy.spin()
 

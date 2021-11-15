@@ -1,2 +1,6 @@
-bool req
+
 ---
+string[] what
+string[] where
+string[] who
+string ID
