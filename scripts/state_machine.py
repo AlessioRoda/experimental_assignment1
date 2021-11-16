@@ -6,7 +6,8 @@ from rospy.impl.tcpros_service import ServiceProxy, wait_for_service
 import smach
 import smach_ros
 import random
-from datetime import datetime, time
+from datetime import datetime
+import time
 from geometry_msgs.msg import Point
 from experimental_assignment1.srv import Move, MoveRequest, AskHint, Solution, SolutionRequest
 from classes.myArmor import MyArmor
@@ -224,7 +225,7 @@ class Try_Solution(smach.State):
     def execute(self, userdata):
         global armor_interface, pub_solution
 
-        time.sleep(2) #Wait to make the smach simulation easier to follow on the visor
+        time.sleep(2)
              
         id_consistent=response_complete.armor_response.queried_objects[0]
         id_consistent=id_consistent[40:]
