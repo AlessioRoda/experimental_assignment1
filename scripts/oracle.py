@@ -1,19 +1,16 @@
 #! /usr/bin/env python
 
-from ctypes import sizeof
-import roslib
 import rospy
 import random
 from datetime import datetime
 from experimental_assignment1.srv import Solution, SolutionResponse, AskHint, AskHintResponse
-# from armor_py_api.scripts.armor_api.armor_client import ArmorClient
-#from armor_client import ArmorClient 
+
 #people=['Col.Mustard', 'Miss.Scarlett', 'Mrs.Peacock', 'Mrs.White', 'Prof.Plum', 'Rev.Green']
 #places=['Ballroom', 'Biliard_Room', 'Conservatory', 'Dining_Room', 'Hall', 'Kitchen', 'Library', 'Lounge','Study']
 #weapons=['Candlestick', 'Dagger','LeadPipe', 'Revolver', 'Rope', 'Spanner']
 
 people=['Col.Mustard', 'Miss.Scarlett', 'Mrs.Peacock']
-places=['Ballroom', 'Biliard_Room', 'Oracle_Room', 'Conservatory', 'Dining_Room']
+places=['Ballroom', 'Biliard_Room', 'Conservatory']
 weapons=['Candlestick', 'Dagger','LeadPipe']
 solution=[]
 
@@ -42,6 +39,8 @@ def init_scene():
 
 def receive_solution(sol):
     global solution_service
+
+    print("\nSolution received: " + sol.what + ", " + sol.where + ", " + sol.who)
     
     res=SolutionResponse()
     if(solution[0]==sol.what and solution[1]==sol.where and solution[2]==sol.who):
@@ -50,8 +49,9 @@ def receive_solution(sol):
 
     else:
         res.correct=False
+        print("\nSolution is not correct, try again")
 
-    solution_service(res)
+    return res
 
 def generate_hint():
     global armor_interface, people, weapons, places, solution_service, num_ID_hint
@@ -71,23 +71,19 @@ def generate_hint():
         if hint_type==0:
             index_people= random.randint(0, len(people)-1) ## The kind of people is casual 
             who.append(people[index_people])
+
         elif hint_type==1:
             index_places= random.randint(0, len(places)-1)
-
-            ##Can't be the oracle room
-            while(places[index_places]=='Oracle_Room'):
-                index_places= random.randint(0, len(places)-1)
-
             where.append(places[index_places])
+
         else:
             index_weapons= random.randint(0, len(weapons)-1)
             what.append(weapons[index_weapons])
 
         i=i+1
     
-    print("\nHint: " + str(what) +", "+ str(where) + ", " + str(who))
-
     num_ID_hint+=1
+    print("\nHint" + str(num_ID_hint) +": " + str(what) +", "+ str(where) + ", " + str(who))
 
     return [what, where, who]
 

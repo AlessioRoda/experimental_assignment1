@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <launch>
 
-   <node name="oracle" pkg="experimental_assignment1" type ="oracle.py" />
-   <node name="state_machine"  pkg="experimental_assignment1" type="state_machine.py" />
-   <node name="go_to_point"  pkg="experimental_assignment1" type="go_to_point.py" />
+   <node name="oracle" pkg="experimental_assignment1" type ="oracle.py" output="screen"/>
+   <node name="state_machine"  pkg="experimental_assignment1" type="state_machine.py" output="screen"/>
+   <node name="go_to_point"  pkg="experimental_assignment1" type="go_to_point.py" output="screen" />
 
    
 

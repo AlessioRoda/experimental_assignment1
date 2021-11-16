@@ -16,7 +16,7 @@ def move(dist):
     global pub_move
 
     print("\nDistance to the next position: " + str(dist))
-    time.sleep(0.5*dist) 
+    time.sleep(0.1*dist) 
     print("\nTarget reached!")
     
     return True ## Notify the target has been reached

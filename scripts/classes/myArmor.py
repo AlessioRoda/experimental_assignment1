@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from posixpath import dirname, realpath
 from armor_msgs.srv import *
 from armor_msgs.msg import *
 from rospy.impl.tcpros_service import ServiceProxy
@@ -19,7 +20,7 @@ class MyArmor(object):
         request.command='LOAD'
         request.primary_command_spec='FILE'
         request.secondary_command_spec=''
-        request.args=[path, 'http://www.emarolab.it/ontoTest-tutorial', 'true', 'PELLET', 'true']
+        request.args=[path, 'http://www.emarolab.it/cluedo-ontology', 'true', 'PELLET', 'true']
         request=armor_interface(request)
         return request
 
@@ -55,6 +56,7 @@ class MyArmor(object):
         req.args= ['COMPLETED']
         req=armor_interface(req)
         return req
+
 
     def ask_inconsistent():
         req=ArmorDirectiveReq()
@@ -111,14 +113,28 @@ class MyArmor(object):
         req=armor_interface(req)
         return req
 
+    def disjoint_class(ind1, ind2):
+        req=ArmorDirectiveReq()
+        req.client_name= 'tutorial'
+        req.reference_name= 'ontoTest'
+        req.command= 'DISJOINT'
+        req.primary_command_spec= 'CLASS'
+        req.secondary_command_spec= ''
+        req.args= [ind1, ind2]
+        req=armor_interface(req)
+        return req
+
+
     def save():
         req=ArmorDirectiveReq()
+        path = dirname(realpath(__file__))
+        path = path[:-15] + "solution_cluedo_ontology.owl"
         req.client_name= 'tutorial'
         req.reference_name= 'ontoTest'
         req.command= 'SAVE'
         req.primary_command_spec= ''
         req.secondary_command_spec= ''
-        req.args= ['/home/alessio/Musica/cluedo_ontology.owl']
+        req.args= [path]
         req=armor_interface(req)
         return req
 

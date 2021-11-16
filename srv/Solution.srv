@@ -1,6 +1,6 @@
 string what
 string where
 string who
-string ID
+
 ---
 bool correct
