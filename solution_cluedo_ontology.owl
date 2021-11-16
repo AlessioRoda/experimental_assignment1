@@ -262,13 +262,13 @@
     
 
 
-    <!-- http://www.emarolab.it/cluedo-ontology#HP662 -->
+    <!-- http://www.emarolab.it/cluedo-ontology#HP292 -->
 
 
-    <owl:NamedIndividual rdf:about="http://www.emarolab.it/cluedo-ontology#HP662">
-        <what rdf:resource="http://www.emarolab.it/cluedo-ontology#Candlestick"/>
-        <where rdf:resource="http://www.emarolab.it/cluedo-ontology#Ballroom"/>
-        <who rdf:resource="http://www.emarolab.it/cluedo-ontology#Mrs.Peacock"/>
+    <owl:NamedIndividual rdf:about="http://www.emarolab.it/cluedo-ontology#HP292">
+        <what rdf:resource="http://www.emarolab.it/cluedo-ontology#LeadPipe"/>
+        <where rdf:resource="http://www.emarolab.it/cluedo-ontology#Conservatory"/>
+        <who rdf:resource="http://www.emarolab.it/cluedo-ontology#Miss.Scarlett"/>
     </owl:NamedIndividual>
     
 

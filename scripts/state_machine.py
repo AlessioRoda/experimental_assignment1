@@ -6,7 +6,7 @@ from rospy.impl.tcpros_service import ServiceProxy, wait_for_service
 import smach
 import smach_ros
 import random
-from datetime import datetime
+from datetime import datetime, time
 from geometry_msgs.msg import Point
 from experimental_assignment1.srv import Move, MoveRequest, AskHint, Solution, SolutionRequest
 from classes.myArmor import MyArmor
@@ -223,6 +223,8 @@ class Try_Solution(smach.State):
         
     def execute(self, userdata):
         global armor_interface, pub_solution
+
+        time.sleep(2) #Wait to make the smach simulation easier to follow on the visor
              
         id_consistent=response_complete.armor_response.queried_objects[0]
         id_consistent=id_consistent[40:]
@@ -245,7 +247,7 @@ class Try_Solution(smach.State):
         who=who[40:]
         who=who[:-1]
 
-        print("\nTrying solution : " + what + ", " + where + ", " + who + "\n")
+        print("\nThe killer is: " + who + " in the " + where + " with " + who + "\n")
 
         ## Send to oracle the solution
         sol=SolutionRequest()
