@@ -225,7 +225,7 @@ class Try_Solution(smach.State):
     def execute(self, userdata):
         global armor_interface, pub_solution
 
-        time.sleep(2)
+        time.sleep(1)
              
         id_consistent=response_complete.armor_response.queried_objects[0]
         id_consistent=id_consistent[40:]
