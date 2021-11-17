@@ -20,6 +20,9 @@ On the basis of this the architecture is structured as a FSM with smach (here th
 In the Move step the robot has to move in a random place between the ones that are provided to collect hints (all the rooms can provide rooms, except to the Oracle_Room) and to perform the motion the state_machine node sends a 
 
 
+SPHINX
+https://alessioroda.github.io/experimental_assignment1/
+
 In order to run it just do it betttter  or even
 
 ```
