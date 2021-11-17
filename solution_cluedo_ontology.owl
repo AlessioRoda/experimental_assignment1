@@ -262,12 +262,12 @@
     
 
 
-    <!-- http://www.emarolab.it/cluedo-ontology#HP292 -->
+    <!-- http://www.emarolab.it/cluedo-ontology#HP360 -->
 
 
-    <owl:NamedIndividual rdf:about="http://www.emarolab.it/cluedo-ontology#HP292">
+    <owl:NamedIndividual rdf:about="http://www.emarolab.it/cluedo-ontology#HP360">
         <what rdf:resource="http://www.emarolab.it/cluedo-ontology#LeadPipe"/>
-        <where rdf:resource="http://www.emarolab.it/cluedo-ontology#Conservatory"/>
+        <where rdf:resource="http://www.emarolab.it/cluedo-ontology#Ballroom"/>
         <who rdf:resource="http://www.emarolab.it/cluedo-ontology#Miss.Scarlett"/>
     </owl:NamedIndividual>
     

@@ -1,5 +1,42 @@
 #! /usr/bin/env python
 
+'''
+.. module:: state_machine
+   :platform: Unix
+   :synopsis: Node implementing a finite state machine that represents the steps of the Cluedo game
+	
+.. moduleauthor:: Alessio Roda alessioroda98@gmail.com
+This node permits to simulate the cluedo game 
+
+Client: 
+     /move_point: custom service to send the position to reach to the go_to_point node
+     /hint_request: custom service to ask a hint message to oracle node
+     /solution: custom service to send the possible solution to the oracle node
+
+ It's performed as the node that permits to simulate the entire Cluedo game, it's the main of the whole architecture and with the smach 
+ StateMachine can simulate the game by switching from three states:
+ 
+ -MOVE: to simulate the motion of the robot from a room to another, it's referred to the Explore class. The game begins with the robot in the Oracle_Room 
+        and in order to simulate the motion a Move custom service message with the actual 
+        position of the robot and the task to reach is sent to the go_to_point node. Once the motion has been performed to the go_to_point node
+        it can switch to two possible steps: if the robot wants to try a solution (and so in this case the variable oracle==True) it switches
+        to the SOLUTION state, otherwise it switches to the ENTER_ROOM, that means that it wants to explore the rooms to collect hints
+
+ -ENTER_ROOM: the state represented with the Enter_Room class that represents the moment in which the robot enters in a room to acquire hints.
+              In order to get hints it sends a request to the oracle node, then it gets a hint defined by an ID
+              and three arrays (what, where and who) that represents some information about weapons, places and people.
+              After having obtained the hint it adds it to the ontology by using the MyArmor class methods, if the hypothesis uploaded is 
+              completed and consistent, then the variable oracle=True, that means that the robot must go to the Oracle_Room to ask to the
+              oracle if the hypothesis is the possible solution. 
+
+ -SOLUTION: the state that represents the moment in which the robot is trying to generate a solution for the Cluedo game. It's defined with
+            the Try_Solution class and gets the person, the place and the weapon associated with the complete and consistent hypothesis,
+            then it sends them to the oracle node with the Solution custom service message. If the oracle confirms that the solution is exact
+            the game ends, otherwise it continue by switching to the MOVE state.          
+
+'''
+
+
 from posixpath import dirname, realpath
 import rospy
 from rospy.impl.tcpros_service import ServiceProxy, wait_for_service
@@ -16,26 +53,62 @@ from armor_msgs.srv import *
 from armor_msgs.msg import *
 
 
-armor_interface=None
 pub_move=None
-pub_ask_hint=None
-pub_solution=None
-places=[]
-actual_pos=None
-pos_sent=Point()
-reached=False
-hint_received=False
-oracle=False
-response_complete=None
+''' Initialize the publisher to /move_point
 
+'''
+pub_ask_hint=None
+''' Initialize the publisher to /hint_request
+
+'''
+pub_solution=None
+''' Initialize the publisher to /solution
+
+'''
+places=[]
+''' Array with the places of the scene
+
+'''
+actual_pos=None
+''' Actual position of the robot in the environment
+
+'''
+oracle=False
+''' Boolean to know if the robot must go to the Oracle_Room
+
+'''
+response_complete=None
+''' Response of the query for a complete hypothesis
+
+'''
 
 people_ontology=['Col.Mustard', 'Miss.Scarlett', 'Mrs.Peacock']
-places_ontology=['Ballroom', 'Biliard_Room', 'Conservatory']
-weapons_onotology=['Candlestick', 'Dagger','LeadPipe']
+''' Define all the people of the scene
+
+'''
+places_ontology=['Ballroom', 'Billiard_Room', 'Conservatory']
+''' Define all the places of the scene
+
+'''
+weapons_ontology=['Candlestick', 'Dagger','LeadPipe']
+''' Define all the weapons of the scene
+
+'''
 oracle_room=None
+''' Initialize the Oracle_Room
+
+'''
 
 
 def init_scene():
+    '''
+    Function to initialize the scene, it defines three rooms as Place objects, then defines the starting position in the Oracle_Room (x=0, y=0)
+    then it adds all the information about the scene to the armor ontology, by loading all the people, places and weapons.
+    When a new element is loaded in the ontology it must be disjointed respect to the other of the same class, in order to define to the ontology
+    that they are different. Finally it preforms 'REASON' command to update the ontology.
+    
+    '''
+
     global places, actual_pos, oracle_room
     places.append(Place(places_ontology[0], 5, 5))
     places.append(Place(places_ontology[1], -5, -5))
@@ -75,8 +148,8 @@ def init_scene():
         j=j+1
 
     j=0
-    while j!=len(weapons_onotology):
-        res=MyArmor.add_item(weapons_onotology[j], 'WEAPON')
+    while j!=len(weapons_ontology):
+        res=MyArmor.add_item(weapons_ontology[j], 'WEAPON')
 
         if res.armor_response.success==False:
             print("\nError in loading PERSON in the ontology")
@@ -84,7 +157,7 @@ def init_scene():
         if j!=0:
             count=j
             while count!=0:
-                MyArmor.disjoint(weapons_onotology[j], weapons_onotology[count-1])
+                MyArmor.disjoint(weapons_ontology[j], weapons_ontology[count-1])
                 count = count -1
         j=j+1
 
@@ -93,19 +166,45 @@ def init_scene():
         
 
 class Explore(smach.State):
+    """
+            A class used to represent the behavior of the robot when it moves from a place to another
+            ...
+            Methods
+            -------
+            __init__(outcomes=['enter_room', 'solution'])
+                initialize the state
+            execute(userdata)
+               implement the behavior
+    """
+
     def __init__(self):
-        # initialisation function, it should not wait
+
         smach.State.__init__(self, 
                              outcomes=['enter_room', 'solution'])
         
     def execute(self, userdata):
+        '''
+        Description of the execute method:
+        First it checks if the robot must go to the Oracle_Room or have to move randomly in the environment, by default it moves randomly
+        in the places of the environment except in the Oracle_Room, since there there aren't any hints to collect. Each time it has to move
+        it checks that the new place to reach does't correspond to the actual robot position, once the target is reached it updates the actual
+        position. Finally it returns 'solution' or 'enter_room' on the basis of the state it has to reach.
+
+            Args:
+                userdata to store the variables between the states (not utilized)
+
+            Returns:
+                'solution'(string): if it must go to the SOLUTION state
+                'enter_room'(string): if it must go to the ENTER_ROOM state
+
+        '''
         global pub_move, actual_pos, places, oracle
 
         if oracle==False:
             random.seed(datetime.now())
             index=random.randint(0, len(places)-1)
 
-            ## Can't be neither in the same place in wich it is, nor in the oracle
+            ## Can't be in the same place in which it is
             while places[index].name==actual_pos.name:
                 index=random.randint(0, len(places)-1)
             destination=places[index]
@@ -113,6 +212,7 @@ class Explore(smach.State):
         else:
             destination=oracle_room
 
+        # Generate the Move custom message to perform the motion
         msg=MoveRequest()
         msg.x_start=actual_pos.x
         msg.y_start=actual_pos.y
@@ -122,15 +222,18 @@ class Explore(smach.State):
         res=pub_move(msg)
         print("\nMoving from " + actual_pos.name + " to " + destination.name +"\n")
 
+        # Wait for a response from the go_to_point node
         rospy.wait_for_service('move_point')
 
         if(res.reached==True):
+            # When reached update the current position
             actual_pos.x=destination.x
             actual_pos.y=destination.y
             actual_pos.name=destination.name
         else:
             print("\nPosition " + destination.name + " not reached")
 
+        # If it is going to the oracle room it sets oracle to False for the future iterations of the state_machine, then returns 'solution'
         if oracle == True:
             oracle=False
             return 'solution'
@@ -140,22 +243,47 @@ class Explore(smach.State):
 
 
 class Enter_Room(smach.State):
+    """
+            A class used to represent the behavior of the robot when it enters in a room and asks for hints
+            ...
+            Methods
+            -------
+            __init__(outcomes=['explore'])
+                initialize the state
+            execute(userdata)
+               implement the behavior
+    """
+
     def __init__(self):
-        # initialisation function, it should not wait
+
         smach.State.__init__(self, 
                              outcomes=['explore'])
         
     def execute(self, userdata):
-        global pub_ask_hint, armor_interface, oracle, response_complete
+        '''
+        Description of the execute method:
+        It asks for a hint from the oracle node, then adds to the ontology all the informations that it received about the PERSON (who),
+        the PLACE (where) and the WEAPON (what), then it checks if there are complete and consistent hypothesis in the ontology.
+        If there exists oracle=True, that means that the robot must go to the Oracle_Room, otherwise the hypothesis is removed from the
+        ontology in order to mantain it as simple as possible.
 
-        #rospy.wait_for_service('hint_request')
+            Args:
+                userdata to store the variables between the states (not utilized)
+            
+            Returns:
+                'explore'(string): it must go to the MOVE state
+        '''
+
+        global pub_ask_hint, oracle, response_complete
+
         res=pub_ask_hint()  
+        # ID of the hint received
         ID=res.ID
 
-        ## Add hints to the ontology 
+        # Add hints to the ontology 
         count=0
         while(count!=len(res.what)):
-            request=MyArmor.add_hipotesis('what', ID, res.what[count])
+            request=MyArmor.add_hypothesis('what', ID, res.what[count])
 
             if request.armor_response.success==False:
                 print("\nError, cannot add " + res.what[count])
@@ -163,7 +291,7 @@ class Enter_Room(smach.State):
 
         count=0
         while(count!=len(res.where)):
-            request=MyArmor.add_hipotesis('where', ID, res.where[count])
+            request=MyArmor.add_hypothesis('where', ID, res.where[count])
 
             if request.armor_response.success==False:
                 print("\nError, cannot add " + res.where[count])
@@ -171,20 +299,20 @@ class Enter_Room(smach.State):
 
         count=0
         while(count!=len(res.who)):
-            request=MyArmor.add_hipotesis('who', ID, res.who[count])
+            request=MyArmor.add_hypothesis('who', ID, res.who[count])
 
             if request.armor_response.success==False:
                 print("\nError, cannot add " + res.who[count])
             count = count +1
 
-        ## Reason
+        # Reason
         reason=MyArmor.reason()
 
         if reason.armor_response.success==False:
                 print("\nError, cannot perform reasoning")
 
 
-        ## First asks for all consistent queries
+        # First asks for all consistent queries
         response_complete=MyArmor.ask_complete()
         if response_complete.armor_response.success==False:
             print("\nError in asking query")        
@@ -192,20 +320,21 @@ class Enter_Room(smach.State):
         if len(response_complete.armor_response.queried_objects)!=0:
             response_inconsistent=MyArmor.ask_inconsistent()
         
-            ## Look for possible inconsistent hypothesis and in case remove them
+            # Look for possible inconsistent hypothesis and in case remove them
             if len(response_inconsistent.armor_response.queried_objects)!=0:
-                str_inconsitent=response_inconsistent.armor_response.queried_objects[0]
-                str_inconsitent=str_inconsitent[40:]
-                id_inconsistent=str_inconsitent[:-1]
+                str_inconsistent=response_inconsistent.armor_response.queried_objects[0]
+                str_inconsistent=str_inconsistent[40:]
+                id_inconsistent=str_inconsistent[:-1]
                 print("ID_inconsistent "+str(id_inconsistent) +"\n")
                 res=MyArmor.remove(id_inconsistent)
                 
                 if res.armor_response.success==False:
                     print("Error in removing\n")
             
-            ## If the hypotesis are completed and not inconsistent, then let's go to the oracle
+            ## If the hypothesis are completed and not inconsistent, then let's go to the oracle
             else:
                 oracle=True
+        # If the response isn't complete it removes it from the ontology
         else:
             res=MyArmor.remove(ID)
             if res.armor_response.success==False:
@@ -217,40 +346,72 @@ class Enter_Room(smach.State):
 
 
 class Try_Solution(smach.State):
+    """
+            A class used to represent the behavior of the robot when it tries to generate a solution
+            ...
+            Methods
+            -------
+            __init__(outcomes=['explore', 'correct'])
+                initialize the state
+            execute(userdata)
+               implement the behaviour
+    """
+
     def __init__(self):
-        # initialisation function, it should not wait
+        # initialization function, it should not wait
         smach.State.__init__(self, 
                              outcomes=['explore', 'correct'])
         
     def execute(self, userdata):
-        global armor_interface, pub_solution
+        '''
+        Description of the execute method:
+        It gets all the informations about the preson, the place and the weapon from the consistent hypothesis, then sends these infomation
+        to the oracle node via Solution custom message. If the oracle node confirms that it's correct the game ends and it saves the final
+        ontology in the solution_cluedo_ontology.owl file, otherwise it removesthe incorrect hypothesis from the ontology, 
+        then returns to the MOVE state.
 
-        time.sleep(1)
-             
+            Args:
+                userdata to store the variables between the states (not utilized)
+            
+            Returns:
+                'explore'(string): it must go to the MOVE state
+                'correct'(string): the solution is correct and the state machine is stopped
+        '''
+
+        global  pub_solution
+
+        #In order to make the view simulation more comfortable wait 1 second before the execution
+        time.sleep(1) 
+        
+        # Get the id of the hypothesis
         id_consistent=response_complete.armor_response.queried_objects[0]
         id_consistent=id_consistent[40:]
         id_consistent=id_consistent[:-1]
 
         print("\n\nID consistent: " + id_consistent + "\n")
 
+        # Get the weapon
         res_what=MyArmor.ask_item('what', id_consistent)
         what=res_what.armor_response.queried_objects[0]
         what=what[40:]
         what=what[:-1]
 
+        # Get the place
         res_where=MyArmor.ask_item('where', id_consistent)
         where=res_where.armor_response.queried_objects[0]
         where=where[40:]
         where=where[:-1]
 
+        # Get the person
         res_who=MyArmor.ask_item('who', id_consistent)
         who=res_who.armor_response.queried_objects[0]
         who=who[40:]
         who=who[:-1]
 
-        print("\nThe killer is: " + who + " in the " + where + " with " + who + "\n")
+        # Formalize the possible solution
+        print("\nThe killer is: " + who + " in the " + where + " with " + what + "\n")
 
-        ## Send to oracle the solution
+        # Send the solution to oracle
         sol=SolutionRequest()
         sol.what=what
         sol.where=where
@@ -271,23 +432,34 @@ class Try_Solution(smach.State):
 
 
 def main():
-    global armor_interface, pub_move, pub_ask_hint, pub_solution
+    '''
+    It's the main of the state_machine node, it performs the initialization of the node itself and initializes the services to the /move_point,
+    /hint_request and /solution topics. Then it loads the cluedo_ontology.owl ontology with the "load" method of the MyArmor class, calls 
+    the init_scene() method to initialize the scene and finally defines all the state of the FSM with smach.
+    '''
+
+    global  pub_move, pub_ask_hint, pub_solution
+
+    # Initialize the node
     rospy.init_node('state_machine')
 
     pub_move=ServiceProxy('/move_point', Move)
     pub_ask_hint=ServiceProxy('/hint_request', AskHint)
     pub_solution=ServiceProxy('/solution', Solution)
 
+    # Gets the actual path of the state_machine.py file
     path = dirname(realpath(__file__))
     path = path[:-7] + "cluedo_ontology.owl"
     
+    # Loads the ontology
     response=MyArmor.load(path)
 
     if response.armor_response.success==True:
-        print("\nOntology loaded succesfully")
+        print("\nOntology loaded successfully")
     else:
         print("\nERROR: Ontology not loaded correctly")
 
+    # Initialize the scene
     init_scene()
 
     # Create a SMACH state machine
