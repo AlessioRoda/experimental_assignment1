@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Indices &mdash; experimental_assignment1 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="#" class="icon icon-home"> experimental_assignment1
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Indices</a></li>
+<li><a class="reference internal" href="#experimental-assignment1-s-documentation">Experimental_assignment1’s documentation!</a><ul>
+<li><a class="reference internal" href="#module-scripts.go_to_point">GoToPoint module</a></li>
+<li><a class="reference internal" href="#module-scripts.oracle">Oracle module</a></li>
+<li><a class="reference internal" href="#module-scripts.state_machine">State Machine module</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">experimental_assignment1</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+      <li>Indices</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="toctree-wrapper compound">
+</div>
+<div class="section" id="indices">
+<h1>Indices<a class="headerlink" href="#indices" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Indice</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="experimental-assignment1-s-documentation">
+<h1>Experimental_assignment1’s documentation!<a class="headerlink" href="#experimental-assignment1-s-documentation" title="Permalink to this headline"></a></h1>
+<p>This is the documentation of the Experimental_assignment1 package</p>
+<div class="section" id="module-scripts.go_to_point">
+<span id="gotopoint-module"></span><h2>GoToPoint module<a class="headerlink" href="#module-scripts.go_to_point" title="Permalink to this headline"></a></h2>
+<span class="target" id="module-go_to_point"></span><p>This node simulate the the motion of the robot from a place to another of the Cluedo game</p>
+<dl class="simple">
+<dt>Service:</dt><dd><p>/move_point</p>
+</dd>
+</dl>
+<p>This node provides a trivial simulation of the motion of the robot in the environment: it receives from the state_machine node the actual
+position of the robot and the target position to reach via Move custom message, then it evaluates the euclidean distance between these two
+points and waits for a time proportionally to the distance. Since the simulation is quite long the time is “just” 1/10 of the evaluated
+distance.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.go_to_point.get_target">
+<span class="sig-prename descclassname"><span class="pre">scripts.go_to_point.</span></span><span class="sig-name descname"><span class="pre">get_target</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pos</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/go_to_point.html#get_target"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.go_to_point.get_target" title="Permalink to this definition"></a></dt>
+<dd><p>Callback to execute when state_machine node asks to perform a motion from a position to another. It evaluates the euclidean distance
+between the actual position expressed in x and y coordinates and the target position (also expressed in x and y coordinates).
+After having evaluated it, it calls the function move() to simulate the motion.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>pos(Move): is the custom service message conaining the actual position and the target position to reach</p>
+</dd>
+<dt>Returns:</dt><dd><p>msg(MoveResponse): the message to notify the state_machine that the target has been reached</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.go_to_point.main">
+<span class="sig-prename descclassname"><span class="pre">scripts.go_to_point.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/go_to_point.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.go_to_point.main" title="Permalink to this definition"></a></dt>
+<dd><p>Main function of the go_to_point node it initializes the node itself, then creates a service on topic /move_point.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.go_to_point.move">
+<span class="sig-prename descclassname"><span class="pre">scripts.go_to_point.</span></span><span class="sig-name descname"><span class="pre">move</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dist</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/go_to_point.html#move"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.go_to_point.move" title="Permalink to this definition"></a></dt>
+<dd><p>Function to emulate the motion of the robot: it receives the distance between the two places and waits for 1/10 nanoseconds of the
+distance.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>dist: is the euclidean distance between the actual position and the position to reach</p>
+</dd>
+<dt>Returns:</dt><dd><p>dist(bool): the message to notify that the target has been reached</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</div>
+<div class="section" id="module-scripts.oracle">
+<span id="oracle-module"></span><h2>Oracle module<a class="headerlink" href="#module-scripts.oracle" title="Permalink to this headline"></a></h2>
+<span class="target" id="module-oracle"></span><p>This node simulate the oracle that knows the solution and that generates hints</p>
+<dl>
+<dt>Service:</dt><dd><blockquote>
+<div><p>/solution</p>
+</div></blockquote>
+<p>/hint_request</p>
+</dd>
+</dl>
+<p>It’s performed as the node that permits to simulate the oracle of the Cluedo game. It generates a random solution by sorting a person, a place
+and a weapon between the ones provided by the scene, then it mainly performs two operations:</p>
+<blockquote>
+<div><dl class="simple">
+<dt>-Generate hints when the state_machine node sends the request, the hints are a random number of elements between the elements of the scene</dt><dd><p>that are stored in the AskHint custom message and sent to the state_machine node.</p>
+</dd>
+<dt>-Receive the solution provided from the state_machine node with the Solution custom message and checks if it’s correct.</dt><dd><p>In the case it is correct it returns True and the game ends, otherwise it returns False and game continue.</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.oracle.generate_hint">
+<span class="sig-prename descclassname"><span class="pre">scripts.oracle.</span></span><span class="sig-name descname"><span class="pre">generate_hint</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/oracle.html#generate_hint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.oracle.generate_hint" title="Permalink to this definition"></a></dt>
+<dd><p>Function to generate a hint, the number of the element for each hint is random and even the type of hint is casual:
+there’s the possibility to generate hint without one of PERSON, PLACE and WEAPON or even cases in which for each one of them
+there are more than one.
+For example a i’s possible to generate</p>
+<p>sol=[[], [], [‘Mrs.Peacock’]]</p>
+<p>or</p>
+<p>sol=[[‘Dagger’], [‘Ballroom’, ‘Conservatory’], [‘Mrs.Peacock’]]</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Returns:</dt><dd><p>[what, where, who]: the elements of the generated hint</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.oracle.hint_req">
+<span class="sig-prename descclassname"><span class="pre">scripts.oracle.</span></span><span class="sig-name descname"><span class="pre">hint_req</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">req</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/oracle.html#hint_req"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.oracle.hint_req" title="Permalink to this definition"></a></dt>
+<dd><p>Callback to execute when the oracle receives a hint request from the state_machine node, it calls the function generate_hint(),
+then returns the hint to the state_machine node.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>req(AskHint): the hint generated</p>
+</dd>
+<dt>Returns:</dt><dd><p>res(AskHintResponse): the message with the hint for the state_machine node</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.oracle.init_scene">
+<span class="sig-prename descclassname"><span class="pre">scripts.oracle.</span></span><span class="sig-name descname"><span class="pre">init_scene</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/oracle.html#init_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.oracle.init_scene" title="Permalink to this definition"></a></dt>
+<dd><p>Function to initialize the scene, it defines the solution to the Cluedo game by sorting a weapon, a place and a person between the
+ones in the current scene and saves them in the solution variable.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.oracle.main">
+<span class="sig-prename descclassname"><span class="pre">scripts.oracle.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/oracle.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.oracle.main" title="Permalink to this definition"></a></dt>
+<dd><p>The main of the oracle node, it initializes the node itself, then creates a service on topic /solution and /hint_request.
+Finally it asks to initialize the scene.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.oracle.num_ID_hint">
+<span class="sig-prename descclassname"><span class="pre">scripts.oracle.</span></span><span class="sig-name descname"><span class="pre">num_ID_hint</span></span><em class="property"> <span class="pre">=</span> <span class="pre">0</span></em><a class="headerlink" href="#scripts.oracle.num_ID_hint" title="Permalink to this definition"></a></dt>
+<dd><p>To count the number of hints provided by the oracle node</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.oracle.people">
+<span class="sig-prename descclassname"><span class="pre">scripts.oracle.</span></span><span class="sig-name descname"><span class="pre">people</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['Col.Mustard',</span> <span class="pre">'Miss.Scarlett',</span> <span class="pre">'Mrs.Peacock']</span></em><a class="headerlink" href="#scripts.oracle.people" title="Permalink to this definition"></a></dt>
+<dd><p>Define all the people of the scene</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.oracle.places">
+<span class="sig-prename descclassname"><span class="pre">scripts.oracle.</span></span><span class="sig-name descname"><span class="pre">places</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['Ballroom',</span> <span class="pre">'Billiard_Room',</span> <span class="pre">'Conservatory']</span></em><a class="headerlink" href="#scripts.oracle.places" title="Permalink to this definition"></a></dt>
+<dd><p>Define all the places of the scene</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.oracle.receive_solution">
+<span class="sig-prename descclassname"><span class="pre">scripts.oracle.</span></span><span class="sig-name descname"><span class="pre">receive_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/oracle.html#receive_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.oracle.receive_solution" title="Permalink to this definition"></a></dt>
+<dd><p>Callback to execute when the oracle receives a possible solution from the state_machine node.
+It checks if the person, the place and the weapon provided from the state_machine corresponds with the ones of the solution and,
+in this case, returns True to confirm, otherwise returns False.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>sol(Solution): is the solution received from the state_machine node</p>
+</dd>
+<dt>Returns:</dt><dd><p>res(SolutionResponse): the response if the provided solution is correct or not</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.oracle.solution">
+<span class="sig-prename descclassname"><span class="pre">scripts.oracle.</span></span><span class="sig-name descname"><span class="pre">solution</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#scripts.oracle.solution" title="Permalink to this definition"></a></dt>
+<dd><p>Define the array in which will be stored the solution of the game</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.oracle.weapons">
+<span class="sig-prename descclassname"><span class="pre">scripts.oracle.</span></span><span class="sig-name descname"><span class="pre">weapons</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['Candlestick',</span> <span class="pre">'Dagger',</span> <span class="pre">'LeadPipe']</span></em><a class="headerlink" href="#scripts.oracle.weapons" title="Permalink to this definition"></a></dt>
+<dd><p>Define all the weapons of the scene</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-scripts.state_machine">
+<span id="state-machine-module"></span><h2>State Machine module<a class="headerlink" href="#module-scripts.state_machine" title="Permalink to this headline"></a></h2>
+<span class="target" id="module-state_machine"></span><p>This node permits to simulate the cluedo game</p>
+<dl>
+<dt>Client:</dt><dd><blockquote>
+<div><p>/move_point: custom service to send the position to reach to the go_to_point node
+/hint_request: custom service to ask a hint message to oracle node
+/solution: custom service to send the possible solution to the oracle node</p>
+</div></blockquote>
+<p>It’s performed as the node that permits to simulate the entire Cluedo game, it’s the main of the whole architecture and with the smach
+StateMachine can simulate the game by switching from three states:</p>
+<dl class="simple">
+<dt>-MOVE: to simulate the motion of the robot from a room to another, it’s referred to the Explore class. The game begins with the robot in the Oracle_Room</dt><dd><p>and in order to simulate the motion a Move custom service message with the actual
+position of the robot and the task to reach is sent to the go_to_point node. Once the motion has been performed to the go_to_point node
+it can switch to two possible steps: if the robot wants to try a solution (and so in this case the variable oracle==True) it switches
+to the SOLUTION state, otherwise it switches to the ENTER_ROOM, that means that it wants to explore the rooms to collect hints</p>
+</dd>
+<dt>-ENTER_ROOM: the state represented with the Enter_Room class that represents the moment in which the robot enters in a room to acquire hints.</dt><dd><p>In order to get hints it sends a request to the oracle node, then it gets a hint defined by an ID
+and three arrays (what, where and who) that represents some information about weapons, places and people.
+After having obtained the hint it adds it to the ontology by using the MyArmor class methods, if the hypothesis uploaded is
+completed and consistent, then the variable oracle=True, that means that the robot must go to the Oracle_Room to ask to the
+oracle if the hypothesis is the possible solution.</p>
+</dd>
+<dt>-SOLUTION: the state that represents the moment in which the robot is trying to generate a solution for the Cluedo game. It’s defined with</dt><dd><p>the Try_Solution class and gets the person, the place and the weapon associated with the complete and consistent hypothesis,
+then it sends them to the oracle node with the Solution custom service message. If the oracle confirms that the solution is exact
+the game ends, otherwise it continue by switching to the MOVE state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.Enter_Room">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">Enter_Room</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#Enter_Room"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Enter_Room" title="Permalink to this definition"></a></dt>
+<dd><p>A class used to represent the behavior of the robot when it enters in a room and asks for hints
+…
+.. method:: __init__(outcomes=[‘explore’])</p>
+<blockquote>
+<div><p>initialize the state</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.Enter_Room.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Enter_Room.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Enter_Room.execute" title="Permalink to this definition"></a></dt>
+<dd><p>implement the behavior</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Enter_Room.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd><p>Description of the execute method:
+It asks for a hint from the oracle node, then adds to the ontology all the informations that it received about the PERSON (who),
+the PLACE (where) and the WEAPON (what), then it checks if there are complete and consistent hypothesis in the ontology.
+If there exists oracle=True, that means that the robot must go to the Oracle_Room, otherwise the hypothesis is removed from the
+ontology in order to mantain it as simple as possible.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>userdata to store the variables between the states (not utilized)</p>
+</dd>
+<dt>Returns:</dt><dd><p>‘explore’(string): it must go to the MOVE state</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.Explore">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">Explore</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#Explore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Explore" title="Permalink to this definition"></a></dt>
+<dd><p>A class used to represent the behavior of the robot when it moves from a place to another
+…
+.. method:: __init__(outcomes=[‘enter_room’, ‘solution’])</p>
+<blockquote>
+<div><p>initialize the state</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.Explore.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Explore.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Explore.execute" title="Permalink to this definition"></a></dt>
+<dd><p>implement the behavior</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id1">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Explore.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id1" title="Permalink to this definition"></a></dt>
+<dd><p>Description of the execute method:
+First it checks if the robot must go to the Oracle_Room or have to move randomly in the environment, by default it moves randomly
+in the places of the environment except in the Oracle_Room, since there there aren’t any hints to collect. Each time it has to move
+it checks that the new place to reach does’t correspond to the actual robot position, once the target is reached it updates the actual
+position. Finally it returns ‘solution’ or ‘enter_room’ on the basis of the state it has to reach.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>userdata to store the variables between the states (not utilized)</p>
+</dd>
+<dt>Returns:</dt><dd><p>‘solution’(string): if it must go to the SOLUTION state
+‘enter_room’(string): if it must go to the ENTER_ROOM state</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.Try_Solution">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">Try_Solution</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#Try_Solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Try_Solution" title="Permalink to this definition"></a></dt>
+<dd><p>A class used to represent the behavior of the robot when it tries to generate a solution
+…
+.. method:: __init__(outcomes=[‘explore’, ‘correct’])</p>
+<blockquote>
+<div><p>initialize the state</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.Try_Solution.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Try_Solution.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Try_Solution.execute" title="Permalink to this definition"></a></dt>
+<dd><p>implement the behaviour</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="id2">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Try_Solution.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#id2" title="Permalink to this definition"></a></dt>
+<dd><p>Description of the execute method:
+It gets all the informations about the preson, the place and the weapon from the consistent hypothesis, then sends these infomation
+to the oracle node via Solution custom message. If the oracle node confirms that it’s correct the game ends and it saves the final
+ontology in the solution_cluedo_ontology.owl file, otherwise it removesthe incorrect hypothesis from the ontology,
+then returns to the MOVE state.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>userdata to store the variables between the states (not utilized)</p>
+</dd>
+<dt>Returns:</dt><dd><p>‘explore’(string): it must go to the MOVE state
+‘correct’(string): the solution is correct and the state machine is stopped</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.actual_pos">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">actual_pos</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.actual_pos" title="Permalink to this definition"></a></dt>
+<dd><p>Actual position of the robot in the environment</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.init_scene">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">init_scene</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#init_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.init_scene" title="Permalink to this definition"></a></dt>
+<dd><p>Function to initialize the scene, it defines three rooms as Place objects, then defines the starting position in the Oracle_Room (x=0, y=0)
+then it adds all the information about the scene to the armor ontology, by loading all the people, places and weapons.
+When a new element is loaded in the ontology it must be disjointed respect to the other of the same class, in order to define to the ontology
+that they are different. Finally it preforms ‘REASON’ command to update the ontology.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.main">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.main" title="Permalink to this definition"></a></dt>
+<dd><p>It’s the main of the state_machine node, it performs the initialization of the node itself and initializes the services to the /move_point,
+/hint_request and /solution topics. Then it loads the cluedo_ontology.owl ontology with the “load” method of the MyArmor class, calls
+the init_scene() method to initialize the scene and finally defines all the state of the FSM with smach.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.oracle">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">oracle</span></span><em class="property"> <span class="pre">=</span> <span class="pre">False</span></em><a class="headerlink" href="#scripts.state_machine.oracle" title="Permalink to this definition"></a></dt>
+<dd><p>Boolean to know if the robot must go to the Oracle_Room</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.oracle_room">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">oracle_room</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.oracle_room" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the Oracle_Room</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.people_ontology">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">people_ontology</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['Col.Mustard',</span> <span class="pre">'Miss.Scarlett',</span> <span class="pre">'Mrs.Peacock']</span></em><a class="headerlink" href="#scripts.state_machine.people_ontology" title="Permalink to this definition"></a></dt>
+<dd><p>Define all the people of the scene</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.places">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">places</span></span><em class="property"> <span class="pre">=</span> <span class="pre">[]</span></em><a class="headerlink" href="#scripts.state_machine.places" title="Permalink to this definition"></a></dt>
+<dd><p>Array with the places of the scene</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.places_ontology">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">places_ontology</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['Ballroom',</span> <span class="pre">'Billiard_Room',</span> <span class="pre">'Conservatory']</span></em><a class="headerlink" href="#scripts.state_machine.places_ontology" title="Permalink to this definition"></a></dt>
+<dd><p>Define all the places of the scene</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.pub_ask_hint">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">pub_ask_hint</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.pub_ask_hint" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the publisher to /hint_request</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.pub_move">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">pub_move</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.pub_move" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the publisher to /move_point</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.pub_solution">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">pub_solution</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.pub_solution" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the publisher to /solution</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.response_complete">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">response_complete</span></span><em class="property"> <span class="pre">=</span> <span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.response_complete" title="Permalink to this definition"></a></dt>
+<dd><p>Response of the query for a complete hypothesis</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.weapons_ontology">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">weapons_ontology</span></span><em class="property"> <span class="pre">=</span> <span class="pre">['Candlestick',</span> <span class="pre">'Dagger',</span> <span class="pre">'LeadPipe']</span></em><a class="headerlink" href="#scripts.state_machine.weapons_ontology" title="Permalink to this definition"></a></dt>
+<dd><p>Define all the weapons of the scene</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Alessio Roda.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

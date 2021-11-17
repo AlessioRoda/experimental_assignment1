@@ -217,10 +217,10 @@
     
 
 
-    <!-- http://www.emarolab.it/cluedo-ontology#Biliard_Room -->
+    <!-- http://www.emarolab.it/cluedo-ontology#Billiard_Room -->
 
 
-    <owl:NamedIndividual rdf:about="http://www.emarolab.it/cluedo-ontology#Biliard_Room">
+    <owl:NamedIndividual rdf:about="http://www.emarolab.it/cluedo-ontology#Billiard_Room">
         <rdf:type rdf:resource="http://www.emarolab.it/cluedo-ontology#PLACE"/>
     </owl:NamedIndividual>
     
@@ -262,13 +262,13 @@
     
 
 
-    <!-- http://www.emarolab.it/cluedo-ontology#HP360 -->
+    <!-- http://www.emarolab.it/cluedo-ontology#HP174 -->
 
 
-    <owl:NamedIndividual rdf:about="http://www.emarolab.it/cluedo-ontology#HP360">
+    <owl:NamedIndividual rdf:about="http://www.emarolab.it/cluedo-ontology#HP174">
         <what rdf:resource="http://www.emarolab.it/cluedo-ontology#LeadPipe"/>
-        <where rdf:resource="http://www.emarolab.it/cluedo-ontology#Ballroom"/>
-        <who rdf:resource="http://www.emarolab.it/cluedo-ontology#Miss.Scarlett"/>
+        <where rdf:resource="http://www.emarolab.it/cluedo-ontology#Billiard_Room"/>
+        <who rdf:resource="http://www.emarolab.it/cluedo-ontology#Mrs.Peacock"/>
     </owl:NamedIndividual>
     
 
@@ -321,7 +321,7 @@
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
         <owl:distinctMembers rdf:parseType="Collection">
             <rdf:Description rdf:about="http://www.emarolab.it/cluedo-ontology#Ballroom"/>
-            <rdf:Description rdf:about="http://www.emarolab.it/cluedo-ontology#Biliard_Room"/>
+            <rdf:Description rdf:about="http://www.emarolab.it/cluedo-ontology#Billiard_Room"/>
         </owl:distinctMembers>
     </rdf:Description>
     <rdf:Description>
@@ -334,7 +334,7 @@
     <rdf:Description>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDifferent"/>
         <owl:distinctMembers rdf:parseType="Collection">
-            <rdf:Description rdf:about="http://www.emarolab.it/cluedo-ontology#Biliard_Room"/>
+            <rdf:Description rdf:about="http://www.emarolab.it/cluedo-ontology#Billiard_Room"/>
             <rdf:Description rdf:about="http://www.emarolab.it/cluedo-ontology#Conservatory"/>
         </owl:distinctMembers>
     </rdf:Description>

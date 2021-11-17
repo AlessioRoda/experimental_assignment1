@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scripts.state_machine &mdash; experimental_assignment1 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> experimental_assignment1
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">experimental_assignment1</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>scripts.state_machine</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scripts.state_machine</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">.. module:: state_machine</span>
+<span class="sd">   :platform: Unix</span>
+<span class="sd">   :synopsis: Node implementing a finite state machine that represents the steps of the Cluedo game</span>
+<span class="sd">	</span>
+<span class="sd">.. moduleauthor:: Alessio Roda alessioroda98@gmail.com</span>
+<span class="sd">This node permits to simulate the cluedo game </span>
+
+<span class="sd">Client: </span>
+<span class="sd">     /move_point: custom service to send the position to reach to the go_to_point node</span>
+<span class="sd">     /hint_request: custom service to ask a hint message to oracle node</span>
+<span class="sd">     /solution: custom service to send the possible solution to the oracle node</span>
+
+<span class="sd"> It&#39;s performed as the node that permits to simulate the entire Cluedo game, it&#39;s the main of the whole architecture and with the smach </span>
+<span class="sd"> StateMachine can simulate the game by switching from three states:</span>
+<span class="sd"> </span>
+<span class="sd"> -MOVE: to simulate the motion of the robot from a room to another, it&#39;s referred to the Explore class. The game begins with the robot in the Oracle_Room </span>
+<span class="sd">        and in order to simulate the motion a Move custom service message with the actual </span>
+<span class="sd">        position of the robot and the task to reach is sent to the go_to_point node. Once the motion has been performed to the go_to_point node</span>
+<span class="sd">        it can switch to two possible steps: if the robot wants to try a solution (and so in this case the variable oracle==True) it switches</span>
+<span class="sd">        to the SOLUTION state, otherwise it switches to the ENTER_ROOM, that means that it wants to explore the rooms to collect hints</span>
+
+<span class="sd"> -ENTER_ROOM: the state represented with the Enter_Room class that represents the moment in which the robot enters in a room to acquire hints.</span>
+<span class="sd">              In order to get hints it sends a request to the oracle node, then it gets a hint defined by an ID</span>
+<span class="sd">              and three arrays (what, where and who) that represents some information about weapons, places and people.</span>
+<span class="sd">              After having obtained the hint it adds it to the ontology by using the MyArmor class methods, if the hypothesis uploaded is </span>
+<span class="sd">              completed and consistent, then the variable oracle=True, that means that the robot must go to the Oracle_Room to ask to the</span>
+<span class="sd">              oracle if the hypothesis is the possible solution. </span>
+
+<span class="sd"> -SOLUTION: the state that represents the moment in which the robot is trying to generate a solution for the Cluedo game. It&#39;s defined with</span>
+<span class="sd">            the Try_Solution class and gets the person, the place and the weapon associated with the complete and consistent hypothesis,</span>
+<span class="sd">            then it sends them to the oracle node with the Solution custom service message. If the oracle confirms that the solution is exact</span>
+<span class="sd">            the game ends, otherwise it continue by switching to the MOVE state.          </span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="kn">from</span> <span class="nn">posixpath</span> <span class="kn">import</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">realpath</span>
+<span class="kn">import</span> <span class="nn">rospy</span>
+<span class="kn">from</span> <span class="nn">rospy.impl.tcpros_service</span> <span class="kn">import</span> <span class="n">ServiceProxy</span><span class="p">,</span> <span class="n">wait_for_service</span>
+<span class="kn">import</span> <span class="nn">smach</span>
+<span class="kn">import</span> <span class="nn">smach_ros</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">geometry_msgs.msg</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="kn">from</span> <span class="nn">experimental_assignment1.srv</span> <span class="kn">import</span> <span class="n">Move</span><span class="p">,</span> <span class="n">MoveRequest</span><span class="p">,</span> <span class="n">AskHint</span><span class="p">,</span> <span class="n">Solution</span><span class="p">,</span> <span class="n">SolutionRequest</span>
+<span class="kn">from</span> <span class="nn">classes.myArmor</span> <span class="kn">import</span> <span class="n">MyArmor</span>
+<span class="kn">from</span> <span class="nn">classes.place</span> <span class="kn">import</span> <span class="n">Place</span>
+<span class="kn">from</span> <span class="nn">armor_msgs.srv</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">armor_msgs.msg</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="n">pub_move</span><span class="o">=</span><span class="kc">None</span>
+<span class="sd">&#39;&#39;&#39; Initialize the publisher to /move_point</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">pub_ask_hint</span><span class="o">=</span><span class="kc">None</span>
+<span class="sd">&#39;&#39;&#39; Initialize the publisher to /hint_request</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">pub_solution</span><span class="o">=</span><span class="kc">None</span>
+<span class="sd">&#39;&#39;&#39; Initialize the publisher to /solution</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">places</span><span class="o">=</span><span class="p">[]</span>
+<span class="sd">&#39;&#39;&#39; Array with the places of the scene</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">actual_pos</span><span class="o">=</span><span class="kc">None</span>
+<span class="sd">&#39;&#39;&#39; Actual position of the robot in the environment</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">oracle</span><span class="o">=</span><span class="kc">False</span>
+<span class="sd">&#39;&#39;&#39; Boolean to know if the robot must go to the Oracle_Room</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">response_complete</span><span class="o">=</span><span class="kc">None</span>
+<span class="sd">&#39;&#39;&#39; Response of the query for a complete hypothesis</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="n">people_ontology</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Col.Mustard&#39;</span><span class="p">,</span> <span class="s1">&#39;Miss.Scarlett&#39;</span><span class="p">,</span> <span class="s1">&#39;Mrs.Peacock&#39;</span><span class="p">]</span>
+<span class="sd">&#39;&#39;&#39; Define all the people of the scene</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">places_ontology</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ballroom&#39;</span><span class="p">,</span> <span class="s1">&#39;Billiard_Room&#39;</span><span class="p">,</span> <span class="s1">&#39;Conservatory&#39;</span><span class="p">]</span>
+<span class="sd">&#39;&#39;&#39; Define all the places of the scene</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">weapons_ontology</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Candlestick&#39;</span><span class="p">,</span> <span class="s1">&#39;Dagger&#39;</span><span class="p">,</span><span class="s1">&#39;LeadPipe&#39;</span><span class="p">]</span>
+<span class="sd">&#39;&#39;&#39; Define all the weapons of the scene</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">oracle_room</span><span class="o">=</span><span class="kc">None</span>
+<span class="sd">&#39;&#39;&#39; Initialize the Oracle_Room</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="init_scene"><a class="viewcode-back" href="../../index.html#scripts.state_machine.init_scene">[docs]</a><span class="k">def</span> <span class="nf">init_scene</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function to initialize the scene, it defines three rooms as Place objects, then defines the starting position in the Oracle_Room (x=0, y=0)</span>
+<span class="sd">    then it adds all the information about the scene to the armor ontology, by loading all the people, places and weapons.</span>
+<span class="sd">    When a new element is loaded in the ontology it must be disjointed respect to the other of the same class, in order to define to the ontology</span>
+<span class="sd">    that they are different. Finally it preforms &#39;REASON&#39; command to update the ontology.</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">global</span> <span class="n">places</span><span class="p">,</span> <span class="n">actual_pos</span><span class="p">,</span> <span class="n">oracle_room</span>
+    <span class="n">places</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Place</span><span class="p">(</span><span class="n">places_ontology</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">places</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Place</span><span class="p">(</span><span class="n">places_ontology</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">))</span>
+    <span class="n">places</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Place</span><span class="p">(</span><span class="n">places_ontology</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="mi">5</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">))</span>
+
+    <span class="n">oracle_room</span><span class="o">=</span><span class="n">Place</span><span class="p">(</span><span class="s1">&#39;Oracle_Room&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">actual_pos</span><span class="o">=</span><span class="n">Place</span><span class="p">(</span><span class="s1">&#39;Oracle_Room&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">#Starts in the oracle room</span>
+
+    <span class="c1">## Add people, weapons and places o the ontology</span>
+
+    <span class="n">j</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">j</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">people_ontology</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">people_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="s1">&#39;PERSON&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error in loading PERSON in the ontology&quot;</span><span class="p">)</span>
+        <span class="c1">## Disjoint all the elements</span>
+        <span class="k">if</span> <span class="n">j</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">count</span><span class="o">=</span><span class="n">j</span>
+            <span class="k">while</span> <span class="n">count</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">MyArmor</span><span class="o">.</span><span class="n">disjoint</span><span class="p">(</span><span class="n">people_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">people_ontology</span><span class="p">[</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="n">j</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">j</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">places_ontology</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">places_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="s1">&#39;PLACE&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error in loading PERSON in the ontology&quot;</span><span class="p">)</span>
+        <span class="c1">## Disjoint all the elements</span>
+        <span class="k">if</span> <span class="n">j</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">count</span><span class="o">=</span><span class="n">j</span>
+            <span class="k">while</span> <span class="n">count</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">MyArmor</span><span class="o">.</span><span class="n">disjoint</span><span class="p">(</span><span class="n">places_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">places_ontology</span><span class="p">[</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="n">j</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">j</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">weapons_ontology</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">weapons_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="s1">&#39;WEAPON&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error in loading PERSON in the ontology&quot;</span><span class="p">)</span>
+        <span class="c1">## Disjoint all the elements</span>
+        <span class="k">if</span> <span class="n">j</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">count</span><span class="o">=</span><span class="n">j</span>
+            <span class="k">while</span> <span class="n">count</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">MyArmor</span><span class="o">.</span><span class="n">disjoint</span><span class="p">(</span><span class="n">weapons_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">weapons_ontology</span><span class="p">[</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">reason</span><span class="p">()</span></div>
+    
+        
+
+<div class="viewcode-block" id="Explore"><a class="viewcode-back" href="../../index.html#scripts.state_machine.Explore">[docs]</a><span class="k">class</span> <span class="nc">Explore</span><span class="p">(</span><span class="n">smach</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            A class used to represent the behavior of the robot when it moves from a place to another</span>
+<span class="sd">            ...</span>
+<span class="sd">            Methods</span>
+<span class="sd">            -------</span>
+<span class="sd">            __init__(outcomes=[&#39;enter_room&#39;, &#39;solution&#39;])</span>
+<span class="sd">                initialize the state</span>
+<span class="sd">            execute(userdata)</span>
+<span class="sd">               implement the behavior</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">smach</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                             <span class="n">outcomes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;enter_room&#39;</span><span class="p">,</span> <span class="s1">&#39;solution&#39;</span><span class="p">])</span>
+        
+<div class="viewcode-block" id="Explore.execute"><a class="viewcode-back" href="../../index.html#scripts.state_machine.Explore.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">userdata</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Description of the execute method:</span>
+<span class="sd">        First it checks if the robot must go to the Oracle_Room or have to move randomly in the environment, by default it moves randomly</span>
+<span class="sd">        in the places of the environment except in the Oracle_Room, since there there aren&#39;t any hints to collect. Each time it has to move</span>
+<span class="sd">        it checks that the new place to reach does&#39;t correspond to the actual robot position, once the target is reached it updates the actual</span>
+<span class="sd">        position. Finally it returns &#39;solution&#39; or &#39;enter_room&#39; on the basis of the state it has to reach.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                userdata to store the variables between the states (not utilized)</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                &#39;solution&#39;(string): if it must go to the SOLUTION state</span>
+<span class="sd">                &#39;enter_room&#39;(string): if it must go to the ENTER_ROOM state</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">global</span> <span class="n">pub_move</span><span class="p">,</span> <span class="n">actual_pos</span><span class="p">,</span> <span class="n">places</span><span class="p">,</span> <span class="n">oracle</span>
+
+        <span class="k">if</span> <span class="n">oracle</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+            <span class="n">index</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">places</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1">## Can&#39;t be in the same place in which it is</span>
+            <span class="k">while</span> <span class="n">places</span><span class="p">[</span><span class="n">index</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="n">actual_pos</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="n">index</span><span class="o">=</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">places</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">destination</span><span class="o">=</span><span class="n">places</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">destination</span><span class="o">=</span><span class="n">oracle_room</span>
+
+        <span class="c1"># Generate the Move custom message to perform the motion</span>
+        <span class="n">msg</span><span class="o">=</span><span class="n">MoveRequest</span><span class="p">()</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">x_start</span><span class="o">=</span><span class="n">actual_pos</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">y_start</span><span class="o">=</span><span class="n">actual_pos</span><span class="o">.</span><span class="n">y</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">x_end</span><span class="o">=</span><span class="n">destination</span><span class="o">.</span><span class="n">x</span>
+        <span class="n">msg</span><span class="o">.</span><span class="n">y_end</span><span class="o">=</span><span class="n">destination</span><span class="o">.</span><span class="n">y</span>
+
+        <span class="n">res</span><span class="o">=</span><span class="n">pub_move</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Moving from &quot;</span> <span class="o">+</span> <span class="n">actual_pos</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; to &quot;</span> <span class="o">+</span> <span class="n">destination</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Wait for a response from the go_to_point node</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="s1">&#39;move_point&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">reached</span><span class="o">==</span><span class="kc">True</span><span class="p">):</span>
+            <span class="c1"># When reached update the current position</span>
+            <span class="n">actual_pos</span><span class="o">.</span><span class="n">x</span><span class="o">=</span><span class="n">destination</span><span class="o">.</span><span class="n">x</span>
+            <span class="n">actual_pos</span><span class="o">.</span><span class="n">y</span><span class="o">=</span><span class="n">destination</span><span class="o">.</span><span class="n">y</span>
+            <span class="n">actual_pos</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">destination</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Position &quot;</span> <span class="o">+</span> <span class="n">destination</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; not reached&quot;</span><span class="p">)</span>
+
+        <span class="c1"># If it is going to the oracle room it sets oracle to False for the future iterations of the state_machine, then returns &#39;solution&#39;</span>
+        <span class="k">if</span> <span class="n">oracle</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">oracle</span><span class="o">=</span><span class="kc">False</span>
+            <span class="k">return</span> <span class="s1">&#39;solution&#39;</span>
+        
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;enter_room&#39;</span></div></div>
+
+
+<div class="viewcode-block" id="Enter_Room"><a class="viewcode-back" href="../../index.html#scripts.state_machine.Enter_Room">[docs]</a><span class="k">class</span> <span class="nc">Enter_Room</span><span class="p">(</span><span class="n">smach</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            A class used to represent the behavior of the robot when it enters in a room and asks for hints</span>
+<span class="sd">            ...</span>
+<span class="sd">            Methods</span>
+<span class="sd">            -------</span>
+<span class="sd">            __init__(outcomes=[&#39;explore&#39;])</span>
+<span class="sd">                initialize the state</span>
+<span class="sd">            execute(userdata)</span>
+<span class="sd">               implement the behavior</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">smach</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                             <span class="n">outcomes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;explore&#39;</span><span class="p">])</span>
+        
+<div class="viewcode-block" id="Enter_Room.execute"><a class="viewcode-back" href="../../index.html#scripts.state_machine.Enter_Room.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">userdata</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Description of the execute method:</span>
+<span class="sd">        It asks for a hint from the oracle node, then adds to the ontology all the informations that it received about the PERSON (who),</span>
+<span class="sd">        the PLACE (where) and the WEAPON (what), then it checks if there are complete and consistent hypothesis in the ontology.</span>
+<span class="sd">        If there exists oracle=True, that means that the robot must go to the Oracle_Room, otherwise the hypothesis is removed from the</span>
+<span class="sd">        ontology in order to mantain it as simple as possible.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                userdata to store the variables between the states (not utilized)</span>
+<span class="sd">            </span>
+<span class="sd">            Returns:</span>
+<span class="sd">                &#39;explore&#39;(string): it must go to the MOVE state</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">global</span> <span class="n">pub_ask_hint</span><span class="p">,</span> <span class="n">oracle</span><span class="p">,</span> <span class="n">response_complete</span>
+
+        <span class="n">res</span><span class="o">=</span><span class="n">pub_ask_hint</span><span class="p">()</span>  
+        <span class="c1"># ID of the hint received</span>
+        <span class="n">ID</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">ID</span>
+
+        <span class="c1"># Add hints to the ontology </span>
+        <span class="n">count</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">count</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">what</span><span class="p">)):</span>
+            <span class="n">request</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">add_hypothesis</span><span class="p">(</span><span class="s1">&#39;what&#39;</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">what</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error, cannot add &quot;</span> <span class="o">+</span> <span class="n">res</span><span class="o">.</span><span class="n">what</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span><span class="mi">1</span>
+
+        <span class="n">count</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">count</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">where</span><span class="p">)):</span>
+            <span class="n">request</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">add_hypothesis</span><span class="p">(</span><span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">where</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error, cannot add &quot;</span> <span class="o">+</span> <span class="n">res</span><span class="o">.</span><span class="n">where</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span><span class="mi">1</span>
+
+        <span class="n">count</span><span class="o">=</span><span class="mi">0</span>
+        <span class="k">while</span><span class="p">(</span><span class="n">count</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="o">.</span><span class="n">who</span><span class="p">)):</span>
+            <span class="n">request</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">add_hypothesis</span><span class="p">(</span><span class="s1">&#39;who&#39;</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">res</span><span class="o">.</span><span class="n">who</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error, cannot add &quot;</span> <span class="o">+</span> <span class="n">res</span><span class="o">.</span><span class="n">who</span><span class="p">[</span><span class="n">count</span><span class="p">])</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">+</span><span class="mi">1</span>
+
+        <span class="c1"># Reason</span>
+        <span class="n">reason</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">reason</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">reason</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error, cannot perform reasoning&quot;</span><span class="p">)</span>
+
+
+        <span class="c1"># First asks for all consistent queries</span>
+        <span class="n">response_complete</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">ask_complete</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">response_complete</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error in asking query&quot;</span><span class="p">)</span>        
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response_complete</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">response_inconsistent</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">ask_inconsistent</span><span class="p">()</span>
+        
+            <span class="c1"># Look for possible inconsistent hypothesis and in case remove them</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response_inconsistent</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">str_inconsistent</span><span class="o">=</span><span class="n">response_inconsistent</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">str_inconsistent</span><span class="o">=</span><span class="n">str_inconsistent</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span>
+                <span class="n">id_inconsistent</span><span class="o">=</span><span class="n">str_inconsistent</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ID_inconsistent &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">id_inconsistent</span><span class="p">)</span> <span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">id_inconsistent</span><span class="p">)</span>
+                
+                <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error in removing</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            
+            <span class="c1">## If the hypothesis are completed and not inconsistent, then let&#39;s go to the oracle</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">oracle</span><span class="o">=</span><span class="kc">True</span>
+        <span class="c1"># If the response isn&#39;t complete it removes it from the ontology</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">ID</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error in removing</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="s1">&#39;explore&#39;</span></div></div>
+            
+
+
+
+<div class="viewcode-block" id="Try_Solution"><a class="viewcode-back" href="../../index.html#scripts.state_machine.Try_Solution">[docs]</a><span class="k">class</span> <span class="nc">Try_Solution</span><span class="p">(</span><span class="n">smach</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            A class used to represent the behavior of the robot when it tries to generate a solution</span>
+<span class="sd">            ...</span>
+<span class="sd">            Methods</span>
+<span class="sd">            -------</span>
+<span class="sd">            __init__(outcomes=[&#39;explore&#39;, &#39;correct&#39;])</span>
+<span class="sd">                initialize the state</span>
+<span class="sd">            execute(userdata)</span>
+<span class="sd">               implement the behaviour</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># initialization function, it should not wait</span>
+        <span class="n">smach</span><span class="o">.</span><span class="n">State</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+                             <span class="n">outcomes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;explore&#39;</span><span class="p">,</span> <span class="s1">&#39;correct&#39;</span><span class="p">])</span>
+        
+<div class="viewcode-block" id="Try_Solution.execute"><a class="viewcode-back" href="../../index.html#scripts.state_machine.Try_Solution.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">userdata</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Description of the execute method:</span>
+<span class="sd">        It gets all the informations about the preson, the place and the weapon from the consistent hypothesis, then sends these infomation</span>
+<span class="sd">        to the oracle node via Solution custom message. If the oracle node confirms that it&#39;s correct the game ends and it saves the final</span>
+<span class="sd">        ontology in the solution_cluedo_ontology.owl file, otherwise it removesthe incorrect hypothesis from the ontology, </span>
+<span class="sd">        then returns to the MOVE state.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                userdata to store the variables between the states (not utilized)</span>
+<span class="sd">            </span>
+<span class="sd">            Returns:</span>
+<span class="sd">                &#39;explore&#39;(string): it must go to the MOVE state</span>
+<span class="sd">                &#39;correct&#39;(string): the solution is correct and the state machine is stopped</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">global</span>  <span class="n">pub_solution</span>
+
+        <span class="c1">#In order to make the view simulation more comfortable wait 1 second before the execution</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> 
+        
+        <span class="c1"># Get the id of the hypothesis</span>
+        <span class="n">id_consistent</span><span class="o">=</span><span class="n">response_complete</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">id_consistent</span><span class="o">=</span><span class="n">id_consistent</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span>
+        <span class="n">id_consistent</span><span class="o">=</span><span class="n">id_consistent</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">ID consistent: &quot;</span> <span class="o">+</span> <span class="n">id_consistent</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get the weapon</span>
+        <span class="n">res_what</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">ask_item</span><span class="p">(</span><span class="s1">&#39;what&#39;</span><span class="p">,</span> <span class="n">id_consistent</span><span class="p">)</span>
+        <span class="n">what</span><span class="o">=</span><span class="n">res_what</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">what</span><span class="o">=</span><span class="n">what</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span>
+        <span class="n">what</span><span class="o">=</span><span class="n">what</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Get the place</span>
+        <span class="n">res_where</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">ask_item</span><span class="p">(</span><span class="s1">&#39;where&#39;</span><span class="p">,</span> <span class="n">id_consistent</span><span class="p">)</span>
+        <span class="n">where</span><span class="o">=</span><span class="n">res_where</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span>
+        <span class="n">where</span><span class="o">=</span><span class="n">where</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Get the person</span>
+        <span class="n">res_who</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">ask_item</span><span class="p">(</span><span class="s1">&#39;who&#39;</span><span class="p">,</span> <span class="n">id_consistent</span><span class="p">)</span>
+        <span class="n">who</span><span class="o">=</span><span class="n">res_who</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">who</span><span class="o">=</span><span class="n">who</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span>
+        <span class="n">who</span><span class="o">=</span><span class="n">who</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Formalize the possible solution</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">The killer is: &quot;</span> <span class="o">+</span> <span class="n">who</span> <span class="o">+</span> <span class="s2">&quot; in the &quot;</span> <span class="o">+</span> <span class="n">where</span> <span class="o">+</span> <span class="s2">&quot; with &quot;</span> <span class="o">+</span> <span class="n">what</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Send the solution to oracle</span>
+        <span class="n">sol</span><span class="o">=</span><span class="n">SolutionRequest</span><span class="p">()</span>
+        <span class="n">sol</span><span class="o">.</span><span class="n">what</span><span class="o">=</span><span class="n">what</span>
+        <span class="n">sol</span><span class="o">.</span><span class="n">where</span><span class="o">=</span><span class="n">where</span>
+        <span class="n">sol</span><span class="o">.</span><span class="n">who</span><span class="o">=</span><span class="n">who</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">pub_solution</span><span class="p">(</span><span class="n">sol</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="s1">&#39;solution&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">correct</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Solution is correct, the game is finished!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">MyArmor</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="s1">&#39;correct&#39;</span>
+
+        <span class="k">elif</span> <span class="n">res</span><span class="o">.</span><span class="n">correct</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">It&#39;s not the correct solution</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">id_consistent</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="s1">&#39;explore&#39;</span></div></div>
+    
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../index.html#scripts.state_machine.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    It&#39;s the main of the state_machine node, it performs the initialization of the node itself and initializes the services to the /move_point,</span>
+<span class="sd">    /hint_request and /solution topics. Then it loads the cluedo_ontology.owl ontology with the &quot;load&quot; method of the MyArmor class, calls </span>
+<span class="sd">    the init_scene() method to initialize the scene and finally defines all the state of the FSM with smach.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">global</span>  <span class="n">pub_move</span><span class="p">,</span> <span class="n">pub_ask_hint</span><span class="p">,</span> <span class="n">pub_solution</span>
+
+    <span class="c1"># Initialize the node</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span><span class="s1">&#39;state_machine&#39;</span><span class="p">)</span>
+
+    <span class="n">pub_move</span><span class="o">=</span><span class="n">ServiceProxy</span><span class="p">(</span><span class="s1">&#39;/move_point&#39;</span><span class="p">,</span> <span class="n">Move</span><span class="p">)</span>
+    <span class="n">pub_ask_hint</span><span class="o">=</span><span class="n">ServiceProxy</span><span class="p">(</span><span class="s1">&#39;/hint_request&#39;</span><span class="p">,</span> <span class="n">AskHint</span><span class="p">)</span>
+    <span class="n">pub_solution</span><span class="o">=</span><span class="n">ServiceProxy</span><span class="p">(</span><span class="s1">&#39;/solution&#39;</span><span class="p">,</span> <span class="n">Solution</span><span class="p">)</span>
+
+    <span class="c1"># Gets the actual path of the state_machine.py file</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;cluedo_ontology.owl&quot;</span>
+    
+    <span class="c1"># Loads the ontology</span>
+    <span class="n">response</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Ontology loaded successfully&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">ERROR: Ontology not loaded correctly&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Initialize the scene</span>
+    <span class="n">init_scene</span><span class="p">()</span>
+
+    <span class="c1"># Create a SMACH state machine</span>
+    <span class="n">sm</span> <span class="o">=</span> <span class="n">smach</span><span class="o">.</span><span class="n">StateMachine</span><span class="p">(</span><span class="n">outcomes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;state_machine&#39;</span><span class="p">])</span>
+    <span class="n">sm</span><span class="o">.</span><span class="n">userdata</span><span class="o">.</span><span class="n">sm_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+     <span class="c1"># Open the container</span>
+    <span class="k">with</span> <span class="n">sm</span><span class="p">:</span>
+        <span class="c1"># Add states to the container</span>
+        <span class="n">smach</span><span class="o">.</span><span class="n">StateMachine</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;MOVE&#39;</span><span class="p">,</span> <span class="n">Explore</span><span class="p">(),</span> 
+                               <span class="n">transitions</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;enter_room&#39;</span><span class="p">:</span><span class="s1">&#39;ENTER_ROOM&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;solution&#39;</span><span class="p">:</span><span class="s1">&#39;SOLUTION&#39;</span> <span class="p">})</span>
+
+        <span class="n">smach</span><span class="o">.</span><span class="n">StateMachine</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;ENTER_ROOM&#39;</span><span class="p">,</span> <span class="n">Enter_Room</span><span class="p">(),</span> 
+                               <span class="n">transitions</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;explore&#39;</span><span class="p">:</span><span class="s1">&#39;MOVE&#39;</span><span class="p">})</span>
+        
+        <span class="n">smach</span><span class="o">.</span><span class="n">StateMachine</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;SOLUTION&#39;</span><span class="p">,</span> <span class="n">Try_Solution</span><span class="p">(),</span>
+                                <span class="n">transitions</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;explore&#39;</span><span class="p">:</span><span class="s1">&#39;MOVE&#39;</span><span class="p">,</span>
+                                             <span class="s1">&#39;correct&#39;</span><span class="p">:</span><span class="s1">&#39;state_machine&#39;</span><span class="p">})</span>
+
+
+    <span class="c1"># Create and start the introspection server for visualization</span>
+    <span class="n">sis</span> <span class="o">=</span> <span class="n">smach_ros</span><span class="o">.</span><span class="n">IntrospectionServer</span><span class="p">(</span><span class="s1">&#39;server_name&#39;</span><span class="p">,</span> <span class="n">sm</span><span class="p">,</span> <span class="s1">&#39;/SM_ROOT&#39;</span><span class="p">)</span>
+    <span class="n">sis</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+    <span class="c1"># Execute the state machine</span>
+    <span class="n">outcome</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+
+    <span class="c1"># Wait for ctrl-c to stop the application</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span>
+    <span class="n">sis</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Alessio Roda.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

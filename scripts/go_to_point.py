@@ -63,11 +63,9 @@ def get_target(pos):
 
     actual_pos.x=pos.x_start
     actual_pos.y=pos.y_start
-    actual_pos.z=0 ## don't care
 
     target.x=pos.x_end
     target.y=pos.y_end
-    target.z=0 ## don't care
 
     # Compute Euclidean distance
     dist = math.sqrt(pow(target.x-actual_pos.x, 2)+pow(target.y-actual_pos.y, 2))
