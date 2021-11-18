@@ -59,6 +59,8 @@ Finally at the end of the game a file solution_cluedo_game is generated, which c
 
 To better describe the behaviour of the architecture here there are the component diagram and temporal diagram:
 
+![UML_diagram1](https://user-images.githubusercontent.com/48511957/142494612-9d6ce9a3-48a1-4a86-a2f3-8d0b63cc737e.jpg)
+
 
 ## How to run the code
 First if you want to run this code you must have the ARMOR package installed in your workspace (otherwhise you ca download from here https://github.com/EmaroLab/armor), then download this folder in your ros workspace and compile it with 
