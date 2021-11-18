@@ -120,7 +120,7 @@ Public Member Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><pre class="fragment">Simple class to use in a more comfortable way the ARMOR commands, providing some methods that already create and
-sends the correct messages to the armor_interface_srv service.
+send the correct messages to the armor_interface_srv service.
 </pre> </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4fcb99382f0b9216c51fee6d646a842b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4fcb99382f0b9216c51fee6d646a842b">&#9670;&nbsp;</a></span>__init__()</h2>
@@ -179,7 +179,7 @@ sends the correct messages to the armor_interface_srv service.
   ID(string): the ID of the hypothesis
   arg(string): the name of the place/weapon/person to add to the ontology
     Returns:
-request(ArmorDirectiveReq): the response received from ARMOR
+res(ArmorDirectiveRes): the response received from ARMOR
 </pre> 
 </div>
 </div>
@@ -214,7 +214,7 @@ request(ArmorDirectiveReq): the response received from ARMOR
 name(string): the name of the element 
 type(string): the type of the element (PERSON/PLACE/WEAPON)
     Returns:
-request(ArmorDirectiveReq): the response received from ARMOR
+res(ArmorDirectiveRes): the response received from ARMOR
 </pre> 
 </div>
 </div>
@@ -235,7 +235,7 @@ request(ArmorDirectiveReq): the response received from ARMOR
 <pre class="fragment">Asks to the ontology for completed hypothesis
 
     Returns:
-request(ArmorDirectiveReq): the response received from ARMOR
+res(ArmorDirectiveRes): the response received from ARMOR
 </pre> 
 </div>
 </div>
@@ -256,7 +256,7 @@ request(ArmorDirectiveReq): the response received from ARMOR
 <pre class="fragment">Asks to the ontology for inconsistent hypothesis
 
     Returns:
-request(ArmorDirectiveReq): the response received from ARMOR
+res(ArmorDirectiveRes): the response received from ARMOR
 </pre> 
 </div>
 </div>
@@ -291,7 +291,7 @@ request(ArmorDirectiveReq): the response received from ARMOR
 type(string): the type of the element (what, where or who)
 ID(string): the ID of the hypothesis
     Returns:
-request(ArmorDirectiveReq): the response received from ARMOR
+res(ArmorDirectiveRes): the response received from ARMOR
 </pre> 
 </div>
 </div>
@@ -326,7 +326,7 @@ request(ArmorDirectiveReq): the response received from ARMOR
 ind1(string): the name of the first element 
 ind1(string): the name of the second element 
     Returns:
-request(ArmorDirectiveReq): the response received from ARMOR
+res(ArmorDirectiveRes): the response received from ARMOR
 </pre> 
 </div>
 </div>
@@ -350,7 +350,7 @@ request(ArmorDirectiveReq): the response received from ARMOR
     Args: 
 path(string): the path in which there's the file with the ontology to load
     Returns:
-request(ArmorDirectiveReq): the response received from ARMOR
+response(ArmorDirectiveRes): the response received from ARMOR
 </pre> 
 </div>
 </div>
@@ -371,7 +371,7 @@ request(ArmorDirectiveReq): the response received from ARMOR
 <pre class="fragment">Perform reason to update the ontology
 
     Returns:
-request(ArmorDirectiveReq): the response received from ARMOR
+res(ArmorDirectiveRes): the response received from ARMOR
 </pre> 
 </div>
 </div>
@@ -395,7 +395,7 @@ request(ArmorDirectiveReq): the response received from ARMOR
     Args: 
 name(string): the name of the hypothesis to remove
     Returns:
-request(ArmorDirectiveReq): the response received from ARMOR
+res(ArmorDirectiveRes): the response received from ARMOR
 </pre> 
 </div>
 </div>
@@ -416,7 +416,7 @@ request(ArmorDirectiveReq): the response received from ARMOR
 <pre class="fragment">Save the current ontology
 
     Returns:
-request(ArmorDirectiveReq): the response received from ARMOR
+res(ArmorDirectiveReq): the response received from ARMOR
 </pre> 
 </div>
 </div>

@@ -118,7 +118,7 @@ between the actual position expressed in x and y coordinates and the target posi
 After having evaluated it, it calls the function move() to simulate the motion.
 
     Args: 
-        pos(Move): is the custom service message conaining the actual position and the target position to reach
+        pos(Move): is the custom service message containing the actual position and the target position to reach
     Returns:
         msg(MoveResponse): the message to notify the state_machine that the target has been reached</pre> 
 </div>
@@ -137,7 +137,7 @@ After having evaluated it, it calls the function move() to simulate the motion.
         </tr>
       </table>
 </div><div class="memdoc">
-<pre class="fragment">Main function of the go_to_point node it initializes the node itself, then creates a service on topic /move_point.</pre> 
+<pre class="fragment">Main function of the go_to_point node, it initializes the node itself, then creates a service on topic /move_point.</pre> 
 </div>
 </div>
 <a id="a970fe8ac56b469984830897ca55ffacb"></a>
@@ -155,7 +155,7 @@ After having evaluated it, it calls the function move() to simulate the motion.
         </tr>
       </table>
 </div><div class="memdoc">
-<pre class="fragment">Function to emulate the motion of the robot: it receives the distance between the two places and waits for 1/10 nanoseconds of the 
+<pre class="fragment">Function to emulate the motion of the robot: it receives the distance between the two places and waits for 1/10 nanoseconds of that 
 distance.
 
     Args: 

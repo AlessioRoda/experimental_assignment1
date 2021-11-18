@@ -102,14 +102,14 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b> (self)</t
 <tr class="separator:a03110d632622a601d2c16fc28b1bbd92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><pre class="fragment">        A class used to represent the behavior of the robot when it moves from a place to another
-        ...
-        Methods
-        -------
-        __init__(outcomes=['enter_room', 'solution'])
-            initialize the state
-        execute(userdata)
-           implement the behavior
+<div class="textblock"><pre class="fragment">    A class used to represent the behavior of the robot when it moves from a place to another
+    ...
+    Methods
+    -------
+    __init__(outcomes=['enter_room', 'solution'])
+        initialize the state
+    execute(userdata)
+        implement the behavior
 </pre> </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a03110d632622a601d2c16fc28b1bbd92"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a03110d632622a601d2c16fc28b1bbd92">&#9670;&nbsp;</a></span>execute()</h2>
@@ -138,12 +138,12 @@ def&#160;</td><td class="memItemRight" valign="bottom"><b>__init__</b> (self)</t
 </div><div class="memdoc">
 <pre class="fragment">Description of the execute method:
 First it checks if the robot must go to the Oracle_Room or have to move randomly in the environment, by default it moves randomly
-in the places of the environment except in the Oracle_Room, since there there aren't any hints to collect. Each time it has to move
+in the places of the environment except in the Oracle_Room, since there aren't any hints to collect. Each time it has to move
 it checks that the new place to reach does't correspond to the actual robot position, once the target is reached it updates the actual
 position. Finally it returns 'solution' or 'enter_room' on the basis of the state it has to reach.
 
     Args:
-userdata to store the variables between the states (not utilized)
+userdata to store the variables between the states
 
     Returns:
 'solution'(string): if it must go to the SOLUTION state

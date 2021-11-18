@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-"""
+'''
 .. module:: oracle
    :platform: Unix
    :synopsis: Node implementing an algorithm to simulate the Cluedo oracle
@@ -21,7 +21,7 @@ and a weapon between the ones provided by the scene, then it mainly performs two
     -Receive the solution provided from the state_machine node with the Solution custom message and checks if it's correct.
         In the case it is correct it returns True and the game ends, otherwise it returns False and game continue.
 
-"""
+'''
 
 import rospy
 import random
@@ -50,11 +50,11 @@ num_ID_hint=0
 '''
 
 def init_scene():
-    """
+    '''
     Function to initialize the scene, it defines the solution to the Cluedo game by sorting a weapon, a place and a person between the 
     ones in the current scene and saves them in the solution variable.
 
-    """
+    '''
 
     global people, places, weapons, solution
 
@@ -74,7 +74,7 @@ def init_scene():
 
 
 def receive_solution(sol):
-    """
+    '''
     Callback to execute when the oracle receives a possible solution from the state_machine node.
     It checks if the person, the place and the weapon provided from the state_machine corresponds with the ones of the solution and,
     in this case, returns True to confirm, otherwise returns False.
@@ -82,9 +82,9 @@ def receive_solution(sol):
         Args: 
             sol(Solution): is the solution received from the state_machine node
         Returns:
-            res(SolutionResponse): the response if the provided solution is correct or not
+            res(SolutionResponse): returns if the provided solution is correct or not
 
-    """
+    '''
 
     print("\nSolution received: " + sol.what + ", " + sol.where + ", " + sol.who)
     
@@ -100,8 +100,8 @@ def receive_solution(sol):
     return res
 
 def generate_hint():
-    """
-    Function to generate a hint, the number of the element for each hint is random and even the type of hint is casual:
+    '''
+    Function to generate a hint, the number of the element for each hint is random and even the type of hint is random:
     there's the possibility to generate hint without one of PERSON, PLACE and WEAPON or even cases in which for each one of them
     there are more than one. 
     For example a it's possible to generate
@@ -115,7 +115,7 @@ def generate_hint():
         Returns:
             [what, where, who]: the elements of the generated hint
         
-    """
+    '''
 
     global people, weapons, places, num_ID_hint
 
@@ -155,7 +155,7 @@ def generate_hint():
 
 
 def hint_req(req):
-    """
+    '''
     Callback to execute when the oracle receives a hint request from the state_machine node, it calls the function generate_hint(),
     then returns the hint to the state_machine node.
 
@@ -164,7 +164,7 @@ def hint_req(req):
         Returns:
             res(AskHintResponse): the message with the hint for the state_machine node
         
-    """
+    '''
     global num_ID_hint
 
     hint=generate_hint()
@@ -180,11 +180,11 @@ def hint_req(req):
 
 
 def main():
-    """
+    '''
     The main of the oracle node, it initializes the node itself, then creates a service on topic /solution and /hint_request.
     Finally it asks to initialize the scene.
         
-    """
+    '''
 
     global people, places, weapons
 

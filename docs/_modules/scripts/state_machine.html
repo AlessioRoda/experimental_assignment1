@@ -82,13 +82,13 @@
 <span class="sd"> </span>
 <span class="sd"> -MOVE: to simulate the motion of the robot from a room to another, it&#39;s referred to the Explore class. The game begins with the robot in the Oracle_Room </span>
 <span class="sd">        and in order to simulate the motion a Move custom service message with the actual </span>
-<span class="sd">        position of the robot and the task to reach is sent to the go_to_point node. Once the motion has been performed to the go_to_point node</span>
+<span class="sd">        position of the robot and the target to reach is sent to the go_to_point node. Once the motion has been performed to the go_to_point node</span>
 <span class="sd">        it can switch to two possible steps: if the robot wants to try a solution (and so in this case the variable oracle==True) it switches</span>
 <span class="sd">        to the SOLUTION state, otherwise it switches to the ENTER_ROOM, that means that it wants to explore the rooms to collect hints</span>
 
 <span class="sd"> -ENTER_ROOM: the state represented with the Enter_Room class that represents the moment in which the robot enters in a room to acquire hints.</span>
 <span class="sd">              In order to get hints it sends a request to the oracle node, then it gets a hint defined by an ID</span>
-<span class="sd">              and three arrays (what, where and who) that represents some information about weapons, places and people.</span>
+<span class="sd">              and three arrays (what, where and who) that represent some information about weapons, places and people.</span>
 <span class="sd">              After having obtained the hint it adds it to the ontology by using the MyArmor class methods, if the hypothesis uploaded is </span>
 <span class="sd">              completed and consistent, then the variable oracle=True, that means that the robot must go to the Oracle_Room to ask to the</span>
 <span class="sd">              oracle if the hypothesis is the possible solution. </span>
@@ -168,7 +168,7 @@
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Function to initialize the scene, it defines three rooms as Place objects, then defines the starting position in the Oracle_Room (x=0, y=0)</span>
 <span class="sd">    then it adds all the information about the scene to the armor ontology, by loading all the people, places and weapons.</span>
-<span class="sd">    When a new element is loaded in the ontology it must be disjointed respect to the other of the same class, in order to define to the ontology</span>
+<span class="sd">    When a new element is loaded in the ontology it must be disjointed respect to the others of the same class, in order to notify the ontology</span>
 <span class="sd">    that they are different. Finally it preforms &#39;REASON&#39; command to update the ontology.</span>
 <span class="sd">    </span>
 <span class="sd">    &#39;&#39;&#39;</span>
@@ -230,16 +230,16 @@
         
 
 <div class="viewcode-block" id="Explore"><a class="viewcode-back" href="../../index.html#scripts.state_machine.Explore">[docs]</a><span class="k">class</span> <span class="nc">Explore</span><span class="p">(</span><span class="n">smach</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            A class used to represent the behavior of the robot when it moves from a place to another</span>
-<span class="sd">            ...</span>
-<span class="sd">            Methods</span>
-<span class="sd">            -------</span>
-<span class="sd">            __init__(outcomes=[&#39;enter_room&#39;, &#39;solution&#39;])</span>
-<span class="sd">                initialize the state</span>
-<span class="sd">            execute(userdata)</span>
-<span class="sd">               implement the behavior</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A class used to represent the behavior of the robot when it moves from a place to another</span>
+<span class="sd">        ...</span>
+<span class="sd">        Methods</span>
+<span class="sd">        -------</span>
+<span class="sd">        __init__(outcomes=[&#39;enter_room&#39;, &#39;solution&#39;])</span>
+<span class="sd">            initialize the state</span>
+<span class="sd">        execute(userdata)</span>
+<span class="sd">            implement the behavior</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
@@ -250,12 +250,12 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Description of the execute method:</span>
 <span class="sd">        First it checks if the robot must go to the Oracle_Room or have to move randomly in the environment, by default it moves randomly</span>
-<span class="sd">        in the places of the environment except in the Oracle_Room, since there there aren&#39;t any hints to collect. Each time it has to move</span>
+<span class="sd">        in the places of the environment except in the Oracle_Room, since there aren&#39;t any hints to collect. Each time it has to move</span>
 <span class="sd">        it checks that the new place to reach does&#39;t correspond to the actual robot position, once the target is reached it updates the actual</span>
 <span class="sd">        position. Finally it returns &#39;solution&#39; or &#39;enter_room&#39; on the basis of the state it has to reach.</span>
 
 <span class="sd">            Args:</span>
-<span class="sd">                userdata to store the variables between the states (not utilized)</span>
+<span class="sd">                userdata to store the variables between the states</span>
 
 <span class="sd">            Returns:</span>
 <span class="sd">                &#39;solution&#39;(string): if it must go to the SOLUTION state</span>
@@ -307,16 +307,16 @@
 
 
 <div class="viewcode-block" id="Enter_Room"><a class="viewcode-back" href="../../index.html#scripts.state_machine.Enter_Room">[docs]</a><span class="k">class</span> <span class="nc">Enter_Room</span><span class="p">(</span><span class="n">smach</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            A class used to represent the behavior of the robot when it enters in a room and asks for hints</span>
-<span class="sd">            ...</span>
-<span class="sd">            Methods</span>
-<span class="sd">            -------</span>
-<span class="sd">            __init__(outcomes=[&#39;explore&#39;])</span>
-<span class="sd">                initialize the state</span>
-<span class="sd">            execute(userdata)</span>
-<span class="sd">               implement the behavior</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A class used to represent the behavior of the robot when it enters in a room and asks for hints</span>
+<span class="sd">        ...</span>
+<span class="sd">        Methods</span>
+<span class="sd">        -------</span>
+<span class="sd">        __init__(outcomes=[&#39;explore&#39;])</span>
+<span class="sd">            initialize the state</span>
+<span class="sd">        execute(userdata)</span>
+<span class="sd">            implement the behavior</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
@@ -332,7 +332,7 @@
 <span class="sd">        ontology in order to mantain it as simple as possible.</span>
 
 <span class="sd">            Args:</span>
-<span class="sd">                userdata to store the variables between the states (not utilized)</span>
+<span class="sd">                userdata to store the variables between the states </span>
 <span class="sd">            </span>
 <span class="sd">            Returns:</span>
 <span class="sd">                &#39;explore&#39;(string): it must go to the MOVE state</span>
@@ -410,7 +410,7 @@
 
 
 <div class="viewcode-block" id="Try_Solution"><a class="viewcode-back" href="../../index.html#scripts.state_machine.Try_Solution">[docs]</a><span class="k">class</span> <span class="nc">Try_Solution</span><span class="p">(</span><span class="n">smach</span><span class="o">.</span><span class="n">State</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">            A class used to represent the behavior of the robot when it tries to generate a solution</span>
 <span class="sd">            ...</span>
 <span class="sd">            Methods</span>
@@ -419,7 +419,7 @@
 <span class="sd">                initialize the state</span>
 <span class="sd">            execute(userdata)</span>
 <span class="sd">               implement the behaviour</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># initialization function, it should not wait</span>
@@ -429,9 +429,9 @@
 <div class="viewcode-block" id="Try_Solution.execute"><a class="viewcode-back" href="../../index.html#scripts.state_machine.Try_Solution.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">userdata</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Description of the execute method:</span>
-<span class="sd">        It gets all the informations about the preson, the place and the weapon from the consistent hypothesis, then sends these infomation</span>
+<span class="sd">        It gets all the informations about the person, the place and the weapon from the consistent hypothesis, then sends these infomation</span>
 <span class="sd">        to the oracle node via Solution custom message. If the oracle node confirms that it&#39;s correct the game ends and it saves the final</span>
-<span class="sd">        ontology in the solution_cluedo_ontology.owl file, otherwise it removesthe incorrect hypothesis from the ontology, </span>
+<span class="sd">        ontology in the solution_cluedo_ontology.owl file, otherwise it removes the incorrect hypothesis from the ontology, </span>
 <span class="sd">        then returns to the MOVE state.</span>
 
 <span class="sd">            Args:</span>

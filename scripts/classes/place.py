@@ -6,7 +6,7 @@
    :synopsis: Class to define the places in the scene
 	
 .. moduleauthor:: Alessio Roda alessioroda98@gmail.com
-This class represents a way to defines the places of the Cluedo game
+This class represents a way to define the places of the Cluedo game
 
 
 This class provides a simple way to define the places of the scene as objects characterized by a name and their x and y coordinates

@@ -18,13 +18,13 @@ Client:
  
  -MOVE: to simulate the motion of the robot from a room to another, it's referred to the Explore class. The game begins with the robot in the Oracle_Room 
         and in order to simulate the motion a Move custom service message with the actual 
-        position of the robot and the task to reach is sent to the go_to_point node. Once the motion has been performed to the go_to_point node
+        position of the robot and the target to reach is sent to the go_to_point node. Once the motion has been performed to the go_to_point node
         it can switch to two possible steps: if the robot wants to try a solution (and so in this case the variable oracle==True) it switches
         to the SOLUTION state, otherwise it switches to the ENTER_ROOM, that means that it wants to explore the rooms to collect hints
 
  -ENTER_ROOM: the state represented with the Enter_Room class that represents the moment in which the robot enters in a room to acquire hints.
               In order to get hints it sends a request to the oracle node, then it gets a hint defined by an ID
-              and three arrays (what, where and who) that represents some information about weapons, places and people.
+              and three arrays (what, where and who) that represent some information about weapons, places and people.
               After having obtained the hint it adds it to the ontology by using the MyArmor class methods, if the hypothesis uploaded is 
               completed and consistent, then the variable oracle=True, that means that the robot must go to the Oracle_Room to ask to the
               oracle if the hypothesis is the possible solution. 
@@ -104,7 +104,7 @@ def init_scene():
     '''
     Function to initialize the scene, it defines three rooms as Place objects, then defines the starting position in the Oracle_Room (x=0, y=0)
     then it adds all the information about the scene to the armor ontology, by loading all the people, places and weapons.
-    When a new element is loaded in the ontology it must be disjointed respect to the other of the same class, in order to define to the ontology
+    When a new element is loaded in the ontology it must be disjointed respect to the others of the same class, in order to notify the ontology
     that they are different. Finally it preforms 'REASON' command to update the ontology.
     
     '''
@@ -166,16 +166,16 @@ def init_scene():
         
 
 class Explore(smach.State):
-    """
-            A class used to represent the behavior of the robot when it moves from a place to another
-            ...
-            Methods
-            -------
-            __init__(outcomes=['enter_room', 'solution'])
-                initialize the state
-            execute(userdata)
-               implement the behavior
-    """
+    '''
+        A class used to represent the behavior of the robot when it moves from a place to another
+        ...
+        Methods
+        -------
+        __init__(outcomes=['enter_room', 'solution'])
+            initialize the state
+        execute(userdata)
+            implement the behavior
+    '''
 
     def __init__(self):
 
@@ -186,12 +186,12 @@ class Explore(smach.State):
         '''
         Description of the execute method:
         First it checks if the robot must go to the Oracle_Room or have to move randomly in the environment, by default it moves randomly
-        in the places of the environment except in the Oracle_Room, since there there aren't any hints to collect. Each time it has to move
+        in the places of the environment except in the Oracle_Room, since there aren't any hints to collect. Each time it has to move
         it checks that the new place to reach does't correspond to the actual robot position, once the target is reached it updates the actual
         position. Finally it returns 'solution' or 'enter_room' on the basis of the state it has to reach.
 
             Args:
-                userdata to store the variables between the states (not utilized)
+                userdata to store the variables between the states
 
             Returns:
                 'solution'(string): if it must go to the SOLUTION state
@@ -243,16 +243,16 @@ class Explore(smach.State):
 
 
 class Enter_Room(smach.State):
-    """
-            A class used to represent the behavior of the robot when it enters in a room and asks for hints
-            ...
-            Methods
-            -------
-            __init__(outcomes=['explore'])
-                initialize the state
-            execute(userdata)
-               implement the behavior
-    """
+    '''
+        A class used to represent the behavior of the robot when it enters in a room and asks for hints
+        ...
+        Methods
+        -------
+        __init__(outcomes=['explore'])
+            initialize the state
+        execute(userdata)
+            implement the behavior
+    '''
 
     def __init__(self):
 
@@ -268,7 +268,7 @@ class Enter_Room(smach.State):
         ontology in order to mantain it as simple as possible.
 
             Args:
-                userdata to store the variables between the states (not utilized)
+                userdata to store the variables between the states 
             
             Returns:
                 'explore'(string): it must go to the MOVE state
@@ -346,7 +346,7 @@ class Enter_Room(smach.State):
 
 
 class Try_Solution(smach.State):
-    """
+    '''
             A class used to represent the behavior of the robot when it tries to generate a solution
             ...
             Methods
@@ -355,7 +355,7 @@ class Try_Solution(smach.State):
                 initialize the state
             execute(userdata)
                implement the behaviour
-    """
+    '''
 
     def __init__(self):
         # initialization function, it should not wait
@@ -365,9 +365,9 @@ class Try_Solution(smach.State):
     def execute(self, userdata):
         '''
         Description of the execute method:
-        It gets all the informations about the preson, the place and the weapon from the consistent hypothesis, then sends these infomation
+        It gets all the informations about the person, the place and the weapon from the consistent hypothesis, then sends these infomation
         to the oracle node via Solution custom message. If the oracle node confirms that it's correct the game ends and it saves the final
-        ontology in the solution_cluedo_ontology.owl file, otherwise it removesthe incorrect hypothesis from the ontology, 
+        ontology in the solution_cluedo_ontology.owl file, otherwise it removes the incorrect hypothesis from the ontology, 
         then returns to the MOVE state.
 
             Args:

@@ -64,7 +64,7 @@
   <h1>Source code for scripts.oracle</h1><div class="highlight"><pre>
 <span></span><span class="ch">#! /usr/bin/env python</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">.. module:: oracle</span>
 <span class="sd">   :platform: Unix</span>
 <span class="sd">   :synopsis: Node implementing an algorithm to simulate the Cluedo oracle</span>
@@ -85,7 +85,7 @@
 <span class="sd">    -Receive the solution provided from the state_machine node with the Solution custom message and checks if it&#39;s correct.</span>
 <span class="sd">        In the case it is correct it returns True and the game ends, otherwise it returns False and game continue.</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 
 <span class="kn">import</span> <span class="nn">rospy</span>
 <span class="kn">import</span> <span class="nn">random</span>
@@ -114,11 +114,11 @@
 <span class="sd">&#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="init_scene"><a class="viewcode-back" href="../../index.html#scripts.oracle.init_scene">[docs]</a><span class="k">def</span> <span class="nf">init_scene</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Function to initialize the scene, it defines the solution to the Cluedo game by sorting a weapon, a place and a person between the </span>
 <span class="sd">    ones in the current scene and saves them in the solution variable.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">global</span> <span class="n">people</span><span class="p">,</span> <span class="n">places</span><span class="p">,</span> <span class="n">weapons</span><span class="p">,</span> <span class="n">solution</span>
 
@@ -138,7 +138,7 @@
 
 
 <div class="viewcode-block" id="receive_solution"><a class="viewcode-back" href="../../index.html#scripts.oracle.receive_solution">[docs]</a><span class="k">def</span> <span class="nf">receive_solution</span><span class="p">(</span><span class="n">sol</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Callback to execute when the oracle receives a possible solution from the state_machine node.</span>
 <span class="sd">    It checks if the person, the place and the weapon provided from the state_machine corresponds with the ones of the solution and,</span>
 <span class="sd">    in this case, returns True to confirm, otherwise returns False.</span>
@@ -146,9 +146,9 @@
 <span class="sd">        Args: </span>
 <span class="sd">            sol(Solution): is the solution received from the state_machine node</span>
 <span class="sd">        Returns:</span>
-<span class="sd">            res(SolutionResponse): the response if the provided solution is correct or not</span>
+<span class="sd">            res(SolutionResponse): returns if the provided solution is correct or not</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Solution received: &quot;</span> <span class="o">+</span> <span class="n">sol</span><span class="o">.</span><span class="n">what</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="n">sol</span><span class="o">.</span><span class="n">where</span> <span class="o">+</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="n">sol</span><span class="o">.</span><span class="n">who</span><span class="p">)</span>
     
@@ -164,8 +164,8 @@
     <span class="k">return</span> <span class="n">res</span></div>
 
 <div class="viewcode-block" id="generate_hint"><a class="viewcode-back" href="../../index.html#scripts.oracle.generate_hint">[docs]</a><span class="k">def</span> <span class="nf">generate_hint</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Function to generate a hint, the number of the element for each hint is random and even the type of hint is casual:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function to generate a hint, the number of the element for each hint is random and even the type of hint is random:</span>
 <span class="sd">    there&#39;s the possibility to generate hint without one of PERSON, PLACE and WEAPON or even cases in which for each one of them</span>
 <span class="sd">    there are more than one. </span>
 <span class="sd">    For example a it&#39;s possible to generate</span>
@@ -179,7 +179,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            [what, where, who]: the elements of the generated hint</span>
 <span class="sd">        </span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">global</span> <span class="n">people</span><span class="p">,</span> <span class="n">weapons</span><span class="p">,</span> <span class="n">places</span><span class="p">,</span> <span class="n">num_ID_hint</span>
 
@@ -219,7 +219,7 @@
 
 
 <div class="viewcode-block" id="hint_req"><a class="viewcode-back" href="../../index.html#scripts.oracle.hint_req">[docs]</a><span class="k">def</span> <span class="nf">hint_req</span><span class="p">(</span><span class="n">req</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Callback to execute when the oracle receives a hint request from the state_machine node, it calls the function generate_hint(),</span>
 <span class="sd">    then returns the hint to the state_machine node.</span>
 
@@ -228,7 +228,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            res(AskHintResponse): the message with the hint for the state_machine node</span>
 <span class="sd">        </span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
     <span class="k">global</span> <span class="n">num_ID_hint</span>
 
     <span class="n">hint</span><span class="o">=</span><span class="n">generate_hint</span><span class="p">()</span>
@@ -244,11 +244,11 @@
 
 
 <div class="viewcode-block" id="main"><a class="viewcode-back" href="../../index.html#scripts.oracle.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    The main of the oracle node, it initializes the node itself, then creates a service on topic /solution and /hint_request.</span>
 <span class="sd">    Finally it asks to initialize the scene.</span>
 <span class="sd">        </span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">global</span> <span class="n">people</span><span class="p">,</span> <span class="n">places</span><span class="p">,</span> <span class="n">weapons</span>
 

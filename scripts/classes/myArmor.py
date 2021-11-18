@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-"""
+'''
 .. module:: go_to_point
    :platform: Unix
    :synopsis: Class implementing the main operations to use ARMOR
@@ -12,7 +12,7 @@ This class implements the ARMOR operations to use during the Cluedo game.
 This class is created to use in a more comfortable way the ARMOR commands, providing some methods that already create and
 sends the correct messages to the armor_interface_srv service.
 
-"""
+'''
 
 from posixpath import dirname, realpath
 from armor_msgs.srv import *
@@ -25,27 +25,27 @@ Defines the armor_interface_srv service to send the messages to ARMOR
 '''
 
 class MyArmor(object):
-    """
+    '''
     Simple class to use in a more comfortable way the ARMOR commands, providing some methods that already create and
-    sends the correct messages to the armor_interface_srv service.
-    """
+    send the correct messages to the armor_interface_srv service.
+    '''
 
 
     def __init__(self):
-        """
+        '''
         Initialize the class
-        """
+        '''
         print("\nClass initialized")
 
     def load(path):
-        """
+        '''
         Load the ontology from file
 
             Args: 
                 path(string): the path in which there's the file with the ontology to load
             Returns:
-                request(ArmorDirectiveReq): the response received from ARMOR
-        """
+                response(ArmorDirectiveRes): the response received from ARMOR
+        '''
 
         request=ArmorDirectiveReq()
         request.client_name='tutorial'
@@ -54,19 +54,19 @@ class MyArmor(object):
         request.primary_command_spec='FILE'
         request.secondary_command_spec=''
         request.args=[path, 'http://www.emarolab.it/cluedo-ontology', 'true', 'PELLET', 'true']
-        request=armor_interface(request)
-        return request
+        response=armor_interface(request)
+        return response
 
     def add_hypothesis(type, ID, arg):
-        """
+        '''
         Add the hypothesis to the ontology
 
             Args: type(string): the type of element to add (what, where or who)
                   ID(string): the ID of the hypothesis
                   arg(string): the name of the place/weapon/person to add to the ontology
             Returns:
-                request(ArmorDirectiveReq): the response received from ARMOR
-        """
+                res(ArmorDirectiveRes): the response received from ARMOR
+        '''
 
         req=ArmorDirectiveReq()
         req.client_name='tutorial'
@@ -75,16 +75,16 @@ class MyArmor(object):
         req.primary_command_spec='OBJECTPROP'
         req.secondary_command_spec='IND'
         req.args=[type, ID, arg]
-        req=armor_interface(req)
-        return req
+        res=armor_interface(req)
+        return res
 
     def reason():
-        """
+        '''
         Perform reason to update the ontology
 
             Returns:
-                request(ArmorDirectiveReq): the response received from ARMOR
-        """
+                res(ArmorDirectiveRes): the response received from ARMOR
+        '''
 
         req=ArmorDirectiveReq()
         req.client_name= 'tutorial'
@@ -93,16 +93,16 @@ class MyArmor(object):
         req.primary_command_spec= ''
         req.secondary_command_spec= ''
         req.args= []
-        req=armor_interface(req)
-        return req
+        res=armor_interface(req)
+        return res
 
     def ask_complete():
-        """
+        '''
         Asks to the ontology for completed hypothesis
 
             Returns:
-                request(ArmorDirectiveReq): the response received from ARMOR
-        """
+                res(ArmorDirectiveRes): the response received from ARMOR
+        '''
 
         req=ArmorDirectiveReq()
         req.client_name= 'tutorial'
@@ -111,17 +111,17 @@ class MyArmor(object):
         req.primary_command_spec= 'IND'
         req.secondary_command_spec= 'CLASS'
         req.args= ['COMPLETED']
-        req=armor_interface(req)
-        return req
+        res=armor_interface(req)
+        return res
 
 
     def ask_inconsistent():
-        """
+        '''
         Asks to the ontology for inconsistent hypothesis
 
             Returns:
-                request(ArmorDirectiveReq): the response received from ARMOR
-        """
+                res(ArmorDirectiveRes): the response received from ARMOR
+        '''
 
         req=ArmorDirectiveReq()
         req.client_name= 'tutorial'
@@ -130,18 +130,18 @@ class MyArmor(object):
         req.primary_command_spec= 'IND'
         req.secondary_command_spec= 'CLASS'
         req.args= ['INCONSISTENT']
-        req=armor_interface(req)
-        return req
+        res=armor_interface(req)
+        return res
 
     def remove(name):
-        """
+        '''
         Remove a hypothesis from the ontology
 
             Args: 
                 name(string): the name of the hypothesis to remove
             Returns:
-                request(ArmorDirectiveReq): the response received from ARMOR
-        """
+                res(ArmorDirectiveRes): the response received from ARMOR
+        '''
 
         req=ArmorDirectiveReq()
         req.client_name= 'tutorial'
@@ -150,19 +150,19 @@ class MyArmor(object):
         req.primary_command_spec= 'IND'
         req.secondary_command_spec= ''
         req.args= [name]
-        req=armor_interface(req)
-        return req
+        res=armor_interface(req)
+        return res
 
     def ask_item(type, ID):
-        """
+        '''
         Ask the name of a certain element of a hypothesis
 
             Args: 
                 type(string): the type of the element (what, where or who)
                 ID(string): the ID of the hypothesis
             Returns:
-                request(ArmorDirectiveReq): the response received from ARMOR
-        """
+                res(ArmorDirectiveRes): the response received from ARMOR
+        '''
 
         req=ArmorDirectiveReq()
         req.client_name= 'tutorial'
@@ -171,19 +171,19 @@ class MyArmor(object):
         req.primary_command_spec= 'OBJECTPROP'
         req.secondary_command_spec= 'IND'
         req.args= [type,ID]
-        req=armor_interface(req)
-        return req
+        res=armor_interface(req)
+        return res
 
     def add_item(name, type):
-        """
+        '''
         Add an element to the ontology
 
             Args: 
                 name(string): the name of the element 
                 type(string): the type of the element (PERSON/PLACE/WEAPON)
             Returns:
-                request(ArmorDirectiveReq): the response received from ARMOR
-        """
+                res(ArmorDirectiveRes): the response received from ARMOR
+        '''
 
         req=ArmorDirectiveReq()
         req.client_name= 'tutorial'
@@ -192,19 +192,19 @@ class MyArmor(object):
         req.primary_command_spec= 'IND'
         req.secondary_command_spec= 'CLASS'
         req.args= [name, type]
-        req=armor_interface(req)
-        return req
+        res=armor_interface(req)
+        return res
 
     def disjoint(ind1, ind2):
-        """
+        '''
         Disjoint two elements to notify the otology that they are different
 
             Args: 
                 ind1(string): the name of the first element 
                 ind1(string): the name of the second element 
             Returns:
-                request(ArmorDirectiveReq): the response received from ARMOR
-        """
+                res(ArmorDirectiveRes): the response received from ARMOR
+        '''
 
         req=ArmorDirectiveReq()
         req.client_name= 'tutorial'
@@ -213,17 +213,17 @@ class MyArmor(object):
         req.primary_command_spec= 'IND'
         req.secondary_command_spec= ''
         req.args= [ind1, ind2]
-        req=armor_interface(req)
-        return req
+        res=armor_interface(req)
+        return res
 
 
     def save():
-        """
+        '''
         Save the current ontology
 
             Returns:
-                request(ArmorDirectiveReq): the response received from ARMOR
-        """
+                res(ArmorDirectiveReq): the response received from ARMOR
+        '''
 
         req=ArmorDirectiveReq()
         path = dirname(realpath(__file__))
@@ -234,8 +234,8 @@ class MyArmor(object):
         req.primary_command_spec= ''
         req.secondary_command_spec= ''
         req.args= [path]
-        req=armor_interface(req)
-        return req
+        res=armor_interface(req)
+        return res
 
 
 
