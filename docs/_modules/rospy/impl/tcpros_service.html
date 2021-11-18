@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rospy.impl.tcpros_service &mdash; experimental_assignment1 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> experimental_assignment1
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">experimental_assignment1</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>rospy.impl.tcpros_service</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for rospy.impl.tcpros_service</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Software License Agreement (BSD License)</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2008, Willow Garage, Inc.</span>
+<span class="c1"># All rights reserved.</span>
+<span class="c1">#</span>
+<span class="c1"># Redistribution and use in source and binary forms, with or without</span>
+<span class="c1"># modification, are permitted provided that the following conditions</span>
+<span class="c1"># are met:</span>
+<span class="c1">#</span>
+<span class="c1">#  * Redistributions of source code must retain the above copyright</span>
+<span class="c1">#    notice, this list of conditions and the following disclaimer.</span>
+<span class="c1">#  * Redistributions in binary form must reproduce the above</span>
+<span class="c1">#    copyright notice, this list of conditions and the following</span>
+<span class="c1">#    disclaimer in the documentation and/or other materials provided</span>
+<span class="c1">#    with the distribution.</span>
+<span class="c1">#  * Neither the name of Willow Garage, Inc. nor the names of its</span>
+<span class="c1">#    contributors may be used to endorse or promote products derived</span>
+<span class="c1">#    from this software without specific prior written permission.</span>
+<span class="c1">#</span>
+<span class="c1"># THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</span>
+<span class="c1"># &quot;AS IS&quot; AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</span>
+<span class="c1"># LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS</span>
+<span class="c1"># FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE</span>
+<span class="c1"># COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,</span>
+<span class="c1"># INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,</span>
+<span class="c1"># BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;</span>
+<span class="c1"># LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER</span>
+<span class="c1"># CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</span>
+<span class="c1"># LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
+<span class="c1"># ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE</span>
+<span class="c1"># POSSIBILITY OF SUCH DAMAGE.</span>
+
+<span class="sd">&quot;&quot;&quot;Internal use: Service-specific extensions for TCPROS support&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<span class="kn">import</span> <span class="nn">genpy</span>
+
+<span class="kn">import</span> <span class="nn">rosgraph</span>
+<span class="kn">import</span> <span class="nn">rosgraph.names</span>
+<span class="kn">import</span> <span class="nn">rosgraph.network</span>
+
+<span class="kn">from</span> <span class="nn">rospy.exceptions</span> <span class="kn">import</span> <span class="n">TransportInitError</span><span class="p">,</span> <span class="n">TransportTerminated</span><span class="p">,</span> <span class="n">ROSException</span><span class="p">,</span> <span class="n">ROSInterruptException</span>
+<span class="kn">from</span> <span class="nn">rospy.service</span> <span class="kn">import</span> <span class="n">_Service</span><span class="p">,</span> <span class="n">ServiceException</span>
+
+<span class="kn">from</span> <span class="nn">rospy.impl.registration</span> <span class="kn">import</span> <span class="n">get_service_manager</span>
+<span class="kn">from</span> <span class="nn">rospy.impl.tcpros_base</span> <span class="kn">import</span> <span class="n">TCPROSTransport</span><span class="p">,</span> <span class="n">TCPROSTransportProtocol</span><span class="p">,</span> \
+    <span class="n">get_tcpros_server_address</span><span class="p">,</span> <span class="n">start_tcpros_server</span><span class="p">,</span> <span class="n">recv_buff</span><span class="p">,</span> \
+    <span class="n">DEFAULT_BUFF_SIZE</span>
+
+<span class="kn">from</span> <span class="nn">rospy.core</span> <span class="kn">import</span> <span class="n">logwarn</span><span class="p">,</span> <span class="n">loginfo</span><span class="p">,</span> <span class="n">logerr</span><span class="p">,</span> <span class="n">logdebug</span>
+<span class="kn">import</span> <span class="nn">rospy.core</span>
+<span class="kn">import</span> <span class="nn">rospy.msg</span>
+<span class="kn">import</span> <span class="nn">rospy.names</span>
+
+<span class="kn">import</span> <span class="nn">rospy.impl.validators</span>
+
+<span class="kn">import</span> <span class="nn">threading</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">hexversion</span> <span class="o">&gt;</span> <span class="mh">0x03000000</span><span class="p">:</span> <span class="c1">#Python3</span>
+    <span class="k">def</span> <span class="nf">isstring</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="c1">#Python 3.x</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">isstring</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">basestring</span><span class="p">)</span> <span class="c1">#Python 2.x</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;rospy.service&#39;</span><span class="p">)</span>
+
+<span class="c1">#########################################################</span>
+<span class="c1"># Service helpers</span>
+
+<span class="k">def</span> <span class="nf">wait_for_service</span><span class="p">(</span><span class="n">service</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Blocks until service is available. Use this in</span>
+<span class="sd">    initialization code if your program depends on a</span>
+<span class="sd">    service already running.</span>
+<span class="sd">    @param service: name of service</span>
+<span class="sd">    @type  service: str</span>
+<span class="sd">    @param timeout: timeout time in seconds or Duration, None for no</span>
+<span class="sd">    timeout. NOTE: timeout=0 is invalid as wait_for_service actually</span>
+<span class="sd">    contacts the service, so non-blocking behavior is not</span>
+<span class="sd">    possible. For timeout=0 uses cases, just call the service without</span>
+<span class="sd">    waiting.</span>
+<span class="sd">    @type  timeout: double|rospy.Duration</span>
+<span class="sd">    @note  roscpp waitForService() has timeout specified in millisecs.</span>
+<span class="sd">    @raise ROSException: if specified timeout is exceeded</span>
+<span class="sd">    @raise ROSInterruptException: if shutdown interrupts wait</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">master</span> <span class="o">=</span> <span class="n">rosgraph</span><span class="o">.</span><span class="n">Master</span><span class="p">(</span><span class="n">rospy</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">get_caller_id</span><span class="p">())</span>
+    <span class="k">def</span> <span class="nf">contact_service</span><span class="p">(</span><span class="n">resolved_name</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">10.0</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">uri</span> <span class="o">=</span> <span class="n">master</span><span class="o">.</span><span class="n">lookupService</span><span class="p">(</span><span class="n">resolved_name</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">rosgraph</span><span class="o">.</span><span class="n">MasterException</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">addr</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">parse_rosrpc_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rosgraph</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">use_ipv6</span><span class="p">():</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET6</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># we always want to timeout just in case we&#39;re connecting</span>
+            <span class="c1"># to a down service.</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="n">logdebug</span><span class="p">(</span><span class="s1">&#39;connecting to &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">addr</span><span class="p">))</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">addr</span><span class="p">)</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;probe&#39;</span> <span class="p">:</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;md5sum&#39;</span> <span class="p">:</span> <span class="s1">&#39;*&#39;</span><span class="p">,</span>
+                  <span class="s1">&#39;callerid&#39;</span> <span class="p">:</span> <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">get_caller_id</span><span class="p">(),</span>
+                  <span class="s1">&#39;service&#39;</span><span class="p">:</span> <span class="n">resolved_name</span> <span class="p">}</span>
+            <span class="n">rosgraph</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">write_ros_handshake_header</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">h</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">uri</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">s</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Duration</span><span class="p">):</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span><span class="o">.</span><span class="n">to_sec</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">timeout</span> <span class="o">==</span> <span class="mf">0.</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;timeout must be non-zero&quot;</span><span class="p">)</span>
+    <span class="n">resolved_name</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">resolve_name</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+    <span class="n">contact_failed</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">timeout</span><span class="p">:</span>
+        <span class="n">timeout_t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">timeout</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">()</span> <span class="ow">and</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">timeout_t</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">uri</span> <span class="o">=</span> <span class="n">contact_service</span><span class="p">(</span><span class="n">resolved_name</span><span class="p">,</span> <span class="n">timeout_t</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">uri</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">contact_failed</span><span class="p">:</span>
+                        <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s2">&quot;wait_for_service(</span><span class="si">%s</span><span class="s2">): finally were able to contact [</span><span class="si">%s</span><span class="s2">]&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">resolved_name</span><span class="p">,</span> <span class="n">uri</span><span class="p">))</span>
+                    <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+                <span class="c1"># re-raise</span>
+                <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">logdebug</span><span class="p">(</span><span class="s2">&quot;wait_for_service: received keyboard interrupt, assuming signals disabled and re-raising&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> 
+            <span class="k">except</span><span class="p">:</span> <span class="c1"># service not actually up</span>
+                <span class="n">contact_failed</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">logwarn_throttle</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;wait_for_service(</span><span class="si">%s</span><span class="s2">): failed to contact, will keep trying&quot;</span><span class="o">%</span><span class="n">resolved_name</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">ROSInterruptException</span><span class="p">(</span><span class="s2">&quot;rospy shutdown&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ROSException</span><span class="p">(</span><span class="s2">&quot;timeout exceeded while waiting for service </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">resolved_name</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">uri</span> <span class="o">=</span> <span class="n">contact_service</span><span class="p">(</span><span class="n">resolved_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">uri</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">contact_failed</span><span class="p">:</span>
+                        <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">loginfo</span><span class="p">(</span><span class="s2">&quot;wait_for_service(</span><span class="si">%s</span><span class="s2">): finally were able to contact [</span><span class="si">%s</span><span class="s2">]&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">resolved_name</span><span class="p">,</span> <span class="n">uri</span><span class="p">))</span>
+                    <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+                <span class="c1"># re-raise</span>
+                <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">logdebug</span><span class="p">(</span><span class="s2">&quot;wait_for_service: received keyboard interrupt, assuming signals disabled and re-raising&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> 
+            <span class="k">except</span><span class="p">:</span> <span class="c1"># service not actually up</span>
+                <span class="n">contact_failed</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">logwarn_throttle</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;wait_for_service(</span><span class="si">%s</span><span class="s2">): failed to contact, will keep trying&quot;</span><span class="o">%</span><span class="n">resolved_name</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">ROSInterruptException</span><span class="p">(</span><span class="s2">&quot;rospy shutdown&quot;</span><span class="p">)</span>
+    
+
+<span class="k">def</span> <span class="nf">convert_return_to_response</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">response_class</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert return value of function to response instance. The</span>
+<span class="sd">    rules/precedence for this are:</span>
+
+<span class="sd">    1. If the return type is the same as the response type, no conversion</span>
+<span class="sd">    is done.</span>
+
+<span class="sd">    2. If the return type is a dictionary, it is used as a keyword-style</span>
+<span class="sd">    initialization for a new response instance.</span>
+
+<span class="sd">    3. If the return type is *not* a list type, it is passed in as a single arg</span>
+<span class="sd">    to a new response instance.</span>
+
+<span class="sd">    4. If the return type is a list/tuple type, it is used as a args-style</span>
+<span class="sd">    initialization for a new response instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># use this declared ROS type check instead of a direct instance</span>
+    <span class="c1"># check, which allows us to play tricks with serialization and</span>
+    <span class="c1"># deserialization</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="n">genpy</span><span class="o">.</span><span class="n">Message</span><span class="p">)</span> <span class="ow">and</span> <span class="n">response</span><span class="o">.</span><span class="n">_type</span> <span class="o">==</span> <span class="n">response_class</span><span class="o">.</span><span class="n">_type</span><span class="p">:</span>
+    <span class="c1">#if isinstance(response, response_class):</span>
+        <span class="k">return</span> <span class="n">response</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="c1"># kwds response</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response_class</span><span class="p">(</span><span class="o">**</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;handler returned invalid value: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">response</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;service handler returned None&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">response</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]:</span>
+        <span class="c1"># single, non-list arg</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response_class</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;handler returned invalid value: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># user returned a list, which has some ambiguous cases. Our resolution is that</span>
+        <span class="c1"># all list/tuples are converted to *args</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response_class</span><span class="p">(</span><span class="o">*</span><span class="n">response</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;handler returned wrong number of values: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">service_connection_handler</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">client_addr</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process incoming service connection. For use with</span>
+<span class="sd">    TCPROSServer. Reads in service name from handshake and creates the</span>
+<span class="sd">    appropriate service handler for the connection.</span>
+<span class="sd">    @param sock: socket connection</span>
+<span class="sd">    @type  sock: socket</span>
+<span class="sd">    @param client_addr: client address</span>
+<span class="sd">    @type  client_addr: (str, int)</span>
+<span class="sd">    @param header: key/value pairs from handshake header</span>
+<span class="sd">    @type  header: dict</span>
+<span class="sd">    @return: error string or None </span>
+<span class="sd">    @rtype: str</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">required</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;service&#39;</span><span class="p">,</span> <span class="s1">&#39;md5sum&#39;</span><span class="p">,</span> <span class="s1">&#39;callerid&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">required</span> <span class="ow">in</span> <span class="n">header</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Missing required &#39;</span><span class="si">%s</span><span class="s2">&#39; field&quot;</span><span class="o">%</span><span class="n">required</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;connection from </span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">client_addr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">client_addr</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">service_name</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;service&#39;</span><span class="p">]</span>
+        
+        <span class="c1">#TODO: make service manager configurable. I think the right</span>
+        <span class="c1">#thing to do is to make these singletons private members of a</span>
+        <span class="c1">#Node instance and enable rospy to have multiple node</span>
+        <span class="c1">#instances.</span>
+        
+        <span class="n">sm</span> <span class="o">=</span> <span class="n">get_service_manager</span><span class="p">()</span>
+        <span class="n">md5sum</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;md5sum&#39;</span><span class="p">]</span>
+        <span class="n">service</span> <span class="o">=</span> <span class="n">sm</span><span class="o">.</span><span class="n">get_service</span><span class="p">(</span><span class="n">service_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">service</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">] is not a provider of  [</span><span class="si">%s</span><span class="s2">]&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">rospy</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">get_caller_id</span><span class="p">(),</span> <span class="n">service_name</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">md5sum</span> <span class="o">!=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">SERVICE_ANYTYPE</span> <span class="ow">and</span> <span class="n">md5sum</span> <span class="o">!=</span> <span class="n">service</span><span class="o">.</span><span class="n">service_class</span><span class="o">.</span><span class="n">_md5sum</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;request from [</span><span class="si">%s</span><span class="s2">]: md5sums do not match: [</span><span class="si">%s</span><span class="s2">] vs. [</span><span class="si">%s</span><span class="s2">]&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;callerid&#39;</span><span class="p">],</span> <span class="n">md5sum</span><span class="p">,</span> <span class="n">service</span><span class="o">.</span><span class="n">service_class</span><span class="o">.</span><span class="n">_md5sum</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">transport</span> <span class="o">=</span> <span class="n">TCPROSTransport</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">)</span>
+            <span class="n">transport</span><span class="o">.</span><span class="n">set_socket</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">header</span><span class="p">[</span><span class="s1">&#39;callerid&#39;</span><span class="p">])</span>
+            <span class="n">transport</span><span class="o">.</span><span class="n">write_header</span><span class="p">()</span>
+            <span class="c1"># using threadpool reduced performance by an order of</span>
+            <span class="c1"># magnitude, need to investigate better</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">service</span><span class="o">.</span><span class="n">handle</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">transport</span><span class="p">,</span> <span class="n">header</span><span class="p">))</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">daemon</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+                
+        
+<span class="k">class</span> <span class="nc">TCPService</span><span class="p">(</span><span class="n">TCPROSTransportProtocol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Protocol implementation for Services over TCPROS</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolved_name</span><span class="p">,</span> <span class="n">service_class</span><span class="p">,</span> <span class="n">buff_size</span><span class="o">=</span><span class="n">DEFAULT_BUFF_SIZE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ctor.</span>
+<span class="sd">        @param resolved_name: name of service</span>
+<span class="sd">        @type  resolved_name: str</span>
+<span class="sd">        @param service_class: Service data type class</span>
+<span class="sd">        @type  service_class: Service</span>
+<span class="sd">        @param buff_size int: size of buffer (bytes) to use for reading incoming requests.</span>
+<span class="sd">        @type  buff_size: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TCPService</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">resolved_name</span><span class="p">,</span> <span class="n">service_class</span><span class="o">.</span><span class="n">_request_class</span><span class="p">,</span> <span class="n">buff_size</span><span class="o">=</span><span class="n">buff_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service_class</span> <span class="o">=</span> <span class="n">service_class</span>
+
+    <span class="k">def</span> <span class="nf">get_header_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Protocol API</span>
+<span class="sd">        @return: header fields</span>
+<span class="sd">        @rtype: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;service&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_class</span><span class="o">.</span><span class="n">_type</span><span class="p">,</span>
+                <span class="s1">&#39;md5sum&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_class</span><span class="o">.</span><span class="n">_md5sum</span><span class="p">,</span> <span class="s1">&#39;callerid&#39;</span><span class="p">:</span> <span class="n">rospy</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">get_caller_id</span><span class="p">()</span> <span class="p">}</span>
+
+<span class="k">class</span> <span class="nc">TCPROSServiceClient</span><span class="p">(</span><span class="n">TCPROSTransportProtocol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Protocol Implementation for Service clients over TCPROS&quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolved_name</span><span class="p">,</span> <span class="n">service_class</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">buff_size</span><span class="o">=</span><span class="n">DEFAULT_BUFF_SIZE</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ctor.</span>
+<span class="sd">        @param resolved_name: resolved service name </span>
+<span class="sd">        @type  resolved_name: str</span>
+<span class="sd">        @param service_class: Service data type class</span>
+<span class="sd">        @type  service_class: Service</span>
+<span class="sd">        @param headers: identifier for Service session</span>
+<span class="sd">        @type  headers: dict</span>
+<span class="sd">        @param buff_size: size of buffer (bytes) for reading responses from Service. </span>
+<span class="sd">        @type  buff_size: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TCPROSServiceClient</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">resolved_name</span><span class="p">,</span> <span class="n">service_class</span><span class="o">.</span><span class="n">_response_class</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service_class</span> <span class="o">=</span> <span class="n">service_class</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="n">headers</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buff_size</span> <span class="o">=</span> <span class="n">buff_size</span>
+        
+    <span class="k">def</span> <span class="nf">get_header_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TCPROSTransportProtocol API        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;service&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span> <span class="s1">&#39;md5sum&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_class</span><span class="o">.</span><span class="n">_md5sum</span><span class="p">,</span>
+                   <span class="s1">&#39;callerid&#39;</span><span class="p">:</span> <span class="n">rospy</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">get_caller_id</span><span class="p">()}</span>
+        <span class="c1"># The current implementation allows user-supplied headers to</span>
+        <span class="c1"># override protocol-specific headers.  We may want to</span>
+        <span class="c1"># eliminate this in the future if it is abused too severely.</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">headers</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="k">return</span> <span class="n">headers</span>
+    
+    <span class="k">def</span> <span class="nf">_read_ok_byte</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">sock</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Utility for reading the OK-byte/error-message header preceding each message.</span>
+<span class="sd">        @param sock: socket connection. Will be read from if OK byte is</span>
+<span class="sd">        false and error message needs to be read</span>
+<span class="sd">        @type  sock: socket.socket</span>
+<span class="sd">        @param b: buffer to read from</span>
+<span class="sd">        @type  b: StringIO</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">ok</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;B&#39;</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># read in ok byte</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ok</span><span class="p">:</span>
+            <span class="nb">str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_service_error</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+            
+            <span class="c1">#_read_ok_byte has to reset state of the buffer to</span>
+            <span class="c1">#consumed as this exception will bypass rest of</span>
+            <span class="c1">#deserialized_messages logic. we currently can&#39;t have</span>
+            <span class="c1">#multiple requests in flight, so we can keep this simple</span>
+            <span class="n">b</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">b</span><span class="o">.</span><span class="n">truncate</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;service [</span><span class="si">%s</span><span class="s2">] responded with an error: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># success, set seek point to start of message</span>
+            <span class="n">b</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">read_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">msg_queue</span><span class="p">,</span> <span class="n">sock</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        In service implementation, reads in OK byte that precedes each</span>
+<span class="sd">        response. The OK byte allows for the passing of error messages</span>
+<span class="sd">        instead of a response message</span>
+<span class="sd">        @param b: buffer</span>
+<span class="sd">        @type  b: StringIO</span>
+<span class="sd">        @param msg_queue: Message queue to append to</span>
+<span class="sd">        @type  msg_queue: [Message]</span>
+<span class="sd">        @param sock: socket to read from</span>
+<span class="sd">        @type  sock: socket.socket</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_read_ok_byte</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">sock</span><span class="p">)</span>
+        <span class="n">rospy</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">deserialize_messages</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">msg_queue</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv_data_class</span><span class="p">,</span> <span class="n">queue_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">queue_size</span><span class="p">,</span> <span class="n">max_msgs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1">#rospy.msg</span>
+        <span class="c1">#deserialize_messages only resets the buffer to the start</span>
+        <span class="c1">#point if everything was consumed, so we have to further reset</span>
+        <span class="c1">#it.</span>
+        <span class="k">if</span> <span class="n">b</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">b</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">_read_service_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sock</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Read service error from sock </span>
+<span class="sd">        @param sock: socket to read from</span>
+<span class="sd">        @type  sock: socket</span>
+<span class="sd">        @param b: currently read data from sock</span>
+<span class="sd">        @type  b: StringIO</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">buff_size</span> <span class="o">=</span> <span class="mi">256</span> <span class="c1">#can be small given that we are just reading an error string</span>
+        <span class="k">while</span> <span class="n">b</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">recv_buff</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">buff_size</span><span class="p">)</span>
+        <span class="n">bval</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+        <span class="p">(</span><span class="n">length</span><span class="p">,)</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;I&#39;</span><span class="p">,</span> <span class="n">bval</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span> <span class="c1"># ready in len byte</span>
+        <span class="k">while</span> <span class="n">b</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">5</span> <span class="o">+</span> <span class="n">length</span><span class="p">):</span>
+            <span class="n">recv_buff</span><span class="p">(</span><span class="n">sock</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">buff_size</span><span class="p">)</span>
+        <span class="n">bval</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s1">&#39;&lt;</span><span class="si">%s</span><span class="s1">s&#39;</span><span class="o">%</span><span class="n">length</span><span class="p">,</span> <span class="n">bval</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">5</span><span class="o">+</span><span class="n">length</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># ready in len byte</span>
+
+    
+<span class="k">class</span> <span class="nc">ServiceProxy</span><span class="p">(</span><span class="n">_Service</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a handle to a ROS service for invoking calls.</span>
+
+<span class="sd">    Usage::</span>
+<span class="sd">      add_two_ints = ServiceProxy(&#39;add_two_ints&#39;, AddTwoInts)</span>
+<span class="sd">      resp = add_two_ints(1, 2)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">service_class</span><span class="p">,</span> <span class="n">persistent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ctor.</span>
+<span class="sd">        @param name: name of service to call</span>
+<span class="sd">        @type  name: str</span>
+<span class="sd">        @param service_class: auto-generated service class</span>
+<span class="sd">        @type  service_class: Service class</span>
+<span class="sd">        @param persistent: (optional) if True, proxy maintains a persistent</span>
+<span class="sd">        connection to service. While this results in better call</span>
+<span class="sd">        performance, persistent connections are discouraged as they are</span>
+<span class="sd">        less resistant to network issues and service restarts.</span>
+<span class="sd">        @type  persistent: bool</span>
+<span class="sd">        @param headers: (optional) arbitrary headers </span>
+<span class="sd">        @type  headers: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ServiceProxy</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">service_class</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buff_size</span> <span class="o">=</span> <span class="n">DEFAULT_BUFF_SIZE</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">persistent</span> <span class="o">=</span> <span class="n">persistent</span>
+        <span class="k">if</span> <span class="n">persistent</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">headers</span><span class="p">:</span>
+                <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">headers</span><span class="p">[</span><span class="s1">&#39;persistent&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="o">=</span> <span class="n">TCPROSServiceClient</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">service_class</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1">#for saving persistent connections</span>
+
+    <span class="k">def</span> <span class="nf">wait_for_service</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">wait_for_service</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+
+    <span class="c1"># #425</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Callable-style version of the service API. This accepts either a request message instance,</span>
+<span class="sd">        or you can call directly with arguments to create a new request instance. e.g.::</span>
+<span class="sd">        </span>
+<span class="sd">          add_two_ints(AddTwoIntsRequest(1, 2))</span>
+<span class="sd">          add_two_ints(1, 2)</span>
+<span class="sd">          add_two_ints(a=1, b=2)          </span>
+<span class="sd">        </span>
+<span class="sd">        @param args: arguments to remote service</span>
+<span class="sd">        @param kwds: message keyword arguments</span>
+<span class="sd">        @raise ROSSerializationException: If unable to serialize</span>
+<span class="sd">        message. This is usually a type error with one of the fields.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">)</span>
+    
+    <span class="k">def</span> <span class="nf">_get_service_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        private routine for getting URI of service to call</span>
+<span class="sd">        @param request: request message</span>
+<span class="sd">        @type  request: L{rospy.Message}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">genpy</span><span class="o">.</span><span class="n">Message</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;request object is not a valid request message instance&quot;</span><span class="p">)</span>
+        <span class="c1"># in order to support more interesting overrides, we only</span>
+        <span class="c1"># check that it declares the same ROS type instead of a</span>
+        <span class="c1"># stricter class check</span>
+        <span class="c1">#if not self.request_class == request.__class__:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_class</span><span class="o">.</span><span class="n">_type</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">_type</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;request object type [</span><span class="si">%s</span><span class="s2">] does not match service type [</span><span class="si">%s</span><span class="s2">]&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_class</span><span class="p">))</span>
+
+        <span class="c1">#TODO: subscribe to service changes</span>
+        <span class="c1">#if self.uri is None:</span>
+        <span class="k">if</span> <span class="mi">1</span><span class="p">:</span> <span class="c1">#always do lookup for now, in the future we need to optimize</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">master</span> <span class="o">=</span> <span class="n">rosgraph</span><span class="o">.</span><span class="n">Master</span><span class="p">(</span><span class="n">rospy</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">get_caller_id</span><span class="p">())</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">master</span><span class="o">.</span><span class="n">lookupService</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;unable to contact master&quot;</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">rosgraph</span><span class="o">.</span><span class="n">MasterError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">]: lookup service failed with message [</span><span class="si">%s</span><span class="s2">]&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                    <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;service [</span><span class="si">%s</span><span class="s2">] unavailable&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">)</span>
+                
+                <span class="c1"># validate</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">parse_rosrpc_uri</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">rospy</span><span class="o">.</span><span class="n">impl</span><span class="o">.</span><span class="n">validators</span><span class="o">.</span><span class="n">ParameterInvalid</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;master returned invalid ROSRPC URI: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">error</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">]: socket error contacting service, master is probably unavailable&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwds</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Call the service. This accepts either a request message instance,</span>
+<span class="sd">        or you can call directly with arguments to create a new request instance. e.g.::</span>
+<span class="sd">        </span>
+<span class="sd">          add_two_ints(AddTwoIntsRequest(1, 2))</span>
+<span class="sd">          add_two_ints(1, 2)</span>
+<span class="sd">          add_two_ints(a=1, b=2)          </span>
+<span class="sd">        </span>
+<span class="sd">        @raise TypeError: if request is not of the valid type (Message)</span>
+<span class="sd">        @raise ServiceException: if communication with remote service fails</span>
+<span class="sd">        @raise ROSInterruptException: if node shutdown (e.g. ctrl-C) interrupts service call</span>
+<span class="sd">        @raise ROSSerializationException: If unable to serialize</span>
+<span class="sd">        message. This is usually a type error with one of the fields.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># convert args/kwds to request message class</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">msg</span><span class="o">.</span><span class="n">args_kwds_to_message</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request_class</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwds</span><span class="p">)</span> 
+            
+        <span class="c1"># initialize transport</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">service_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_service_uri</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="n">dest_addr</span><span class="p">,</span> <span class="n">dest_port</span> <span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">parse_rosrpc_uri</span><span class="p">(</span><span class="n">service_uri</span><span class="p">)</span>
+
+            <span class="c1"># connect to service            </span>
+            <span class="n">transport</span> <span class="o">=</span> <span class="n">TCPROSTransport</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">protocol</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">)</span>
+            <span class="n">transport</span><span class="o">.</span><span class="n">buff_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buff_size</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">transport</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dest_addr</span><span class="p">,</span> <span class="n">dest_port</span><span class="p">,</span> <span class="n">service_uri</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">TransportInitError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># can be a connection or md5sum mismatch</span>
+                <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;unable to connect to service: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="n">transport</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">transport</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span>
+
+        <span class="c1"># send the actual request message</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">transport</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">responses</span> <span class="o">=</span> <span class="n">transport</span><span class="o">.</span><span class="n">receive_once</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">responses</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;service [</span><span class="si">%s</span><span class="s2">] returned no response&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">responses</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;service [</span><span class="si">%s</span><span class="s2">] returned multiple responses: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">responses</span><span class="p">)))</span>
+        <span class="k">except</span> <span class="n">rospy</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TransportException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># convert lower-level exception to exposed type</span>
+            <span class="k">if</span> <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">rospy</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ROSInterruptException</span><span class="p">(</span><span class="s2">&quot;node shutdown interrupted service call&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;transport error completing service call: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">persistent</span><span class="p">:</span>
+                <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">responses</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Close this ServiceProxy. This only has an effect on persistent ServiceProxy instances.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="k">class</span> <span class="nc">ServiceImpl</span><span class="p">(</span><span class="n">_Service</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation of ROS Service. This intermediary class allows for more configuration of behavior than the Service class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">service_class</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">buff_size</span><span class="o">=</span><span class="n">DEFAULT_BUFF_SIZE</span><span class="p">,</span> <span class="n">error_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ServiceImpl</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">service_class</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">name</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">isstring</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;service name is not a non-empty string&quot;</span><span class="p">)</span>
+        <span class="c1"># #2202</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rosgraph</span><span class="o">.</span><span class="n">names</span><span class="o">.</span><span class="n">is_legal_name</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+            <span class="kn">import</span> <span class="nn">warnings</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a legal ROS graph resource name. This may cause problems with other ROS tools&quot;</span><span class="o">%</span><span class="n">name</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">handler</span> <span class="o">=</span> <span class="n">handler</span>
+        <span class="k">if</span> <span class="n">error_handler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_handler</span> <span class="o">=</span> <span class="n">error_handler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registered</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buff_size</span><span class="o">=</span><span class="n">buff_size</span>
+
+        <span class="n">start_tcpros_server</span><span class="p">()</span> <span class="c1">#lazy-init the tcprosserver</span>
+        <span class="n">host</span><span class="p">,</span> <span class="n">port</span> <span class="o">=</span> <span class="n">get_tcpros_server_address</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">ROSRPC</span><span class="p">,</span> <span class="n">host</span><span class="p">,</span> <span class="n">port</span><span class="p">)</span>
+        <span class="n">logdebug</span><span class="p">(</span><span class="s2">&quot;... service URL is </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="o">=</span> <span class="n">TCPService</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span> <span class="n">service_class</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buff_size</span><span class="p">)</span>
+
+        <span class="n">logdebug</span><span class="p">(</span><span class="s2">&quot;[</span><span class="si">%s</span><span class="s2">]: new Service instance&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">)</span>
+
+    <span class="c1"># TODO: should consider renaming to unregister</span>
+
+    <span class="k">def</span> <span class="nf">error_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">tb</span><span class="p">):</span>
+        <span class="n">logerr</span><span class="p">(</span><span class="s2">&quot;Error processing request: </span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exception</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">tb</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop this service</span>
+<span class="sd">        @param reason: human-readable shutdown reason</span>
+<span class="sd">        @type  reason: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">logdebug</span><span class="p">(</span><span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">].shutdown: reason [</span><span class="si">%s</span><span class="s1">]&#39;</span><span class="o">%</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span> <span class="n">reason</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1">#TODO: make service manager configurable            </span>
+            <span class="n">get_service_manager</span><span class="p">()</span><span class="o">.</span><span class="n">unregister</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logerr</span><span class="p">(</span><span class="s2">&quot;Unable to unregister with master: &quot;</span><span class="o">+</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="k">raise</span> <span class="n">ServiceException</span><span class="p">(</span><span class="s2">&quot;Unable to connect to master: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">spin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Let service run and take over thread until service or node</span>
+<span class="sd">        shutdown. Use this method to keep your scripts from exiting</span>
+<span class="sd">        execution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="ow">not</span> <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">is_shutdown</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+            <span class="n">logdebug</span><span class="p">(</span><span class="s2">&quot;keyboard interrupt, shutting down&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_write_service_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transport</span><span class="p">,</span> <span class="n">err_msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send error message to client</span>
+<span class="sd">        @param transport: transport connection to client </span>
+<span class="sd">        @type  transport: Transport</span>
+<span class="sd">        @param err_msg: error message to send to client</span>
+<span class="sd">        @type  err_msg: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">hexversion</span> <span class="o">&gt;</span> <span class="mh">0x03000000</span><span class="p">:</span> <span class="c1">#Python3</span>
+            <span class="n">err_msg</span> <span class="o">=</span> <span class="nb">bytes</span><span class="p">(</span><span class="n">err_msg</span><span class="p">,</span> <span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">transport</span><span class="o">.</span><span class="n">write_data</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;&lt;BI</span><span class="si">%s</span><span class="s1">s&#39;</span><span class="o">%</span><span class="nb">len</span><span class="p">(</span><span class="n">err_msg</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">err_msg</span><span class="p">),</span> <span class="n">err_msg</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_handle_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transport</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process a single incoming request.</span>
+<span class="sd">        @param transport: transport instance</span>
+<span class="sd">        @type  transport: L{TCPROSTransport}</span>
+<span class="sd">        @param request: Message</span>
+<span class="sd">        @type  request: genpy.Message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># convert return type to response Message instance</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">convert_return_to_response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">handler</span><span class="p">(</span><span class="n">request</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_class</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="c1"># ok byte</span>
+            <span class="n">transport</span><span class="o">.</span><span class="n">write_buff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">(</span><span class="s1">&#39;&lt;B&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">transport</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">ServiceException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">rospy</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">rospydebug</span><span class="p">(</span><span class="s2">&quot;handler raised ServiceException: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_service_error</span><span class="p">(</span><span class="n">transport</span><span class="p">,</span> <span class="s2">&quot;service cannot process request: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">e</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_handler</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">tb</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_write_service_error</span><span class="p">(</span><span class="n">transport</span><span class="p">,</span> <span class="s2">&quot;error processing request: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transport</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process incoming request. This method should be run in its</span>
+<span class="sd">        own thread. If header[&#39;persistent&#39;] is set to 1, method will</span>
+<span class="sd">        block until connection is broken.</span>
+<span class="sd">        @param transport: transport instance</span>
+<span class="sd">        @type  transport: L{TCPROSTransport}</span>
+<span class="sd">        @param header: headers from client</span>
+<span class="sd">        @type  header: dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;persistent&#39;</span> <span class="ow">in</span> <span class="n">header</span> <span class="ow">and</span> \
+               <span class="n">header</span><span class="p">[</span><span class="s1">&#39;persistent&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">]:</span>
+            <span class="n">persistent</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">persistent</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">header</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;probe&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;1&#39;</span><span class="p">:</span>
+            <span class="c1">#this will likely do more in the future</span>
+            <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="n">handle_done</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">handle_done</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">requests</span> <span class="o">=</span> <span class="n">transport</span><span class="o">.</span><span class="n">receive_once</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">request</span> <span class="ow">in</span> <span class="n">requests</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_handle_request</span><span class="p">(</span><span class="n">transport</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">persistent</span><span class="p">:</span>
+                    <span class="n">handle_done</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">except</span> <span class="n">rospy</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">TransportTerminated</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">persistent</span><span class="p">:</span>
+                    <span class="n">logerr</span><span class="p">(</span><span class="s2">&quot;incoming connection failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="o">%</span><span class="n">e</span><span class="p">)</span>
+                <span class="n">logdebug</span><span class="p">(</span><span class="s2">&quot;service[</span><span class="si">%s</span><span class="s2">]: transport terminated&quot;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">)</span>
+                <span class="n">handle_done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">transport</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<span class="k">class</span> <span class="nc">Service</span><span class="p">(</span><span class="n">ServiceImpl</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Declare a ROS service. Service requests are passed to the</span>
+<span class="sd">    specified handler. </span>
+
+<span class="sd">    Service Usage::</span>
+<span class="sd">      s = Service(&#39;getmapservice&#39;, GetMap, get_map_handler)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">service_class</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span>
+                 <span class="n">buff_size</span><span class="o">=</span><span class="n">DEFAULT_BUFF_SIZE</span><span class="p">,</span> <span class="n">error_handler</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        ctor.</span>
+
+<span class="sd">        @param name: service name, ``str``</span>
+<span class="sd">        @param service_class: Service definition class</span>
+<span class="sd">        </span>
+<span class="sd">        @param handler: callback function for processing service</span>
+<span class="sd">        request. Function takes in a ServiceRequest and returns a</span>
+<span class="sd">        ServiceResponse of the appropriate type. Function may also</span>
+<span class="sd">        return a list, tuple, or dictionary with arguments to initialize</span>
+<span class="sd">        a ServiceResponse instance of the correct type.</span>
+
+<span class="sd">        If handler cannot process request, it may either return None,</span>
+<span class="sd">        to indicate failure, or it may raise a rospy.ServiceException</span>
+<span class="sd">        to send a specific error message to the client. Returning None</span>
+<span class="sd">        is always considered a failure.</span>
+<span class="sd">        </span>
+<span class="sd">        @type  handler: fn(req)-&gt;resp</span>
+
+<span class="sd">        @param buff_size: size of buffer for reading incoming requests. Should be at least size of request message</span>
+<span class="sd">        @type  buff_size: int</span>
+
+<span class="sd">        @param error_handler: callback function for handling errors</span>
+<span class="sd">        raised in the service code.</span>
+<span class="sd">        @type  error_handler: fn(exception, exception_type, exception_value, traceback)-&gt;None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Service</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">service_class</span><span class="p">,</span> <span class="n">handler</span><span class="p">,</span> <span class="n">buff_size</span><span class="p">,</span>
+                                      <span class="n">error_handler</span><span class="p">)</span>
+
+        <span class="c1">#TODO: make service manager configurable</span>
+        <span class="n">get_service_manager</span><span class="p">()</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">resolved_name</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2021, Alessio Roda.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

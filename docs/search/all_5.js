@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['hint_5freq_13',['hint_req',['../namespacescripts_1_1oracle.html#aa5b54089895e1378836c8342070cb328',1,'scripts::oracle']]]
+  ['generate_5fhint_11',['generate_hint',['../namespacescripts_1_1oracle.html#a82c8ecec74be0571945d59a0bf45f678',1,'scripts::oracle']]],
+  ['get_5ftarget_12',['get_target',['../namespacescripts_1_1go__to__point.html#ab832b3fa51463b99006d0cc8390cd346',1,'scripts::go_to_point']]]
 ];

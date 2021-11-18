@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['go_5fto_5fpoint_23',['go_to_point',['../namespacescripts_1_1go__to__point.html',1,'scripts']]],
-  ['oracle_24',['oracle',['../namespacescripts_1_1oracle.html',1,'scripts']]],
-  ['save_25',['save',['../classmy_armor_1_1_my_armor.html#a76714a946b7397e6fed9e24953f65ad7',1,'myArmor::MyArmor']]],
-  ['state_5fmachine_26',['state_machine',['../namespacescripts_1_1state__machine.html',1,'scripts']]]
+  ['reason_20',['reason',['../classmy_armor_1_1_my_armor.html#a30b7e92311e858a8a3eaa5ccb4e41c00',1,'myArmor::MyArmor']]],
+  ['receive_5fsolution_21',['receive_solution',['../namespacescripts_1_1oracle.html#aa20cc0fd050c027565a9da83e517220d',1,'scripts::oracle']]],
+  ['remove_22',['remove',['../classmy_armor_1_1_my_armor.html#aa8997027190526d6d77e1a0ca24ea6e3',1,'myArmor::MyArmor']]]
 ];

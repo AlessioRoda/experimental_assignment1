@@ -104,7 +104,7 @@ def generate_hint():
     Function to generate a hint, the number of the element for each hint is random and even the type of hint is casual:
     there's the possibility to generate hint without one of PERSON, PLACE and WEAPON or even cases in which for each one of them
     there are more than one. 
-    For example a i's possible to generate
+    For example a it's possible to generate
     
     sol=[[], [], ['Mrs.Peacock']]
 

@@ -1,5 +1,5 @@
 .. experimental_assignment1 documentation master file, created by
-   sphinx-quickstart on Wed Nov 17 22:53:37 2021.
+   sphinx-quickstart on Thu Nov 18 03:26:44 2021.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -14,9 +14,8 @@ Indices
 * :ref:`search`
 
 Experimental_assignment1's documentation!
-*****************************************
+====================================================
 This is the documentation of the Experimental_assignment1 package
-
 
 GoToPoint module
 =====================
@@ -31,4 +30,14 @@ Oracle module
 State Machine module
 =====================
 .. automodule:: scripts.state_machine
+   :members:
+
+MyArmor class
+=====================
+.. automodule:: scripts.classes.myArmor
+   :members:
+
+Place class
+=====================
+.. automodule:: scripts.classes.place
    :members:
