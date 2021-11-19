@@ -131,7 +131,7 @@ rosrun experimental_assignment1 go_to_point.py
 rosrun experimental_assignment1 state_machine.py
 ```
 
-Here you can also find a video showing the simulation: 
+Here you can also find a video showing the simulation: https://unigeit-my.sharepoint.com/:f:/g/personal/s4458313_studenti_unige_it/EjP1rVdH2uFBnkIKq8NO5lkBPwpAsmEM3pY_6PQNa9qrBg?e=YqmBde
 
 
 ## System features and limitations
