@@ -59,8 +59,18 @@ Finally at the end of the game a file solution_cluedo_game is generated, which c
 
 To better describe the behaviour of the architecture here there are the component diagram and temporal diagram:
 
-![UML_diagram1](https://user-images.githubusercontent.com/48511957/142494612-9d6ce9a3-48a1-4a86-a2f3-8d0b63cc737e.jpg)
+### Component diagram
 
+![UML_diagram](https://user-images.githubusercontent.com/48511957/142516652-f87dcadd-5d02-47fa-ad94-964be49b00d0.jpg)
+
+Here it's possible to notice that the state_machine node is the "heart" of the entire architecture, in particular: 
+
+* Comunicates with the go_to_point node by sending the position to reache (x and y coordinates of the actual position and the position to reach) and receiving a feedback (boolen)
+* Comunicates with the oracle node by sending a hint request and receiving the hint(what[], where[], who[] arrays containig the elements of the hint and ID of the hint), then it also sends a possible solution (what, where, who strings) and receives a feedback if it's correct or not (boolean)
+* Interacts with the MyArmor class in order to comunicate with the Update Ontology: it uses the methods of the class to perform operations and receives the ARMOR response
+
+The MyArmor class comunicate with the Update Ontology node by sending an ARMOR message and receiving the ARMOR response that passes to the state_machine node.
+Finally the state_machine nodes generates Place objects with the Place class, by defining the x and y coordinates of a place and its name.
 
 ## How to run the code
 First if you want to run this code you must have the ARMOR package installed in your workspace (otherwhise you ca download from here https://github.com/EmaroLab/armor), then download this folder in your ros workspace and compile it with 
