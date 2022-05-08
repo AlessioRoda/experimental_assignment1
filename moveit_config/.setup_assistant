@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: experimental_assignment1
+    relative_path: urdf/m2wr_arm2.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/m2wr.srdf
+  CONFIG:
+    author_name: Alessio Roda
+    author_email: alessioroda98@gmail.com
+    generated_timestamp: 1649520516
