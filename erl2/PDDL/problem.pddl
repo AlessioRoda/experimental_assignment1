@@ -10,7 +10,8 @@
 (:init
     
 (in_position oracle_room sherlock)
-;Notice that the distance described here are proportionally to the real distances, but haven't the purpose to provide a real value
+;Notice that the distance described here are proportionally to the real distances, but haven't the purpose to provide 
+;a real value
 ;Provide all the possible distances, it's up to the robot to find the best planning 
 (distance w1 w2 5)
 (distance w2 w1 5)

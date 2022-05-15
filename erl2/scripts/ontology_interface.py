@@ -157,7 +157,7 @@ def main():
     Main function 
     '''
     global ask_solution, update_service, consistency_service
-    rospy.init_node('main') 
+    rospy.init_node('ontology_interface') 
     init_scene()
     update_service= rospy.Service('/update_request', Update, update_ontology)
     consistency_service=rospy.Service('/conosistency_request', Consistency, try_solution)

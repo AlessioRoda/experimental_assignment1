@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(experimental_assignment1)
+project(erl2)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -167,7 +167,7 @@ add_dependencies(simulation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTE
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-scripts/main.py 
+scripts/ontology_interface.py 
 DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

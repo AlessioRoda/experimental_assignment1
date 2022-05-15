@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
 
-	<arg name="model" default="$(find experimental_assignment1)/urdf/robot.urdf" />
+	<arg name="model" default="$(find erl2)/urdf/robot.urdf" />
   <!-- Load the URDF into the ROS Parameter Server -->
   <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)" />
 	
@@ -21,7 +21,7 @@
   <arg name="debug" default="false"/>
   <arg name="physics" default="ode"/>
   <arg name="verbose" default="false"/>
-  <arg name="world_name" value="$(find experimental_assignment1)/world/$(arg world).world"/>
+  <arg name="world_name" value="$(find erl2)/world/$(arg world).world"/>
   <arg name="respawn_gazebo" default="false"/>
   <arg name="use_clock_frequency" default="false"/>
   <arg name="pub_clock_frequency" default="100"/>
@@ -51,9 +51,9 @@
     <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen"/>
   </group>
 
-  <node name="simulation" pkg ="experimental_assignment1" type="simulation" output="screen" /> 
+  <node name="simulation" pkg ="erl2" type="simulation" output="screen" /> 
 	
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find experimental_assignment1)/config/sim.rviz" /> 
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find erl2)/config/sim.rviz" /> 
 
 
   <!--Spawn the robot model on Gazebo Simulation-->
