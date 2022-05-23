@@ -1,4 +1,4 @@
-#include "erl2/update_Ontology.h"
+#include "erl2/check_Consistency.h"
 #include <unistd.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
@@ -35,7 +35,7 @@ namespace KCL_rosplan {
 }
 
 	int main(int argc, char **argv) {
-		ros::init(argc, argv, "update_Ontology", ros::init_options::AnonymousName);
+		ros::init(argc, argv, "update_ontology", ros::init_options::AnonymousName);
         ros::ServiceServer pub_update= nh.advertiseService("/update_request", Consistency);
 		ros::NodeHandle nh("~");
 		KCL_rosplan::Update_OnotlogyActionInterface my_aci(nh);

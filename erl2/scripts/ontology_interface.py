@@ -1,9 +1,10 @@
-#!/usr/bin/env python
+#! /usr/bin/env python3
 
 from posixpath import dirname, realpath
 import rospy
 from classes.myArmor import MyArmor
-from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle
+#from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle
+from experimental_assignment1.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle 
 from erl2.msg import ErlOracle
 from armor_msgs.srv import *
 from armor_msgs.msg import *
@@ -35,7 +36,7 @@ def init_scene():
     
     '''
 
-    global actual_pos, oracle_room
+
 
     ## Add people, weapons and places o the ontology
 
@@ -157,13 +158,25 @@ def main():
     Main function 
     '''
     global ask_solution, update_service, consistency_service
-    rospy.init_node('ontology_interface') 
-    init_scene()
-    update_service= rospy.Service('/update_request', Update, update_ontology)
+    rospy.init_node('ontology_interface')
+   
     consistency_service=rospy.Service('/conosistency_request', Consistency, try_solution)
+    update_service= rospy.Service('/update_request', Update, update_ontology)
     ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
-    rospy.Service('/oracle_hint', ErlOracle, receive_hint)
+    rospy.Subscriber('/oracle_hint', ErlOracle, receive_hint)
 
+    path = dirname(realpath(__file__))
+    path = path[:-7] + "cluedo_ontology.owl"
+    print("PATH: "+str(path))
+    
+    # Loads the ontology
+    response=MyArmor.load(path)
+    if response.armor_response.success==True:
+        print("\nOntology loaded successfully")
+    else:
+        print("\nERROR: Ontology not loaded correctly")
+    
+    init_scene()
     rospy.spin()
 
 

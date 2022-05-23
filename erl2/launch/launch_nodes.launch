@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<launch>
+   <node name="ontology_interface"  pkg="erl2" type="ontology_interface.py" output="screen"/>
+   
+</launch>

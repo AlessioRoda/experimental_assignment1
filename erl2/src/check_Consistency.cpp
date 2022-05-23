@@ -3,7 +3,6 @@
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
 #include <cmath>
-#include <erl2/Consistency.h>
 #include <motion_plan/PlanningAction.h>
 
 
