@@ -1,15 +1,17 @@
 #include "erl2/check_Consistency.h"
+#include <erl2/Consistency.h>
 #include <unistd.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
 #include <cmath>
-#include <motion_plan/PlanningAction.h>
+#include <ros/ros.h>
+//#include <motion_plan/PlanningAction.h>
 
 
 float pose_x;
 float pose_y;
 float orientation;
-ros::ServiceServer pub_consistency;
+ros::ServiceClient client_conistency;
 
 
 namespace KCL_rosplan {
@@ -20,9 +22,10 @@ namespace KCL_rosplan {
 
 	bool CheckConsistencyActionInterface::concreteCallback(const rosplan_dispatch_msgs::ActionDispatch::ConstPtr& msg) {
 			// here the implementation of the action 
-		
-		res=pub_consistency.publish();
-        if res.updated==true:
+		erl2::Consistency req;
+		req.request.req=true;
+	    client_conistency.call(req);
+        if (req.response.res==true)
 		{
             return true;
         }
@@ -35,9 +38,9 @@ namespace KCL_rosplan {
 
 	int main(int argc, char **argv) {
 		ros::init(argc, argv, "check_consistency", ros::init_options::AnonymousName);
-        ros::ServiceServer pub_consistency= nh.advertiseService("/conosistency_request", Consistency);
 		ros::NodeHandle nh("~");
-		KCL_rosplan::Update_OnotlogyActionInterface my_aci(nh);
+        client_conistency= nh.serviceClient<erl2::Consistency>("/conosistency_request");
+		KCL_rosplan::CheckConsistencyActionInterface my_aci(nh);
 		my_aci.runActionInterface();
 		return 0;
 	}

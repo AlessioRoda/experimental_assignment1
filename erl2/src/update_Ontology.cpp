@@ -1,16 +1,15 @@
-#include "erl2/check_Consistency.h"
+#include "erl2/update_Ontology.h"
 #include <unistd.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
 #include <cmath>
-#include <erl2/Consistency.h>
-#include <motion_plan/PlanningAction.h>
+#include <erl2/Update.h>
 
 
 float pose_x;
 float pose_y;
 float orientation;
-ros::ServiceServer pub_update;
+ros::ServiceClient client_update;
 
 
 namespace KCL_rosplan {
@@ -21,9 +20,10 @@ namespace KCL_rosplan {
 
 	bool Update_OnotlogyActionInterface::concreteCallback(const rosplan_dispatch_msgs::ActionDispatch::ConstPtr& msg) {
 			// here the implementation of the action 
-		
-		res=pub_update.publish();
-        if res.updated==true:
+		erl2::Update req;
+		req.request.req=true;
+	    client_update.call(req);
+        if (req.response.updated==true)
 		{
             return true;
         }
@@ -36,8 +36,9 @@ namespace KCL_rosplan {
 
 	int main(int argc, char **argv) {
 		ros::init(argc, argv, "update_ontology", ros::init_options::AnonymousName);
-        ros::ServiceServer pub_update= nh.advertiseService("/update_request", Consistency);
 		ros::NodeHandle nh("~");
+		
+        client_update= nh.serviceClient<erl2::Update>("/update_request");
 		KCL_rosplan::Update_OnotlogyActionInterface my_aci(nh);
 		my_aci.runActionInterface();
 		return 0;

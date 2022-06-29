@@ -3,7 +3,7 @@
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
 #include <cmath>
-#include <motion_plan/PlanningAction.h>
+#include <erl2/MoveAction.h>
 
 
 float pose_x;
@@ -22,8 +22,8 @@ namespace KCL_rosplan {
 			// here the implementation of the action 
 		std::cout << "Going from " << msg->parameters[1].value << " to " << msg->parameters[2].value << std::endl;
 		
-		actionlib::SimpleActionClient<motion_plan::PlanningAction> ac("reaching_goal", true);
-		motion_plan::PlanningGoal goal;
+		actionlib::SimpleActionClient<erl2::MoveAction> ac("reaching_goal", true);
+		erl2::MoveAction goal;
 		ac.waitForServer();
 		if(msg->parameters[2].value == "wp1"){
 		pose_x=-2.5;
@@ -51,11 +51,11 @@ namespace KCL_rosplan {
 		orientation=0.0;
 		}
 
-		goal.target_pose.pose.position.x = pose_x;
-		goal.target_pose.pose.position.y = pose_y;
-		goal.target_pose.pose.orientation.w = orientation;
+		goal.action_goal.goal.x_pos=pose_x;
+		goal.action_goal.goal.y_pos=pose_y;
+		goal.action_goal.goal.theta=orientation;
 
-		ac.sendGoal(goal);
+		ac.sendGoal(goal.action_goal.goal);
 		ac.waitForResult();
 		
 		ROS_INFO("Action (%s) performed: completed!", msg->name.c_str());
