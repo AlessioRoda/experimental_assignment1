@@ -156,8 +156,8 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/experimental_assignment1_node.cpp)
 add_executable(check_consistency src/check_Consistency.cpp)
-add_executable(goto_waypoint_action src/goto_waypoint.cpp)
-add_executable(movearm_action src/movearm.cpp)
+add_executable(goto_waypoint src/goto_waypoint.cpp)
+add_executable(movearm src/movearm.cpp)
 add_executable(update_ontology src/update_Ontology.cpp)
 add_executable(simulation src/simulation.cpp)
 
@@ -170,8 +170,8 @@ add_executable(simulation src/simulation.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(check_consistency ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(goto_waypoint_action ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(movearm_action ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(goto_waypoint ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(movearm ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(update_ontology ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(simulation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
@@ -179,10 +179,10 @@ add_dependencies(simulation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTE
  target_link_libraries(check_consistency
    ${catkin_LIBRARIES}
  )
- target_link_libraries(goto_waypoint_action
+ target_link_libraries(goto_waypoint
  ${catkin_LIBRARIES}
 )
-target_link_libraries(movearm_action
+target_link_libraries(movearm
 ${catkin_LIBRARIES}
 )
 target_link_libraries(update_ontology

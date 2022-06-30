@@ -170,10 +170,11 @@ def go_to_point(goal):
 ## In the main there are the initialization of the publisher, th subscriber and the SimpleActionServer
 def main():
     global pub_, server
-    rospy.init_node('/go_to_point')
+    rospy.init_node('go_to_point')
     pub_ = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
     sub_odom = rospy.Subscriber('/odom', Odometry, clbk_odom)
-    server = actionlib.SimpleActionServer('reaching_goal', MoveAction, execute_cb = go_to_point, auto_start=True)
+    server = actionlib.SimpleActionServer('reaching_goal', MoveAction, execute_cb = go_to_point, auto_start=False)
+    server.start()
     
     rospy.spin()
 
