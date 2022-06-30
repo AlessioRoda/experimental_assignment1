@@ -28,6 +28,10 @@
     <gazebo reference="arm_link_04">
     <material>Gazebo/Red</material>
   </gazebo>
+    <gazebo reference="cluedo_link">
+    <material>Gazebo/Red</material>
+  </gazebo>
+
 
 
       <gazebo reference="right_grip_link">

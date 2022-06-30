@@ -1,6 +1,6 @@
 moveit_setup_assistant_config:
   URDF:
-    package: experimental_assignment1
+    package: erl2
     relative_path: urdf/m2wr_arm2.xacro
     xacro_args: ""
   SRDF:
