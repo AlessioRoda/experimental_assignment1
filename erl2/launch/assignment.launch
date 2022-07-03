@@ -51,6 +51,7 @@
     <node name="gazebo_gui" pkg="gazebo_ros" type="gzclient" respawn="false" output="screen"/>
   </group>
 
+  <!--Questo va rimosso poi!!!!!!!!!!!-->
   <node name="simulation" pkg ="erl2" type="simulation" output="screen" /> 
 	
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find erl2)/config/sim.rviz" /> 

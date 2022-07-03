@@ -56,7 +56,7 @@
         )
     )
 
-    (:durative-action update_Ontology
+    (:durative-action update_ontology
         :parameters ()
         :duration (= ?duration 1)
         :condition (and 
@@ -69,7 +69,7 @@
         )
     )
     
-    (:durative-action check_Consistency
+    (:durative-action check_consistency
         :parameters ()
         :duration (= ?duration 1)
         :condition (and 
@@ -81,9 +81,5 @@
             ))
         )
     )
-    
-    
-    
-    
     
 )
