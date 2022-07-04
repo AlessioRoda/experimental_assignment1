@@ -10,7 +10,7 @@
         robot waypoint
     )
 
-    :(:functions
+    (:functions
         (waypoints)
     )
 
@@ -29,10 +29,10 @@
             (end_game)
 
     )
-
-    (:durative-action goto_waypoint
+;(= (?duration) (distance ?from ?to))
+    (:durative-action go_to_waypoint
         :parameters (?from ?to - waypoint ?r - robot)
-        :duration (= (?duration) (distance ?from ?to))
+        :duration (= ?duration 5)
         :condition (and 
             (at start (and (in_position ?from ?r)(waypoint_pose ?to)(not_visited ?to)
             ))
@@ -56,7 +56,7 @@
         )
     )
 
-    (:durative-action update_ontology
+    (:durative-action updateOntology
         :parameters ()
         :duration (= ?duration 1)
         :condition (and 
@@ -69,7 +69,7 @@
         )
     )
     
-    (:durative-action check_consistency
+    (:durative-action checkConsistency
         :parameters ()
         :duration (= ?duration 1)
         :condition (and 

@@ -4,7 +4,7 @@
 
 namespace KCL_rosplan {
 
-	class Update_OnotlogyActionInterface: public RPActionInterface
+	class UpdateOnotlogyActionInterface: public RPActionInterface
 	{
 
 	private:
@@ -12,7 +12,7 @@ namespace KCL_rosplan {
 	public:
 
 		/* constructor */
-		Update_OnotlogyActionInterface(ros::NodeHandle &nh);
+		UpdateOnotlogyActionInterface(ros::NodeHandle &nh);
 
 		/* listen to and process action_dispatch topic */
 		bool concreteCallback(const rosplan_dispatch_msgs::ActionDispatch::ConstPtr& msg);

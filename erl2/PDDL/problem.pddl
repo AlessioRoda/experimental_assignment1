@@ -51,10 +51,10 @@
 (:goal 
     (and
     (visited w1)
-    (visited w2)
-    (visited w3)
-    (visited w4)
-    (end_game)
+    ;(visited w2)
+    ;(visited w3)
+    ;(visited w4)
+    ;(end_game)
 
     )
 )

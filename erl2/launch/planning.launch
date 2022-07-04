@@ -37,6 +37,8 @@ output="screen">
     <param name="planner_topic" value="/rosplan_planner_interface/planner_output" />
     <param name="plan_topic" value="complete_plan" />
     </node>
+   
+   Plan dispatcher
     <node name="rosplan_plan_dispatcher" pkg="rosplan_planning_system" type="pddl_simple_plan_dispatcher" respawn="false"
     output="screen">
     <param name="knowledge_base" value="rosplan_knowledge_base" />
@@ -47,17 +49,17 @@ output="screen">
 
     <!--Simulated actions-->
     <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
-    <arg name="pddl_action_name" value="goto_waypoint" />
+    <arg name="pddl_action_name" value="go_to_waypoint" />
     </include>
-    <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
+    <!-- <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
     <arg name="pddl_action_name" value="movearm" />
     </include>
     <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
-    <arg name="pddl_action_name" value="update_Ontology" />
+    <arg name="pddl_action_name" value="updateOntology" />
     </include>
     <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
-    <arg name="pddl_action_name" value="check_Consistency" />
-    </include>
+    <arg name="pddl_action_name" value="checkConsistency" />
+    </include> -->
 
 
 
