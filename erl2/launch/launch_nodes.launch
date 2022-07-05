@@ -1,11 +1,16 @@
 <?xml version="1.0"?>
 <launch>
+   	<arg name="ontology" default="$(find erl2)/cluedo_ontology.owl" />
+
    <node name="ontology_interface"  pkg="erl2" type="ontology_interface.py" output="screen"/>
+      <param name="ontology"               value="$(arg ontology)"/>
+   </node>
    <node name="go_to_point"  pkg="erl2" type="go_to_point.py" output="screen"/>
    <node name="check_consistency"  pkg="erl2" type="check_consistency" output="screen"/>
    <node name="goto_waypoint_action"  pkg="erl2" type="goto_waypoint" output="screen"/>
    <node name="movearm_action"  pkg="erl2" type="movearm" output="screen"/>
    <node name="assignment2"  pkg="erl2" type="simulation" output="screen"/>
    <node name="update_ontology"  pkg="erl2" type="update_ontology" output="screen"/>
+   <node name="simulation" pkg ="erl2" type="simulation" output="screen" /> 
    
 </launch>

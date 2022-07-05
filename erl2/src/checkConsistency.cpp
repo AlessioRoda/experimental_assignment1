@@ -30,7 +30,7 @@ namespace KCL_rosplan {
             return true;
         }
         else
-        {
+        {	printf("Error occurred in checkConsistency");
             return false;
         }
 	}

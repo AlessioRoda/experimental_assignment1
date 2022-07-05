@@ -148,6 +148,10 @@ def try_solution():
             id_consistent=res.armor_response.queried_objects[0]
             if solution == id_consistent:
                 print("\nSolution found!: "+ solution)
+
+        print("Reload the plan")
+
+
     res=ConsistencyResponse()
     res.ok=True
     consistency_service(res)
@@ -165,8 +169,11 @@ def main():
     ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
     rospy.Subscriber('/oracle_hint', ErlOracle, receive_hint)
 
-    path = dirname(realpath(__file__))
-    path = path[:-7] + "cluedo_ontology.owl"
+    # path = dirname(realpath(__file__))
+    # path = path[:-7] + "cluedo_ontology.owl"
+    # print("PATH: "+str(path))
+
+    path=rospy.get_param("ontology")
     print("PATH: "+str(path))
     
     # Loads the ontology

@@ -81,6 +81,7 @@ add_service_files(
  add_action_files(
    FILES
    Move.action
+   Reset.action
 #   Action2.action
  )
 
@@ -202,7 +203,7 @@ ${catkin_LIBRARIES}
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-scripts/ontology_interface.py scripts/go_to_point.py
+scripts/ontology_interface.py scripts/go_to_point.py scripts/reset_planner.py
 DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

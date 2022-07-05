@@ -33,24 +33,16 @@ namespace KCL_rosplan {
         moveit::planning_interface::MoveGroupInterface group("arm");
         const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
+        //Poition to reach
         geometry_msgs::Pose pose;
 
-
-        float pose_x=0.5;
-        float pose_y=0;
-        float pose_z=1.25;
-        float orientation_x=0;
-        float orientation_y=0;
-        float orientation_z=0;
-        float orientation_w=0;
-
-        pose.orientation.w = orientation_w;
-        pose.orientation.x = orientation_x;
-        pose.orientation.y = orientation_y;
-        pose.orientation.z = orientation_z;
-        pose.position.x =  pose_x;
-        pose.position.y =  pose_y;
-        pose.position.z =  pose_z;
+        pose.orientation.w = 0;
+        pose.orientation.x = 0;
+        pose.orientation.y = 0;
+        pose.orientation.z = 0;
+        pose.position.x =  0.5;
+        pose.position.y =  0;
+        pose.position.z =  1.25;
 
         group.setStartStateToCurrentState();
         group.setApproximateJointValueTarget(pose, "cluedo_link");
@@ -58,7 +50,6 @@ namespace KCL_rosplan {
         double timeout = 0.1;
         bool found_ik = kinematic_state->setFromIK(joint_model_group, pose, timeout);
 
-        // Now, we can print out the IK solution (if found):
         if (found_ik)
         {
             kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
@@ -69,7 +60,7 @@ namespace KCL_rosplan {
         }
         else
         {
-            ROS_INFO("Did not find IK solution");
+            ROS_INFO("No valid solution");
         }
 
         group.setJointValueTarget(joint_values);
@@ -82,18 +73,10 @@ namespace KCL_rosplan {
         group.plan(my_plan); 
         group.execute(my_plan);
         
-        std::cout << "Quote 1.75 reached -> IK + setJointValue" << std::endl;
+        std::cout << "Quote 1.75 reached" << std::endl;
         sleep(2.0);
 
-        pose_z=0.75;
-
-        pose.orientation.w = orientation_w;
-        pose.orientation.x = orientation_x;
-        pose.orientation.y = orientation_y;
-        pose.orientation.z = orientation_z;
-        pose.position.x =  pose_x;
-        pose.position.y =  pose_y;
-        pose.position.z =  pose_z;
+        pose.position.z =  0.75;
 
         group.setStartStateToCurrentState();
         group.setApproximateJointValueTarget(pose, "cluedo_link");
@@ -104,12 +87,12 @@ namespace KCL_rosplan {
             kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
             for (std::size_t i = 0; i < joint_names.size(); ++i)
             {
-            ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+            printf("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
             }
         }
         else
         {
-            ROS_INFO("Did not find IK solution");
+            printf("No valid solution");
         }
         
         
@@ -124,7 +107,7 @@ namespace KCL_rosplan {
 
         sleep(2.0);
 
-        group.setNamedTarget("zero");
+        group.setNamedTarget("starting_position");
 	    group.move(); 
 		
 		ROS_INFO("Action (%s) performed: completed!", msg->name.c_str());
