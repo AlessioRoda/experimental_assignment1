@@ -38,7 +38,7 @@ output="screen">
     <param name="plan_topic" value="complete_plan" />
     </node>
    
-   Plan dispatcher
+   <!-- Plan dispatcher -->
     <node name="rosplan_plan_dispatcher" pkg="rosplan_planning_system" type="pddl_simple_plan_dispatcher" respawn="false"
     output="screen">
     <param name="knowledge_base" value="rosplan_knowledge_base" />

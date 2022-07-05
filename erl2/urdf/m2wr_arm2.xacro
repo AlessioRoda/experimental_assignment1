@@ -298,7 +298,7 @@
   	</visual>
   </link>
 
-    <joint name="cluedo_link_joint" type="revolute">
+    <joint name="cluedo_joint" type="revolute">
   	<axis xyz="1 0 0"/>
   	<limit effort="1000.0" lower="-1.8" upper="1.8" velocity="0.5"/>
   	<origin rpy="0 0 0" xyz="0 0 0"/>
@@ -413,12 +413,23 @@
 	</actuator>
 </transmission>
 
+<transmission name="cluedo_joint_trans">
+	<type>transmission_interface/SimpleTransmission</type>
+	<joint name="cluedo_joint">
+		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+	</joint>
+	<actuator name="motor5">
+		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+		<mechanicalInterface>1</mechanicalInterface>
+	</actuator>
+</transmission>
+
 <transmission name="left_grip_trans">
 	<type>transmission_interface/SimpleTransmission</type>
 	<joint name="left_grip_joint">
 		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
 	</joint>
-	<actuator name="motor5">
+	<actuator name="motor6">
 		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
 		<mechanicalInterface>1</mechanicalInterface>
 	</actuator>
@@ -429,7 +440,7 @@
 	<joint name="right_grip_joint">
 		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
 	</joint>
-	<actuator name="motor6">
+	<actuator name="motor7">
 		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
 		<mechanicalInterface>1</mechanicalInterface>
 	</actuator>

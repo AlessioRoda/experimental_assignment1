@@ -55,6 +55,9 @@
     <gazebo reference="arm_link_04">
         <material>Gazebo/Red</material>
     </gazebo>
+    <gazebo reference="cluedo_link">
+        <material>Gazebo/Red</material>
+    </gazebo>
     <gazebo reference="right_grip_link">
         <material>Gazebo/White</material>
     </gazebo>
@@ -480,7 +483,7 @@
         </inertial>
 
     </link>
-    <joint name="cluedo_link_joint" type="revolute">
+    <joint name="cluedo_joint" type="revolute">
         <axis xyz="1 0 0" />
         <limit effort="1000.0" lower="-1.8" upper="1.8" velocity="0.5" />
         <origin rpy="0 0 0" xyz="0 0 0" />
@@ -586,12 +589,22 @@
             <mechanicalInterface>1</mechanicalInterface>
         </actuator>
     </transmission>
+    <transmission name="cluedo_joint_trans">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="cluedo_joint">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="motor5">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalInterface>1</mechanicalInterface>
+        </actuator>
+    </transmission>
     <transmission name="left_grip_trans">
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="left_grip_joint">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </joint>
-        <actuator name="motor5">
+        <actuator name="motor6">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
             <mechanicalInterface>1</mechanicalInterface>
         </actuator>
@@ -601,7 +614,7 @@
         <joint name="right_grip_joint">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </joint>
-        <actuator name="motor6">
+        <actuator name="motor7">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
             <mechanicalInterface>1</mechanicalInterface>
         </actuator>
@@ -666,12 +679,12 @@
             <mechanicalReduction>1</mechanicalReduction>
         </actuator>
     </transmission>
-    <transmission name="trans_cluedo_link_joint">
+    <transmission name="trans_cluedo_joint">
         <type>transmission_interface/SimpleTransmission</type>
-        <joint name="cluedo_link_joint">
+        <joint name="cluedo_joint">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </joint>
-        <actuator name="cluedo_link_joint_motor">
+        <actuator name="cluedo_joint_motor">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
             <mechanicalReduction>1</mechanicalReduction>
         </actuator>

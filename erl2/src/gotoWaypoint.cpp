@@ -1,4 +1,4 @@
-#include "erl2/gotoWaypoint.h"
+#include "erl2/go_to_waypoint.h"
 #include <unistd.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
