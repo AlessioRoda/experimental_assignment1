@@ -6,6 +6,7 @@
       <param name="ontology"               value="$(arg ontology)"/>
    </node>
    <node name="go_to_point"  pkg="erl2" type="go_to_point.py" output="screen"/>
+   <node name="reset_planning" pkg ="erl2" type="reset_planner.py" output="screen" /> 
    <node name="check_consistency"  pkg="erl2" type="check_consistency" output="screen"/>
    <node name="goto_waypoint_action"  pkg="erl2" type="goto_waypoint" output="screen"/>
    <node name="movearm_action"  pkg="erl2" type="movearm" output="screen"/>

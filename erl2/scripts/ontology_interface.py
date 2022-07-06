@@ -5,9 +5,10 @@ import rospy
 from classes.myArmor import MyArmor
 #from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle
 from experimental_assignment1.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle 
-from erl2.msg import ErlOracle
+from erl2.msg import ErlOracle, ResetAction, ResetActionGoal
 from armor_msgs.srv import *
 from armor_msgs.msg import *
+import actionlib
 
 people_ontology=["missScarlett", "colonelMustard", "mrsWhite", "mrGreen", "mrsPeacock", "profPlum"]
 ''' Define all the people of the scene
@@ -24,6 +25,7 @@ value=[]
 ask_solution=None
 update_service=None
 consistency_service=None
+reset_action_client=None
 
 solution=None
 
@@ -148,26 +150,36 @@ def try_solution():
             id_consistent=res.armor_response.queried_objects[0]
             if solution == id_consistent:
                 print("\nSolution found!: "+ solution)
+                res=ConsistencyResponse()
+                res.ok=True
+                consistency_service(res)
 
         print("Reload the plan")
+        goal=ResetActionGoal()
+        reset_action_client.wait_for_server()
+        reset_action_client.send_goal(goal.goal)
+        res=reset_action_client.wait_for_result()
+        if res.succeed==False:
+            print("Error in replanning")
+        
 
 
-    res=ConsistencyResponse()
-    res.ok=True
-    consistency_service(res)
+    
 
 
 def main():
     '''
     Main function 
     '''
-    global ask_solution, update_service, consistency_service
+    global ask_solution, update_service, consistency_service, reset_action_client
     rospy.init_node('ontology_interface')
    
     consistency_service=rospy.Service('/conosistency_request', Consistency, try_solution)
     update_service= rospy.Service('/update_request', Update, update_ontology)
     ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
     rospy.Subscriber('/oracle_hint', ErlOracle, receive_hint)
+    reset_action_client=actionlib.SimpleActionClient("reset_planning_action", ResetAction)
+    
 
     # path = dirname(realpath(__file__))
     # path = path[:-7] + "cluedo_ontology.owl"

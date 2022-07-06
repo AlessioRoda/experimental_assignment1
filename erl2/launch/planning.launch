@@ -47,11 +47,15 @@ output="screen">
     <param name="action_feedback_topic" value="action_feedback" />
     </node>
 
-    <!--Simulated actions-->
+
+    <!-- simulating actions -->
+    <arg name="simulating_actions" default="false" />
+    <group if="$(eval arg('simulating_actions') == 'true')">
     <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
     <arg name="pddl_action_name" value="go_to_waypoint" />
+    <arg name="action_duration" value="5" />
     </include>
-    <!-- <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
+    <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
     <arg name="pddl_action_name" value="movearm" />
     </include>
     <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
@@ -59,12 +63,8 @@ output="screen">
     </include>
     <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
     <arg name="pddl_action_name" value="checkConsistency" />
-    </include> -->
-
-
-
-
-
+    </include>
+    </group>
 
 
 </launch>
