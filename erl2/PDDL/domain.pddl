@@ -12,6 +12,8 @@
 
     (:functions
         (waypoints)
+        (cost)
+        (distance ?from ?to - waypoint)
     )
 
     (:predicates
@@ -21,30 +23,25 @@
             (get_hint ?w - waypoint)
             (not_get_hint ?w - waypoint)
             (not_ontology_updated)
-            (distance ?from ?to - waypoint)
+            ;(distance ?from ?to - waypoint)
             (can_check)
             (not_can_check)
             (end_game)
 
     )
 
-(:action action_name
-    :parameters ()
-    :precondition (and )
-    :effect (and )
-)
 
 
-;(= (?duration) (distance ?from ?to))
+;(= ?duration (distance ?from ?to))
     (:durative-action go_to_waypoint
         :parameters (?from ?to - waypoint ?r - robot)
-        :duration (= ?duration 5)
+        :duration (= ?duration (distance ?from ?to))
         :condition (and 
             (at start (and (in_position ?from ?r)(not_visited ?to)
             ))
         )
         :effect (and 
-            (at end (and (in_position ?to ?r)(visited ?to)(not(in_position ?from ?r))(not(not_visited ?to))
+            (at end (and (in_position ?to ?r)(visited ?to)(not(in_position ?from ?r))(not(not_visited ?to))(increase (cost) (distance ?from ?to))
             ))
         )
     )
@@ -57,7 +54,7 @@
             ))
         )
         :effect (and 
-            (at end (and (not (not_get_hint ?w))(get_hint ?w)(increase (waypoints) 1)
+            (at end (and (not (not_get_hint ?w))(get_hint ?w)(increase (waypoints) 1)(increase (cost) 1)
             ))
         )
     )
@@ -66,11 +63,11 @@
         :parameters ()
         :duration (= ?duration 1)
         :condition (and 
-            (at start (and (=(waypoints)4)
+            (at start (and (>= (waypoints) 4)
             ))
         )
         :effect (and 
-            (at end (and (can_check)
+            (at end (and (can_check)(increase (cost) 1)
             ))
         )
     )
@@ -83,7 +80,7 @@
             ))
         )
         :effect (and 
-            (at end (and (end_game) 
+            (at end (and (end_game)(increase (cost) 1)
             ))
         )
     )

@@ -60,7 +60,7 @@ namespace KCL_rosplan {
         }
         else
         {
-            ROS_INFO("No valid solution");
+            ROS_INFO("Did not find IK solution");
         }
 
         group.setJointValueTarget(joint_values);
@@ -87,12 +87,12 @@ namespace KCL_rosplan {
             kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
             for (std::size_t i = 0; i < joint_names.size(); ++i)
             {
-            printf("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+            ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
             }
         }
         else
         {
-            printf("No valid solution");
+            ROS_INFO("Did not find IK solution");
         }
         
         
