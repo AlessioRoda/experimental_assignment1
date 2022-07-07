@@ -44,6 +44,7 @@
     (not_visited w2)
     (not_visited w3)
     (not_visited w4)
+    (not_visited oracle_room)
 
     )
 
