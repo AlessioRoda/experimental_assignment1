@@ -44,9 +44,32 @@ def reset():
     value.append("sherlock")
     Planner.add_attribute(attribute_name="in_position", key=key, value=value)
 
-    ## VEDI TU SE AGGIUNGERE ANCHE LE DISTANZE FATTE BENE
+    ##4 Add functions 
+    Planner.add_function(func_name="waypoints", key=[], value=[], func_value=0)
+    Planner.add_function(func_name="cost", key=[], value=[], func_value=0)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w1", "w2"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w2", "w1"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w1", "w4"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w4", "w1"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w2", "w3"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w3", "w2"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w3", "w4"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w4", "w3"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w1", "oracle_room"], func_value=3.5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w2", "oracle_room"], func_value=3.5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w3", "oracle_room"], func_value=3.5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w4", "oracle_room"], func_value=3.5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["oracle_room", "w1"], func_value=3.5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["oracle_room", "w2"], func_value=3.5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["oracle_room", "w3"], func_value=3.5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["oracle_room", "w4"], func_value=3.5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w1", "w3"], func_value=7.25)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w2", "w4"], func_value=7.25)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w3", "w1"], func_value=7.25)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w4", "w2"], func_value=7.25)
 
-    #4 Add the goal
+
+    #5 Add the goal
     Planner.add_goal(attribute_name="visited", key=["waypoint"], value=["w1"])
     Planner.add_goal(attribute_name="visited", key=["waypoint"], value=["w2"])
     Planner.add_goal(attribute_name="visited", key=["waypoint"], value=["w3"])
@@ -60,13 +83,13 @@ def reset():
     value_goal.append("sherlock")
     Planner.add_goal(attribute_name="in_position", key=key_goal, value=value_goal)
 
-    #5 Generate the problem
+    #6 Generate the problem
     Planner.generate_problem()
-    #6 Generate the plan
+    #7 Generate the plan
     Planner.generate_plan()
-    #7 Parse the plan
+    #8 Parse the plan
     Planner.parse_plan()
-    #8 Dispatch the plan and get solution
+    #9 Dispatch the plan and get solution
     solution=Planner.dispatch_plan()
 
     result=ResetActionResult()
@@ -87,6 +110,12 @@ def main():
     Main function 
     '''
     rospy.init_node('reset_planning')
+
+    Planner.generate_problem()
+    Planner.generate_plan()
+    Planner.parse_plan()
+    Planner.dispatch_plan()
+
    
     reset_action_server=actionlib.SimpleActionServer("reset_planning_action", ResetAction, reset, auto_start=False)
     reset_action_server.start()

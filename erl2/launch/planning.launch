@@ -49,7 +49,7 @@ output="screen">
 
 
     <!-- simulating actions -->
-    <arg name="simulating_actions" default="false" />
+    <!-- <arg name="simulating_actions" default="false" />
     <group if="$(eval arg('simulating_actions') == 'true')">
     <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
     <arg name="pddl_action_name" value="go_to_waypoint" />
@@ -64,7 +64,37 @@ output="screen">
     <include file="$(find rosplan_planning_system)/launch/includes/simulated_action.launch" >
     <arg name="pddl_action_name" value="checkConsistency" />
     </include>
-    </group>
+    </group> -->
 
+
+    <node name="rosplan_interface_go_to_waypoint" pkg="erl2" type="gotoWaypoint" respawn="false" output="screen">
+    <param name="knowledge_base" value="rosplan_knowledge_base" />
+    <param name="pddl_action_name" value="go_to_waypoint" />
+    <param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
+    <param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
+    </node>
+
+    <node name="rosplan_interface_movearm" pkg="erl2" type="movearm" respawn="false" output="screen">
+    <param name="knowledge_base" value="rosplan_knowledge_base" />
+    <param name="pddl_action_name" value="movearm" />
+    <param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
+    <param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
+    </node>
+
+    <node name="rosplan_interface_updateOntology" pkg="erl2" type="updateOntology" respawn="false" output="screen">
+    <param name="knowledge_base" value="rosplan_knowledge_base" />
+    <param name="pddl_action_name" value="updateOntology" />
+    <param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
+    <param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
+    </node>
+
+    <node name="rosplan_interface_checkConsistency" pkg="erl2" type="checkConsistency" respawn="false" output="screen">
+    <param name="knowledge_base" value="rosplan_knowledge_base" />
+    <param name="pddl_action_name" value="checkConsistency" />
+    <param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
+    <param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
+    </node>
+
+<node name="reset_planning" pkg ="erl2" type="reset_planner.py" output="screen" />
 
 </launch>

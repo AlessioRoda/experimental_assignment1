@@ -64,6 +64,24 @@ class Planner(object):
             req.knowledge.values.append(key_value)
         res=knowledge_update(req)
         return res
+
+
+
+    def add_function(func_name, key, value, func_value):
+        req = KnowledgeUpdateServiceRequest()
+        req.knowledge.attribute_name = func_name
+        req.knowledge.knowledge_type = req.knowledge.FUNCTION
+        assert len(key)!=len(value), "The key elements and the value one do not correspond in add_goal method"
+        for i, j in zip(key, value):
+            key_value=KeyValue()
+            key_value.key=i
+            key_value.value=j
+            req.knowledge.values.append(key_value)
+        req.knowledge.function_value = func_value
+        res=knowledge_update(req)
+        return res
+
+
         
     def clear_planner():
         rospy.wait_for_service('rosplan_knowledge_base/clear')

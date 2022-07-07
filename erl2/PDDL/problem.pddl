@@ -17,9 +17,9 @@
     (=(distance w1 w4) 5)
     (=(distance w4 w1) 5)
     (=(distance w2 w3) 5)
-    (=(distance w2 w1) 5)
     (=(distance w3 w2) 5)
     (=(distance w3 w4) 5)
+    (=(distance w4 w3) 5)
     (=(distance w1 oracle_room) 3.5) ;distance between the corner of the room and the center
     (=(distance w2 oracle_room) 3.5)
     (=(distance w3 oracle_room) 3.5)

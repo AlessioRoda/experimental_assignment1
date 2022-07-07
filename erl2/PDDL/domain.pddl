@@ -23,7 +23,6 @@
             (get_hint ?w - waypoint)
             (not_get_hint ?w - waypoint)
             (not_ontology_updated)
-            ;(distance ?from ?to - waypoint)
             (can_check)
             (not_can_check)
             (end_game)
@@ -32,7 +31,6 @@
 
 
 
-;(= ?duration (distance ?from ?to))
     (:durative-action go_to_waypoint
         :parameters (?from ?to - waypoint ?r - robot)
         :duration (= ?duration (distance ?from ?to))
