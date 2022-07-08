@@ -1,4 +1,4 @@
-#include "erl2/updateOntology.h"
+#include "erl2/update_ontology.h"
 #include <unistd.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>

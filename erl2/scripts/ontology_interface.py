@@ -185,7 +185,7 @@ def main():
     # path = path[:-7] + "cluedo_ontology.owl"
     # print("PATH: "+str(path))
 
-    path=rospy.get_param("ontology")
+    path=rospy.get_param("~ontology")
     print("PATH: "+str(path))
     
     # Loads the ontology

@@ -1,4 +1,4 @@
-#include "erl2/checkConsistency.h"
+#include "erl2/check_consistency.h"
 #include <erl2/Consistency.h>
 #include <unistd.h>
 #include <actionlib/client/simple_action_client.h>

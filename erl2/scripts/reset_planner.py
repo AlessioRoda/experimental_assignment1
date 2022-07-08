@@ -4,7 +4,7 @@ import rospy
 from erl2.msg import ResetAction, ResetActionResult
 import actionlib
 
-from classes.Planner import Planner
+from classes.planner import Planner
 
 reset_action_server=None
 

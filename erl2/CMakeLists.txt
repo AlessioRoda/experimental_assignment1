@@ -156,10 +156,10 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/experimental_assignment1_node.cpp)
-add_executable(checkConsistency src/checkConsistency.cpp)
+add_executable(checkConsistency src/check_consistency.cpp)
 add_executable(gotoWaypoint src/gotoWaypoint.cpp)
 add_executable(movearm src/movearm.cpp)
-add_executable(updateOntology src/updateOntology.cpp)
+add_executable(updateOntology src/update_ontology.cpp)
 add_executable(simulation src/simulation.cpp)
 
 ## Rename C++ executable without prefix

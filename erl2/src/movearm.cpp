@@ -13,7 +13,6 @@
 
 
 
-
 namespace KCL_rosplan {
 
 	MovearmActionInterface::MovearmActionInterface(ros::NodeHandle &nh) {
@@ -36,14 +35,32 @@ namespace KCL_rosplan {
         //Poition to reach
         geometry_msgs::Pose pose;
 
+        if(msg->parameters[1].value == "w1"){
+            pose.position.x=-3;
+            pose.position.y=0;
+        }
+        else if (msg->parameters[1].value == "w2"){
+		pose.position.x=3;
+		pose.position.y=0.0;
+		}
+		else if (msg->parameters[1].value == "w3"){
+		pose.position.x=0.0;
+		pose.position.y=3;
+		}
+		else if (msg->parameters[1].value == "w4"){
+		pose.position.x=0.0;
+		pose.position.y=-3;
+		}
+
+        pose.position.z=1.25;
         pose.orientation.w = 0;
         pose.orientation.x = 0;
         pose.orientation.y = 0;
         pose.orientation.z = 0;
-        pose.position.x =  0.5;
-        pose.position.y =  0;
-        pose.position.z =  1.25;
-
+        // pose.position.x =  0.5;
+        // pose.position.y =  0;
+        // pose.position.z =  1.25;
+        std::cout << "Pose: " <<pose<< std::endl;
         group.setStartStateToCurrentState();
         group.setApproximateJointValueTarget(pose, "cluedo_link");
         std::vector<double> joint_values;
@@ -121,7 +138,6 @@ namespace KCL_rosplan {
 	int main(int argc, char **argv) {
 		ros::init(argc, argv, "movearm_action", ros::init_options::AnonymousName);
 		ros::NodeHandle nh("~");
-
 		KCL_rosplan::MovearmActionInterface my_aci(nh);
 		my_aci.runActionInterface();
 

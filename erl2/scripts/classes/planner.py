@@ -1,10 +1,10 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
-from queue import Empty
 from rosplan_dispatch_msgs.srv import DispatchService
 from rosplan_knowledge_msgs.srv import KnowledgeUpdateService, KnowledgeUpdateServiceRequest
 from diagnostic_msgs.msg import KeyValue
 import rospy
+from std_srvs.srv import Empty
 
 knowledge_update=rospy.ServiceProxy('rosplan_knowledge_base/update', KnowledgeUpdateService)
 plan_dispatch=rospy.ServiceProxy('rosplan_plan_dispatcher/dispatch_plan', DispatchService) 

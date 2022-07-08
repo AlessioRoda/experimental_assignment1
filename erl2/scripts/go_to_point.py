@@ -164,7 +164,7 @@ def go_to_point(goal):
     result.result.reached=True
     server.set_succeeded(result.result)
     
-    return True
+    #return True
 
 
 ## In the main there are the initialization of the publisher, th subscriber and the SimpleActionServer

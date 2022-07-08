@@ -81,16 +81,16 @@ output="screen">
     <param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
     </node>
 
-    <node name="rosplan_interface_updateOntology" pkg="erl2" type="updateOntology" respawn="false" output="screen">
+    <node name="rosplan_interface_update_ontology" pkg="erl2" type="update_ontology" respawn="false" output="screen">
     <param name="knowledge_base" value="rosplan_knowledge_base" />
-    <param name="pddl_action_name" value="updateOntology" />
+    <param name="pddl_action_name" value="update_ontology" />
     <param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
     <param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
     </node>
 
-    <node name="rosplan_interface_checkConsistency" pkg="erl2" type="checkConsistency" respawn="false" output="screen">
+    <node name="rosplan_interface_check_consistency" pkg="erl2" type="check_consistency" respawn="false" output="screen">
     <param name="knowledge_base" value="rosplan_knowledge_base" />
-    <param name="pddl_action_name" value="checkConsistency" />
+    <param name="pddl_action_name" value="check_consistency" />
     <param name="action_dispatch_topic" value="/rosplan_plan_dispatcher/action_dispatch" />
     <param name="action_feedback_topic" value="/rosplan_plan_dispatcher/action_feedback" />
     </node>
