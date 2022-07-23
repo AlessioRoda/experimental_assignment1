@@ -176,16 +176,6 @@
             <jointName>arm_joint_04</jointName>
         </plugin>
     </gazebo>
-    <gazebo reference="cluedo_joint">
-        <provideFeedback>true</provideFeedback>
-    </gazebo>
-    <gazebo>
-        <plugin filename="libgazebo_ros_ft_sensor.so" name="ft_sensor">
-            <updateRate>100.0</updateRate>
-            <topicName>ft_sensor_topic</topicName>
-            <jointName>cluedo_joint</jointName>
-        </plugin>
-    </gazebo>
     <link name="base_link">
         <!-- pose and inertial -->
         <pose>0 0 0.1 0 0 0</pose>

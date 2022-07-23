@@ -27,27 +27,26 @@ namespace KCL_rosplan {
 		
 		actionlib::SimpleActionClient<erl2::MoveAction> ac("reaching_goal", true);
 		erl2::MoveAction goal;
-		ac.waitForServer();
-
+		
 		if(msg->parameters[1].value == "w1"){
-		pose_x=-2;
+		pose_x=-2.7;
 		pose_y=0.0;
 		orientation=M_PI;
 		}
 		else if (msg->parameters[1].value == "w2"){
-		pose_x=2;
+		pose_x=2.7;
 		pose_y=0.0;
 		orientation=0.0;
 		}
 		else if (msg->parameters[1].value == "w3"){
 		pose_x=0.0;
-		pose_y=2;
-		orientation=1.5*M_PI;
+		pose_y=2.7;
+		orientation=M_PI_2;
 		}
 		else if (msg->parameters[1].value == "w4"){
 		pose_x=0.0;
-		pose_y=-2;
-		orientation=M_PI_2;
+		pose_y=-2.7;
+		orientation=1.5*M_PI;
 		}
 		else { //Go to oracle room
 		pose_x=0.0;
@@ -58,7 +57,8 @@ namespace KCL_rosplan {
 		goal.action_goal.goal.x_pos=pose_x;
 		goal.action_goal.goal.y_pos=pose_y;
 		goal.action_goal.goal.theta=orientation;
-
+		
+		ac.waitForServer();
 		ac.sendGoal(goal.action_goal.goal);
 		ac.waitForResult();
 

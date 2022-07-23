@@ -24,6 +24,7 @@ nav_msgs
 rosplan_dispatch_msgs
 rosplan_knowledge_msgs
 std_srvs
+moveit_msgs
 
 )
 
@@ -93,6 +94,7 @@ add_service_files(
    armor_msgs  
    rosplan_knowledge_msgs
    std_srvs
+   moveit_msgs
  )
 
 ################################################

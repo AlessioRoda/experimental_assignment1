@@ -65,15 +65,15 @@
        default=" -J arm_joint_01 -1.544 -J arm_joint_02 -0.3318 -J arm_joint_03 -0.6159 -J arm_joint_04 0.1284 -J cluedo_joint -0.3481"/>
 
   <!-- unpause only after loading robot model -->
-  <arg name="unpause" value="$(eval '' if arg('paused') else '-unpause')" />
+  <!-- <arg name="unpause" value="$(eval '' if arg('paused') else '-unpause')" />
   <arg name="world_pose" value="-x 0 -y 0 -z 0" />
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot $(arg unpause) $(arg world_pose) $(arg initial_joint_positions)"
-    respawn="false" output="screen" />
-
-  <!-- push robot_description to factory and spawn robot in gazebo at the origin, change x,y,z arguments to spawn in a different position
+    respawn="false" output="screen" /> -->
+	
+  <!-- push robot_description to factory and spawn robot in gazebo at the origin, change x,y,z arguments to spawn in a different position -->
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -x 0 -y 0 -z 0"
     respawn="false" output="screen" />
-	 -->
+
 
    <!-- Load joint controller parameters for Gazebo -->
   <rosparam file="$(find moveit_config)/config/gazebo_controllers.yaml" />
@@ -81,9 +81,9 @@
 
    <include file="$(find moveit_config)/launch/demo.launch" pass_all_args="true">
      <!-- robot description is loaded by gazebo.launch, to enable Gazebo features -->
-    <arg name="load_robot_description" value="false" />
+     <arg name="load_robot_description" value="false" />
     <arg name="moveit_controller_manager" value="ros_control" />
-  </include>
+  </include> 
 
 
 

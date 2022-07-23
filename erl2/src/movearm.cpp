@@ -10,8 +10,16 @@
 #include <moveit/robot_model/robot_model.h>
 #include <moveit/robot_state/robot_state.h>
 #include <geometry_msgs/Pose.h>
+#include <moveit_msgs/GetStateValidity.h>
+#include <moveit_msgs/GetPlanningScene.h>
+#include<unistd.h>
 
 
+#define _USE_MATH_DEFINES
+
+
+ros::ServiceClient validity_service;
+ros::ServiceClient planning_scene_service;
 
 namespace KCL_rosplan {
 
@@ -32,6 +40,7 @@ namespace KCL_rosplan {
         moveit::planning_interface::MoveGroupInterface group("arm");
         const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
+        
         //Poition to reach
         geometry_msgs::Pose pose;
 
@@ -54,17 +63,48 @@ namespace KCL_rosplan {
 
         pose.position.z=1.25;
         pose.orientation.w = 0;
-        pose.orientation.x = 0;
-        pose.orientation.y = 0;
-        pose.orientation.z = 0;
-        // pose.position.x =  0.5;
-        // pose.position.y =  0;
-        // pose.position.z =  1.25;
+	    pose.orientation.x = 0;
+	    pose.orientation.y = 0;
+	    pose.orientation.z = 0;
+
         std::cout << "Pose: " <<pose<< std::endl;
         group.setStartStateToCurrentState();
         group.setApproximateJointValueTarget(pose, "cluedo_link");
+        
+        moveit_msgs::GetPlanningScene req_scene;
+        planning_scene_service.waitForExistence();
+        
+        if (planning_scene_service.call(req_scene))
+        {
+            moveit_msgs::PlanningScene scene = req_scene.response.scene;
+
+            moveit_msgs::GetStateValidity req;
+            req.request.robot_state=scene.robot_state; 
+            req.request.group_name ="arm";
+            if(validity_service.call(req))
+            {
+                bool valid=req.response.valid;
+                if(valid==true)
+                {
+                    std::cout << "Position to reach is valid " << std::endl;
+                }
+                else
+                {
+                    std::cout << "Position to reach is NOT VALID " << std::endl;
+                }
+            }
+            else
+            {
+                std::cout << "Error in getting the validity of the pose" << std::endl;
+            }
+        }
+        else 
+        {
+            std::cout << "Error in getting the scene " << std::endl;
+        }
+        
         std::vector<double> joint_values;
-        double timeout = 0.1;
+        double timeout = 1;
         bool found_ik = kinematic_state->setFromIK(joint_model_group, pose, timeout);
 
         if (found_ik)
@@ -82,8 +122,8 @@ namespace KCL_rosplan {
 
         group.setJointValueTarget(joint_values);
         group.setStartStateToCurrentState();
-        group.setGoalOrientationTolerance(0.01);
-        group.setGoalPositionTolerance(0.01);
+        group.setGoalOrientationTolerance(2*M_PI); //Don't care about orientation
+        group.setGoalPositionTolerance(0.1);
 
         // Plan and execute
         moveit::planning_interface::MoveGroupInterface::Plan my_plan;
@@ -115,7 +155,7 @@ namespace KCL_rosplan {
         
         group.setJointValueTarget(joint_values);
         group.setStartStateToCurrentState();
-        group.setGoalOrientationTolerance(0.01);
+        group.setGoalOrientationTolerance(1000);
         group.setGoalPositionTolerance(0.01);
 
         // Plan and execute
@@ -124,8 +164,17 @@ namespace KCL_rosplan {
 
         sleep(2.0);
 
-        group.setNamedTarget("starting_position");
-	    group.move(); 
+        // group.setNamedTarget("initial_pose");
+	    // group.move(); 
+        // sleep(1);
+
+        // group.setNamedTarget("reach_target");
+	    // group.move(); 
+        // sleep(1);
+
+        // group.setNamedTarget("initial_pose");
+	    // group.move(); 
+        // sleep(1);
 		
 		ROS_INFO("Action (%s) performed: completed!", msg->name.c_str());
 		return true;
@@ -138,6 +187,10 @@ namespace KCL_rosplan {
 	int main(int argc, char **argv) {
 		ros::init(argc, argv, "movearm_action", ros::init_options::AnonymousName);
 		ros::NodeHandle nh("~");
+        validity_service=nh.serviceClient<moveit_msgs::GetStateValidity>("/check_state_validity");
+        planning_scene_service=nh.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
+        ros::AsyncSpinner spinner(1); //Nuova aggiunta, vedi se funziona
+        spinner.start();
 		KCL_rosplan::MovearmActionInterface my_aci(nh);
 		my_aci.runActionInterface();
 
