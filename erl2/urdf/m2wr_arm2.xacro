@@ -163,6 +163,35 @@
   	<child link="arm_base_link"/>
   </joint>
 
+  <link name="arm_link_0">
+  	<inertial>
+  		<mass value="0.025"/>
+  		<origin xyz="0 0 0" rpy="0 0 0" />
+  		<inertia ixx="0.000010279" ixy="0" ixz="0" iyy="0.000010279" iyz="0" izz="0.000007225"/>
+  	</inertial>
+  	<collision>
+  	  <origin xyz="0 0 ${len_coeff*0}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.04" length="${len_coeff*0}"/>
+      </geometry>
+  	</collision>
+  	<visual>
+  	  <origin xyz="0 0 ${len_coeff*0}" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.04" length="${len_coeff*0}"/>
+      </geometry>
+      <material name="red" />
+  	</visual>
+  </link>
+
+  <joint name="arm_joint_0" type="revolute">
+  	<axis xyz="0 1 0"/>
+  	<limit effort="1000.0" lower="-1.7" upper="1.7" velocity="0.2"/>
+  	<origin rpy="0 0 0" xyz="0 0 ${len_coeff*0.0001}"/> 
+  	<parent link="arm_base_link"/>
+  	<child link="arm_link_0"/>
+  </joint>
+
 
   <link name="arm_link_01">
   	<inertial>
@@ -189,7 +218,7 @@
   	<axis xyz="0 0 1"/>
   	<limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.2"/>
   	<origin rpy="0 0 0" xyz="0 0 ${len_coeff*0.5}"/> 
-  	<parent link="arm_base_link"/>
+  	<parent link="arm_link_0"/>
   	<child link="arm_link_01"/>
   </joint>
 
@@ -367,7 +396,16 @@
   </joint>
 
 
-
+<transmission name="arm_joint_0_trans">
+	<type>transmission_interface/SimpleTransmission</type>
+	<joint name="arm_joint_0">
+		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+	</joint>
+	<actuator name="motor0">
+		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+		<mechanicalInterface>1</mechanicalInterface>
+	</actuator>
+</transmission>
 
 <transmission name="arm_joint_01_trans">
 	<type>transmission_interface/SimpleTransmission</type>

@@ -13,6 +13,10 @@
     <material>Gazebo/Red</material>
   </gazebo>
 
+
+  <gazebo reference="arm_link_0">
+    <material>Gazebo/Red</material>
+  </gazebo>
   <gazebo reference="arm_link_01">
     <material>Gazebo/Red</material>
   </gazebo>
@@ -42,21 +46,6 @@
   </gazebo>
 
 
-
-
-  <gazebo reference="arm_joint_02">
-    <provideFeedback>true</provideFeedback>
-</gazebo>
-
-
-<!-- The ft_sensor plugin -->  
-<gazebo>
-    <plugin name="ft_sensor" filename="libgazebo_ros_ft_sensor.so">
-        <updateRate>100.0</updateRate>
-        <topicName>ft_sensor_topic</topicName>
-        <jointName>arm_joint_02</jointName>
-    </plugin>
-</gazebo>
  
  
   <gazebo>
@@ -125,6 +114,16 @@
     </plugin>
   </gazebo>
 
+  <gazebo reference="arm_joint_0">
+  <provideFeedback>true</provideFeedback>
+  </gazebo>
+  <gazebo>
+  <plugin name="ft_sensor" filename="libgazebo_ros_ft_sensor.so">
+  <updateRate>100.0</updateRate>
+  <topicName>ft_sensor_topic</topicName>
+  <jointName>arm_joint_0</jointName>
+  </plugin>
+  </gazebo>
 
   <gazebo reference="arm_joint_01">
   <provideFeedback>true</provideFeedback>

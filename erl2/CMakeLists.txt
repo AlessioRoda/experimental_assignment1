@@ -163,6 +163,7 @@ add_executable(gotoWaypoint src/gotoWaypoint.cpp)
 add_executable(movearm src/movearm.cpp)
 add_executable(updateOntology src/update_ontology.cpp)
 add_executable(simulation src/simulation.cpp)
+add_executable(init src/init.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -177,6 +178,7 @@ add_dependencies(gotoWaypoint ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPOR
 add_dependencies(movearm ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(updateOntology ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(simulation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(init ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
  target_link_libraries(checkConsistency
@@ -192,6 +194,9 @@ target_link_libraries(updateOntology
 ${catkin_LIBRARIES}
 )
 target_link_libraries(simulation
+${catkin_LIBRARIES}
+)
+target_link_libraries(init
 ${catkin_LIBRARIES}
 )
 

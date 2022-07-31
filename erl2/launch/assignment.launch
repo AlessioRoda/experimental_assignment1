@@ -5,9 +5,9 @@
   <!-- Load the URDF into the ROS Parameter Server -->
   <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)" />
 	
-	<param name="use_gui" value="True"/>
+	<!-- <param name="use_gui" value="True"/>
     <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" ></node>
-	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> 
+	<node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />  -->
 
 
   <arg name="gazebo_gui" default="true"/>
@@ -62,7 +62,7 @@
   -J arm_joint_03 -1.02 -J arm_joint_04 0.7215 -J cluedo_link_joint 0.0"/>  -->
 
  <arg name="initial_joint_positions" doc="Initial joint configuration of the robot"
-       default=" -J arm_joint_01 -1.544 -J arm_joint_02 -0.3318 -J arm_joint_03 -0.6159 -J arm_joint_04 0.1284 -J cluedo_joint -0.3481"/>
+       default=" -J arm_joint_0 0 -J arm_joint_01 -1.544 -J arm_joint_02 -0.3318 -J arm_joint_03 -0.6159 -J arm_joint_04 0.1284 -J cluedo_joint -0.3481"/>
 
   <!-- unpause only after loading robot model -->
   <!-- <arg name="unpause" value="$(eval '' if arg('paused') else '-unpause')" />
@@ -76,7 +76,7 @@
 
 
    <!-- Load joint controller parameters for Gazebo -->
-  <rosparam file="$(find moveit_config)/config/gazebo_controllers.yaml" />
+  <rosparam file="$(find moveit_config)/config/ros_controllers.yaml" />
   <include file="$(find moveit_config)/launch/ros_controllers.launch"/>
 
    <include file="$(find moveit_config)/launch/demo.launch" pass_all_args="true">

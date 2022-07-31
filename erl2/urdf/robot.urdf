@@ -40,6 +40,9 @@
     <gazebo reference="arm_base_link">
         <material>Gazebo/Red</material>
     </gazebo>
+    <gazebo reference="arm_link_0">
+        <material>Gazebo/Red</material>
+    </gazebo>
     <gazebo reference="arm_link_01">
         <material>Gazebo/Red</material>
     </gazebo>
@@ -63,17 +66,6 @@
     </gazebo>
     <gazebo reference="left_grip_link">
         <material>Gazebo/White</material>
-    </gazebo>
-    <gazebo reference="arm_joint_02">
-        <provideFeedback>true</provideFeedback>
-    </gazebo>
-    <!-- The ft_sensor plugin -->
-    <gazebo>
-        <plugin filename="libgazebo_ros_ft_sensor.so" name="ft_sensor">
-            <updateRate>100.0</updateRate>
-            <topicName>ft_sensor_topic</topicName>
-            <jointName>arm_joint_02</jointName>
-        </plugin>
     </gazebo>
     <gazebo>
         <plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
@@ -134,6 +126,16 @@
             <robotNamespace>m2wr</robotNamespace>
             <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
             <legacyModeNS>true</legacyModeNS>
+        </plugin>
+    </gazebo>
+    <gazebo reference="arm_joint_0">
+        <provideFeedback>true</provideFeedback>
+    </gazebo>
+    <gazebo>
+        <plugin filename="libgazebo_ros_ft_sensor.so" name="ft_sensor">
+            <updateRate>100.0</updateRate>
+            <topicName>ft_sensor_topic</topicName>
+            <jointName>arm_joint_0</jointName>
         </plugin>
     </gazebo>
     <gazebo reference="arm_joint_01">
@@ -336,6 +338,35 @@
         <parent link="base_link" />
         <child link="arm_base_link" />
     </joint>
+    <link name="arm_link_0">
+        
+<inertial>
+            <mass value="0.025" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="0.000010279" ixy="0" ixz="0" iyy="0.000010279" iyz="0" izz="0.000007225" />
+        </inertial>
+
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0.0" />
+            <geometry>
+                <cylinder length="0.0" radius="0.04" />
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0.0" />
+            <geometry>
+                <cylinder length="0.0" radius="0.04" />
+            </geometry>
+            <material name="red" />
+        </visual>
+    </link>
+    <joint name="arm_joint_0" type="revolute">
+        <axis xyz="0 1 0" />
+        <limit effort="1000.0" lower="-1.7" upper="1.7" velocity="0.2" />
+        <origin rpy="0 0 0" xyz="0 0 8e-05" />
+        <parent link="arm_base_link" />
+        <child link="arm_link_0" />
+    </joint>
     <link name="arm_link_01">
         
 <inertial>
@@ -362,7 +393,7 @@
         <axis xyz="0 0 1" />
         <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.2" />
         <origin rpy="0 0 0" xyz="0 0 0.4" />
-        <parent link="arm_base_link" />
+        <parent link="arm_link_0" />
         <child link="arm_link_01" />
     </joint>
     <link name="arm_link_02">
@@ -539,7 +570,17 @@
         <child link="left_grip_link" />
     </joint>
     
-<transmission name="arm_joint_01_trans">
+<transmission name="arm_joint_0_trans">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="arm_joint_0">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="motor0">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalInterface>1</mechanicalInterface>
+        </actuator>
+    </transmission>
+    <transmission name="arm_joint_01_trans">
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="arm_joint_01">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
@@ -625,6 +666,16 @@
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </joint>
         <actuator name="joint_left_wheel_motor">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+            <mechanicalReduction>1</mechanicalReduction>
+        </actuator>
+    </transmission>
+    <transmission name="trans_arm_joint_0">
+        <type>transmission_interface/SimpleTransmission</type>
+        <joint name="arm_joint_0">
+            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+        </joint>
+        <actuator name="arm_joint_0_motor">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
             <mechanicalReduction>1</mechanicalReduction>
         </actuator>

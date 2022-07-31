@@ -41,7 +41,7 @@ namespace KCL_rosplan {
         const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
         
-        //Poition to reach
+       // Poition to reach
         geometry_msgs::Pose pose;
 
         if(msg->parameters[1].value == "w1"){
