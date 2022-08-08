@@ -29,23 +29,23 @@ namespace KCL_rosplan {
 		erl2::MoveAction goal;
 		
 		if(msg->parameters[1].value == "w1"){
-		pose_x=-2.7;
+		pose_x=-2.0;
 		pose_y=0.0;
 		orientation=M_PI;
 		}
 		else if (msg->parameters[1].value == "w2"){
-		pose_x=2.7;
+		pose_x=2.0;
 		pose_y=0.0;
 		orientation=0.0;
 		}
 		else if (msg->parameters[1].value == "w3"){
 		pose_x=0.0;
-		pose_y=2.7;
+		pose_y=2.0;
 		orientation=M_PI_2;
 		}
 		else if (msg->parameters[1].value == "w4"){
 		pose_x=0.0;
-		pose_y=-2.7;
+		pose_y=-2.0;
 		orientation=1.5*M_PI;
 		}
 		else { //Go to oracle room
