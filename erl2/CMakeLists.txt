@@ -17,14 +17,12 @@ message_generation
 moveit_ros_planning_interface
 actionlib
 actionlib_msgs
-rosplan_planning_system
 armor_msgs
 geometry_msgs
 nav_msgs
-rosplan_dispatch_msgs
-rosplan_knowledge_msgs
 std_srvs
 moveit_msgs
+move_base_msgs
 
 )
 
@@ -92,7 +90,6 @@ add_service_files(
    std_msgs
    actionlib_msgs
    armor_msgs  
-   rosplan_knowledge_msgs
    std_srvs
    moveit_msgs
  )
@@ -158,12 +155,8 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/experimental_assignment1_node.cpp)
-add_executable(checkConsistency src/check_consistency.cpp)
-add_executable(gotoWaypoint src/gotoWaypoint.cpp)
 add_executable(movearm src/movearm.cpp)
-add_executable(updateOntology src/update_ontology.cpp)
-add_executable(simulation src/simulation.cpp)
-add_executable(init src/init.cpp)
+add_executable(init_arm src/init_arm.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -173,30 +166,14 @@ add_executable(init src/init.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
-add_dependencies(checkConsistency ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(gotoWaypoint ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(movearm ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(updateOntology ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(simulation ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-add_dependencies(init ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(init_arm ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
- target_link_libraries(checkConsistency
-   ${catkin_LIBRARIES}
- )
- target_link_libraries(gotoWaypoint
- ${catkin_LIBRARIES}
-)
 target_link_libraries(movearm
 ${catkin_LIBRARIES}
 )
-target_link_libraries(updateOntology
-${catkin_LIBRARIES}
-)
-target_link_libraries(simulation
-${catkin_LIBRARIES}
-)
-target_link_libraries(init
+target_link_libraries(init_arm
 ${catkin_LIBRARIES}
 )
 
@@ -210,7 +187,7 @@ ${catkin_LIBRARIES}
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-scripts/ontology_interface.py scripts/go_to_point.py scripts/reset_planner.py
+scripts/ontology_interface.py 
 DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
