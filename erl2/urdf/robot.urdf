@@ -165,6 +165,43 @@
             <jointName>arm_joint_04</jointName>
         </plugin>
     </gazebo>
+    <!-- camera -->
+    <gazebo reference="camera_link">
+        <sensor name="camera1" type="camera">
+            <update_rate>30.0</update_rate>
+            <camera name="head">
+                <horizontal_fov>1.3962634</horizontal_fov>
+                <image>
+                    <width>800</width>
+                    <height>800</height>
+                    <format>R8G8B8</format>
+                </image>
+                <clip>
+                    <near>0.02</near>
+                    <far>300</far>
+                </clip>
+                <noise>
+                    <type>gaussian</type>
+                    <mean>0.0</mean>
+                    <stddev>0.007</stddev>
+                </noise>
+            </camera>
+            <plugin filename="libgazebo_ros_camera.so" name="camera_controller">
+                <alwaysOn>true</alwaysOn>
+                <updateRate>0.0</updateRate>
+                <cameraName>robot/camera1</cameraName>
+                <imageTopicName>image_raw</imageTopicName>
+                <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+                <frameName>camera_link</frameName>
+                <hackBaseline>0.07</hackBaseline>
+                <distortionK1>0.0</distortionK1>
+                <distortionK2>0.0</distortionK2>
+                <distortionK3>0.0</distortionK3>
+                <distortionT1>0.0</distortionT1>
+                <distortionT2>0.0</distortionT2>
+            </plugin>
+        </sensor>
+    </gazebo>
     <link name="base_link">
         <!-- pose and inertial -->
         <pose>0 0 0.1 0 0 0</pose>
@@ -378,7 +415,7 @@
     </link>
     <joint name="arm_joint_02" type="revolute">
         <axis xyz="1 0 0" />
-        <limit effort="1000.0" lower="-1.7" upper="-0.19" velocity="0.2" />
+        <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.2" />
         <origin rpy="0 0 0" xyz="0 0 0.4" />
         <parent link="arm_link_01" />
         <child link="arm_link_02" />
@@ -407,7 +444,7 @@
     </link>
     <joint name="arm_joint_03" type="revolute">
         <axis xyz="1 0 0" />
-        <limit effort="1000.0" lower="-1.8" upper="-0.28" velocity="0.2" />
+        <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.2" />
         <origin rpy="0 0 0" xyz="0 0 0.8" />
         <parent link="arm_link_02" />
         <child link="arm_link_03" />
@@ -463,11 +500,41 @@
 
     </link>
     <joint name="cluedo_joint" type="revolute">
-        <axis xyz="1 0 0" />
+        <axis xyz="0 0 0" />
         <limit effort="1000.0" lower="-1.8" upper="1.8" velocity="0.5" />
         <origin rpy="0 0 0" xyz="0 0 0" />
         <parent link="arm_link_04" />
         <child link="cluedo_link" />
+    </joint>
+    <link name="camera_link">
+        <collision>
+            <origin rpy="0 0 0" xyz="0 0 0.025" />
+            <geometry>
+                <box size="0.05 0.05 0.05" />
+            </geometry>
+        </collision>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0.025" />
+            <geometry>
+                <box size="0.05 0.05 0.05" />
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 1" />
+            </material>
+        </visual>
+        
+<inertial>
+            <mass value="1e-5" />
+            <origin rpy="0 0 0" xyz="0 0 0" />
+            <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+        </inertial>
+
+    </link>
+    <joint name="camera_joint" type="fixed">
+        <axis xyz="0 1 0" />
+        <origin rpy="0 0 0" xyz="0 0 0.05" />
+        <parent link="cluedo_link" />
+        <child link="camera_link" />
     </joint>
     <link name="right_grip_link">
         

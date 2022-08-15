@@ -16,57 +16,75 @@
 
 ros::ServiceClient validity_service;
 ros::ServiceClient planning_scene_service;
-actionlib::SimpleActionServer<erl2::MoveAction> movearm_server;
 
-void init_arm()
+class Movearm_class
 {
-    robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
+protected:
+    actionlib::SimpleActionServer<erl2::MoveAction> movearm_server;
 
-    const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
-    ROS_INFO("Model frame: %s", kinematic_model->getModelFrame().c_str());
+public:
+    Movearm_class(ros::NodeHandle node_handler) :
+    movearm_server(node_handler, "movearm_action", boost::bind(&Movearm_class::movearm_request, this, _1), false)
+    {
+        init_arm();
+        movearm_server.start();
+    }
 
-    moveit::core::RobotStatePtr kinematic_state(new moveit::core::RobotState(kinematic_model));
-    kinematic_state->setToDefaultValues();
-    const moveit::core::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("arm");
-    moveit::planning_interface::MoveGroupInterface group("arm");
-    const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
+    ~Movearm_class(void)
+    {
+    }
 
-    group.setNamedTarget("initial_pose");
-    group.move();
-}
+    void init_arm()
+    {
+        robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
 
-void movearm_request(const erl2::MoveGoalConstPtr &goal)
-{
-    const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
-    ROS_INFO("Model frame: %s", kinematic_model->getModelFrame().c_str());
+        const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
+        ROS_INFO("Model frame: %s", kinematic_model->getModelFrame().c_str());
 
-    moveit::core::RobotStatePtr kinematic_state(new moveit::core::RobotState(kinematic_model));
-    kinematic_state->setToDefaultValues();
-    const moveit::core::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("arm");
-    moveit::planning_interface::MoveGroupInterface group("arm");
-    const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
+        moveit::core::RobotStatePtr kinematic_state(new moveit::core::RobotState(kinematic_model));
+        kinematic_state->setToDefaultValues();
+        const moveit::core::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("arm");
+        moveit::planning_interface::MoveGroupInterface group("arm");
+        const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
-    group.setNamedTarget("explore_pose1");
-    group.move();
-    sleep(0.5);
+        group.setNamedTarget("initial_pose");
+        group.move();
+    }
 
-    /// Ruota di 180° in una direzione e poi nell'altra per esplorare tutto ///
+    void movearm_request(const erl2::MoveGoalConstPtr &goal)
+    {
+        robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
+        const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
+        ROS_INFO("Model frame: %s", kinematic_model->getModelFrame().c_str());
 
-    sleep(0.1)
-    group.setNamedTarget("explore_pose2");
-    group.move();
-    sleep(0.5);
+        moveit::core::RobotStatePtr kinematic_state(new moveit::core::RobotState(kinematic_model));
+        kinematic_state->setToDefaultValues();
+        const moveit::core::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("arm");
+        moveit::planning_interface::MoveGroupInterface group("arm");
+        const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
-    /// Ruota di 180° in una direzione e poi nell'altra per esplorare tutto ///
+        group.setNamedTarget("search_aruco_01");
+        group.move();
+        sleep(0.1);
+        group.setNamedTarget("search_aruco_02");
+        group.move();
+        sleep(0.1);
+        group.setNamedTarget("search_aruco_03");
+        group.move();
+        sleep(0.1);
+        group.setNamedTarget("search_aruco_04");
+        group.move();
+        sleep(0.1);
 
-    //Return to initial position
-    group.setNamedTarget("initial_pose");
-    group.move();
-    sleep(0.1);
+        //Return to initial position
+        group.setNamedTarget("initial_pose");
+        group.move();
+        sleep(0.1);
 
-    movearm_server.setSucceeded();
+        movearm_server.setSucceeded();
 
-}
+    }
+};
 
 
 int main(int argc, char **argv)
@@ -76,13 +94,9 @@ int main(int argc, char **argv)
     ros::NodeHandle nh("~");
     validity_service=nh.serviceClient<moveit_msgs::GetStateValidity>("/check_state_validity");
     planning_scene_service=nh.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
-    init_arm();
-    movearm_server(nh, "movearm_action", boost::bind(&movearm_request, this, _1), false);
-    movearm_server.start();
+    Movearm_class ma(nh);
     ros::AsyncSpinner spinner(1); //Nuova aggiunta, vedi se funziona
     spinner.start();
 
     return 0;
-    
-
 }

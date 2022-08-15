@@ -85,10 +85,32 @@ class Explore(smach.State):
             return 'solution'
         
         else:
-            movearm_client.send_goal()
+            movearm_client.wait_for_server()
+            movearm_client.send_goal_and_wait()
             # Move the arm to explore the room
 
             return 'enter_room'
+
+class Check_Consistency(smach.State):
+    def __init__(self):
+
+        smach.State.__init__(self, 
+                             outcomes=['explore'])
+
+    def execute(self, userdata):
+        print("Check-consistency")
+        return 'explore'
+
+
+class Try_Solution(smach.State):
+    def __init__(self):
+
+        smach.State.__init__(self, 
+                             outcomes=['explore', 'correct'])
+
+    def execute(self, userdata):
+        print("Try solution")
+        return 'explore'
 
 
 def main():
@@ -99,6 +121,8 @@ def main():
     #pub_move_base=rospy.Publisher('move_base/goal', MoveBaseActionGoal, queue_size=1)
     pub_move_base=actionlib.SimpleActionClient('move_base', MoveBaseAction)
     movearm_client=actionlib.SimpleActionClient('movearm_action', MoveAction)
+
+    init_scene()
 
     # Create a SMACH state machine
     sm = smach.StateMachine(outcomes=['state_machine'])
@@ -112,7 +136,7 @@ def main():
                                transitions={'check_consistency':'CHECK_CONSISTENCY',
                                             'solution':'SOLUTION' })
 
-        smach.StateMachine.add('ENTER_ROOM', Check_Consistency(), 
+        smach.StateMachine.add('CHECK_CONSISTENCY', Check_Consistency(), 
                                transitions={'explore':'MOVE'})
         
         smach.StateMachine.add('SOLUTION', Try_Solution(),
