@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 import rospy
-from move_base_msgs.msg import MoveBaseAction, MoveBaseActionGoal
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import smach
 import smach_ros
 from classes.place import Place
@@ -40,8 +40,8 @@ def init_scene():
     places.append(Place('ROOM5', 5, -3))
     places.append(Place('ROOM6', 5, 1))
 
-    oracle_room=Place('Oracle_Room', 0, 0)
-    actual_pos=Place('Oracle_Room', 0, 0) #Starts in the oracle room
+    oracle_room=Place('Oracle_Room', 0, -1)
+    actual_pos=Place('Oracle_Room', 0, -1) #Starts in the oracle room
 
 
 
@@ -62,12 +62,16 @@ class Explore(smach.State):
             destination=oracle_room
 
         ## Initialize a MoveBaseActionGoal target to move my robot
-        move_goal = MoveBaseActionGoal()
-        move_goal.goal.target_pose.header.frame_id="map"
-        move_goal.goal.target_pose.pose.orientation.w=1
+        move_goal = MoveBaseGoal()
+        move_goal.target_pose.header.frame_id="map"
+        move_goal.target_pose.pose.orientation.w=1
+        move_goal.target_pose.pose.orientation.z=0
+        move_goal.target_pose.pose.orientation.x=0
+        move_goal.target_pose.pose.orientation.y=0
 
-        move_goal.goal.target_pose.pose.position.x = destination.x
-        move_goal.goal.target_pose.pose.position.y = destination.y
+        move_goal.target_pose.pose.position.x = destination.x
+        move_goal.target_pose.pose.position.y = destination.y
+        move_goal.target_pose.pose.position.z = 0
 
         pub_move_base.wait_for_server()
         print("\nMoving from " + actual_pos.name + " to " + destination.name +"\n")
@@ -89,7 +93,7 @@ class Explore(smach.State):
             movearm_client.send_goal_and_wait()
             # Move the arm to explore the room
 
-            return 'enter_room'
+            return 'check_consistency'
 
 class Check_Consistency(smach.State):
     def __init__(self):

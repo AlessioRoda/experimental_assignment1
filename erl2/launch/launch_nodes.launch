@@ -8,6 +8,6 @@
    </node>
    <node name="simulation" pkg ="exp_assignment3" type="final_oracle"  /> 
    <node name="movearm" pkg ="erl2" type="movearm"  /> 
-   <node name="state_machine" pkg ="erl2" type="state_machine.py"  /> 
+   <node name="state_machine" pkg ="erl2" type="state_machine.py"  output="screen"/> 
    
 </launch>
