@@ -32,9 +32,6 @@
     <gazebo reference="cluedo_link">
     <material>Gazebo/Red</material>
   </gazebo>
-
-
-
       <gazebo reference="right_grip_link">
     <material>Gazebo/White</material>
   </gazebo>
@@ -43,7 +40,6 @@
   </gazebo>
 
 
- 
  
   <gazebo>
     <plugin filename="libgazebo_ros_diff_drive.so" name="differential_drive_controller">
@@ -95,21 +91,12 @@
         </noise>
       </ray>
       <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
-        <topicName>m2wr/laser/scan</topicName>
+        <topicName>/scan</topicName>
         <frameName>laser</frameName>
       </plugin>
     </sensor>
   </gazebo>
 
-
-
-  <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-      <robotNamespace>m2wr</robotNamespace>
-      <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-      <legacyModeNS>true</legacyModeNS>
-    </plugin>
-  </gazebo>
 
 
   <gazebo reference="arm_joint_01">

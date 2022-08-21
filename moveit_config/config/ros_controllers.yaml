@@ -1,7 +1,7 @@
 # Simulation settings for using moveit_sim_controllers
 moveit_sim_hw_interface:
   joint_model_group: arm
-  joint_model_group_pose: search_aruco_03
+  joint_model_group_pose: initial_pose
 # Settings for ros_control_boilerplate control loop
 generic_hw_control_loop:
   loop_hz: 300
@@ -45,27 +45,27 @@ arm_controller:
     - cluedo_joint
   gains:
     arm_joint_01:
-      p: 60
+      p: 30
       d: 0
       i: 0
       i_clamp: 0
     arm_joint_02:
-      p: 60
+      p: 30
       d: 0
       i: 0
       i_clamp: 0
     arm_joint_03:
-      p: 60
+      p: 30
       d: 0
       i: 0
       i_clamp: 0
     arm_joint_04:
-      p: 60
+      p: 30
       d: 0
       i: 0
       i_clamp: 0
     cluedo_joint:
-      p: 60
+      p: 30
       d: 0
       i: 0
       i_clamp: 0
