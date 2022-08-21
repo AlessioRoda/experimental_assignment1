@@ -282,33 +282,9 @@
   </joint>
 
 
-    <link name="cluedo_link">
-  	<collision>
-  	  <origin xyz="0 0 ${len_coeff*0}" rpy="0 0 1.57"/>
-      <geometry>
-        <box size="0.0001 0.0001 0.0001"/>
-      </geometry>
-  	</collision>
-  	<visual>
-  	  <origin xyz="0 0 ${len_coeff*0}" rpy="0 0 1.57"/>
-      <geometry>
-        <box size="0.0001 0.0001 0.0001"/>
-      </geometry>
-      <material name="red" />
-  	</visual>
-  </link>
-
-    <joint name="cluedo_joint" type="revolute">
-  	<axis xyz="0 0 0"/>
-  	<limit effort="1000.0" lower="-1.8" upper="1.8" velocity="0.5"/>
-  	<origin rpy="0 0 0" xyz="0 0 0"/>
-  	<parent link="arm_link_04"/>
-  	<child link="cluedo_link"/>
-  </joint>
-
   <link name="camera_link">
 	    <collision>
-	      <origin xyz="0 0 0.025" rpy="0 0 0"/>
+	      <origin xyz="0 0 0.025" rpy="0 0 1.57"/>
 	      <geometry>
 		<box size="0.05 0.05 0.05"/>
 	      </geometry>
@@ -443,16 +419,6 @@
 	</actuator>
 </transmission>
 
-<transmission name="cluedo_joint_trans">
-	<type>transmission_interface/SimpleTransmission</type>
-	<joint name="cluedo_joint">
-		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-	</joint>
-	<actuator name="motor5">
-		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-		<mechanicalInterface>1</mechanicalInterface>
-	</actuator>
-</transmission>
 
 <transmission name="left_grip_trans">
 	<type>transmission_interface/SimpleTransmission</type>

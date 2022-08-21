@@ -6,7 +6,6 @@ controller_list:
       - arm_joint_02
       - arm_joint_03
       - arm_joint_04
-      - cluedo_joint
 initial:  # Define initial robot poses.
   - group: arm
     pose: initial_pose

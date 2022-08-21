@@ -55,9 +55,6 @@
     <gazebo reference="arm_link_04">
         <material>Gazebo/Red</material>
     </gazebo>
-    <gazebo reference="cluedo_link">
-        <material>Gazebo/Red</material>
-    </gazebo>
     <gazebo reference="right_grip_link">
         <material>Gazebo/White</material>
     </gazebo>
@@ -146,6 +143,16 @@
             <updateRate>100.0</updateRate>
             <topicName>ft_sensor_topic</topicName>
             <jointName>arm_joint_03</jointName>
+        </plugin>
+    </gazebo>
+    <gazebo reference="arm_joint_04">
+        <provideFeedback>true</provideFeedback>
+    </gazebo>
+    <gazebo>
+        <plugin filename="libgazebo_ros_ft_sensor.so" name="ft_sensor">
+            <updateRate>100.0</updateRate>
+            <topicName>ft_sensor_topic</topicName>
+            <jointName>arm_joint_04</jointName>
         </plugin>
     </gazebo>
     <gazebo reference="arm_joint_04">
@@ -471,37 +478,9 @@
         <parent link="arm_link_03" />
         <child link="arm_link_04" />
     </joint>
-    <link name="cluedo_link">
-        <collision>
-            <origin rpy="0 0 1.57" xyz="1 0 0.0" />
-            <geometry>
-                <box size="0.0001 0.0001 0.0001" />
-            </geometry>
-        </collision>
-        <visual>
-            <origin rpy="0 0 1.57" xyz="0 0 0.0" />
-            <geometry>
-                <box size="0.0001 0.0001 0.0001" />
-            </geometry>
-            <material name="red" />
-        </visual>
-        
-<inertial>
-            <mass value="0.1" />
-            <inertia ixx="0.03" iyy="0.03" izz="0.03" ixy="0.0" ixz="0.0" iyz="0.0" />
-        </inertial>
-
-    </link>
-    <joint name="cluedo_joint" type="revolute">
-        <axis xyz="0 0 0" />
-        <limit effort="1000.0" lower="-1.8" upper="1.8" velocity="0.5" />
-        <origin rpy="0 0 0" xyz="0 0 0" />
-        <parent link="arm_link_04" />
-        <child link="cluedo_link" />
-    </joint>
     <link name="camera_link">
         <collision>
-            <origin rpy="0 0 0" xyz="0 0 0.025" />
+            <origin rpy="0 0 1.57" xyz="0 0 0.025" />
             <geometry>
                 <box size="0.05 0.05 0.05" />
             </geometry>
@@ -628,16 +607,6 @@
             <mechanicalInterface>1</mechanicalInterface>
         </actuator>
     </transmission>
-    <transmission name="cluedo_joint_trans">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="cluedo_joint">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="motor5">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            <mechanicalInterface>1</mechanicalInterface>
-        </actuator>
-    </transmission>
     <transmission name="left_grip_trans">
         <type>transmission_interface/SimpleTransmission</type>
         <joint name="left_grip_joint">
@@ -714,16 +683,6 @@
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
         </joint>
         <actuator name="arm_joint_04_motor">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-            <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
-    <transmission name="trans_cluedo_joint">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="cluedo_joint">
-            <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="cluedo_joint_motor">
             <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
             <mechanicalReduction>1</mechanicalReduction>
         </actuator>
