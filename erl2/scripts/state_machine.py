@@ -6,7 +6,7 @@ import smach
 import smach_ros
 from classes.place import Place
 import actionlib
-from erl2.msg import MoveAction
+from erl2.msg import MoveAction, MoveActionGoal
 
 
 pub_move_base=None
@@ -89,8 +89,11 @@ class Explore(smach.State):
             return 'solution'
         
         else:
-            movearm_client.wait_for_server()
-            movearm_client.send_goal_and_wait()
+            print("OI")
+            goal=MoveActionGoal()
+            #movearm_client.wait_for_server()
+            movearm_client.send_goal(goal)
+            movearm_client.wait_for_result()
             # Move the arm to explore the room
 
             return 'check_consistency'

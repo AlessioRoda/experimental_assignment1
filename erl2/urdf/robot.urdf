@@ -172,8 +172,8 @@
             <camera name="head">
                 <horizontal_fov>1.3962634</horizontal_fov>
                 <image>
-                    <width>800</width>
-                    <height>800</height>
+                    <width>2000</width>
+                    <height>2000</height>
                     <format>R8G8B8</format>
                 </image>
                 <clip>
@@ -480,7 +480,7 @@
     </joint>
     <link name="camera_link">
         <collision>
-            <origin rpy="0 0 1.57" xyz="0 0 0.025" />
+            <origin rpy="0 0 0" xyz="0 0 0.025" />
             <geometry>
                 <box size="0.05 0.05 0.05" />
             </geometry>
@@ -497,14 +497,14 @@
         
 <inertial>
             <mass value="1e-5" />
-            <origin rpy="0 0 0" xyz="0 0 0" />
+            <origin rpy="0 0 0" xyz="0 0 0.25" />
             <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
         </inertial>
 
     </link>
     <joint name="camera_joint" type="fixed">
         <axis xyz="0 1 0" />
-        <origin rpy="0 0 0" xyz="0 0 0.05" />
+        <origin rpy="0 0 1.57" xyz="0 0 0.05" />
         <parent link="arm_link_04" />
         <child link="camera_link" />
     </joint>

@@ -19,6 +19,30 @@
         <joint name="arm_joint_03" value="0"/>
         <joint name="arm_joint_04" value="0"/>
     </group_state>
+    <group_state name="search_aruco_01" group="arm">
+        <joint name="arm_joint_01" value="-3.14"/>
+        <joint name="arm_joint_02" value="0"/>
+        <joint name="arm_joint_03" value="0"/>
+        <joint name="arm_joint_04" value="0"/>
+    </group_state>
+    <group_state name="search_aruco_02" group="arm">
+        <joint name="arm_joint_01" value="3.14"/>
+        <joint name="arm_joint_02" value="0"/>
+        <joint name="arm_joint_03" value="0"/>
+        <joint name="arm_joint_04" value="0"/>
+    </group_state>
+    <group_state name="search_aruco_03" group="arm">
+        <joint name="arm_joint_01" value="-3.14"/>
+        <joint name="arm_joint_02" value="2.9318"/>
+        <joint name="arm_joint_03" value="-2.8971"/>
+        <joint name="arm_joint_04" value="0"/>
+    </group_state>
+    <group_state name="search_aruco_04" group="arm">
+        <joint name="arm_joint_01" value="3.14"/>
+        <joint name="arm_joint_02" value="2.9318"/>
+        <joint name="arm_joint_03" value="-2.8971"/>
+        <joint name="arm_joint_04" value="0"/>
+    </group_state>
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
     <disable_collisions link1="arm_base_link" link2="arm_link_01" reason="Adjacent"/>
     <disable_collisions link1="arm_base_link" link2="arm_link_02" reason="User"/>
