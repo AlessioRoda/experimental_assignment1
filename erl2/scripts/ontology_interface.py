@@ -156,6 +156,7 @@ def try_solution():
         consistency_service(res)
 
 
+
 def main():
     '''
     Main function 
