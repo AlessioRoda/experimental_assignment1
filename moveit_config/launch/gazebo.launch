@@ -58,7 +58,6 @@
     respawn="false" output="screen" />
 
 
-
   <include file="$(find moveit_config)/launch/ros_controllers.launch"/>
 
 </launch>

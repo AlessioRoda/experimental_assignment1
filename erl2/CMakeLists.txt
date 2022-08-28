@@ -72,6 +72,8 @@ add_service_files(
    Oracle.srv
    Update.srv
    Consistency.srv
+   Marker.srv
+   Hint.srv
 #   Service2.srv
  )
 

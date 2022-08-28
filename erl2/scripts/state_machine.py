@@ -6,11 +6,21 @@ import smach
 import smach_ros
 from classes.place import Place
 import actionlib
+from std_msgs.msg import Int32
 from erl2.msg import MoveAction, MoveActionGoal
+from erl2.srv import MarkerRequest, Marker, Hint, HintRequest, Consistency, Update
 
 
 pub_move_base=None
 movearm_client=None
+sub_ID=None
+client_ID_msg=None
+client_add_hint=None
+client_update_ontology=None
+client_try_solution=None
+
+IDs=[]
+tried_IDs=[]
 
 places=[]
 ''' Array with the places of the scene
@@ -28,6 +38,11 @@ oracle_room=None
 ''' Initialize the Oracle_Room
 '''
 
+
+def IDs_callback(id):
+    global IDs
+    if id not in IDs:
+        IDs.append(id)
 
 
 def init_scene():
@@ -89,12 +104,11 @@ class Explore(smach.State):
             return 'solution'
         
         else:
-            print("OI")
+            # Move the arm to explore the room
             goal=MoveActionGoal()
             #movearm_client.wait_for_server()
             movearm_client.send_goal(goal)
             movearm_client.wait_for_result()
-            # Move the arm to explore the room
 
             return 'check_consistency'
 
@@ -105,7 +119,25 @@ class Check_Consistency(smach.State):
                              outcomes=['explore'])
 
     def execute(self, userdata):
-        print("Check-consistency")
+        global IDs, tried_IDs, client_ID_msg, oracle
+
+        for id in IDs:
+            if id not in tried_IDs:
+                req=MarkerRequest()
+                req.markerId=id
+                res=client_ID_msg.call(req)
+                req=HintRequest()
+                req.oracle_hint=res
+                res=client_add_hint.call(req)
+
+                tried_IDs.append(id)
+                IDs.remove(id)
+
+        #After having added all the hints to the ontology, perform "reason" operation
+        client_update_ontology.call()
+        #Update oracle flag to send robot in the oracle room to try a solution
+        oracle=True
+
         return 'explore'
 
 
@@ -116,18 +148,29 @@ class Try_Solution(smach.State):
                              outcomes=['explore', 'correct'])
 
     def execute(self, userdata):
-        print("Try solution")
-        return 'explore'
+        res=client_try_solution.call()
+
+        if res.solution_found==True:
+            print("Solution found!")
+            return 'correct'
+        else:
+            print("Solution not correct")
+            return 'explore'
 
 
 def main():
-    global pub_move_base, movearm_client
+    global pub_move_base, movearm_client, sub_ID, client_ID_msg, client_add_hint, client_update_ontology, client_try_solution
 
     # Initialize the node
     rospy.init_node('state_machine')
     #pub_move_base=rospy.Publisher('move_base/goal', MoveBaseActionGoal, queue_size=1)
     pub_move_base=actionlib.SimpleActionClient('move_base', MoveBaseAction)
     movearm_client=actionlib.SimpleActionClient('movearm_action', MoveAction)
+    sub_ID=rospy.Subscriber('/marker_id', Int32, IDs_callback)
+    client_ID_msg=rospy.client('/oracle_hint', Marker)
+    client_add_hint=rospy.client('/ontology_interface/add_hint', Hint)
+    client_update_ontology=rospy.client('/ontology_interface/update_request', Update)
+    client_try_solution=rospy.client('/ontology_interface/try_solution', Consistency)
 
     init_scene()
 

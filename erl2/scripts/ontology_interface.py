@@ -4,7 +4,7 @@ from posixpath import dirname, realpath
 import rospy
 from classes.myArmor import MyArmor
 #from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle
-from experimental_assignment1.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle 
+from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle, Hint
 from erl2.msg import ErlOracle
 from armor_msgs.srv import *
 from armor_msgs.msg import *
@@ -35,7 +35,6 @@ def init_scene():
     that they are different. Finally it preforms 'REASON' command to update the ontology.
     
     '''
-
 
 
     ## Add people, weapons and places o the ontology
@@ -86,7 +85,6 @@ def init_scene():
 
 
 
-
 def receive_hint(hint):
     global ID, key, value
     ID.append(hint.ID)
@@ -117,46 +115,45 @@ def update_ontology():
 def try_solution():
     global ask_solution, solution
 
-    print("Trying solution: ")
+    print("Trying solution ")
     response_complete=[]
     response_complete.append(MyArmor.ask_complete())
     if response_complete.armor_response.success==False:
         print("\nError in asking query")
-    
-    for j in response_complete:
-        if len(response_complete[j].armor_response.queried_objects)!=0:
-            response_inconsistent=[]
-            response_inconsistent.append(MyArmor.ask_inconsistent())
-        
-            # Look for possible inconsistent hypothesis and in case remove them
-            if len(response_inconsistent.armor_response.queried_objects)!=0:
-
-                for i in response_inconsistent:
-                    str_inconsistent=response_inconsistent[i].armor_response.queried_objects[0]
-                    str_inconsistent=str_inconsistent[40:]
-                    id_inconsistent=str_inconsistent[:-1]
-                    print("ID_inconsistent "+str(id_inconsistent) +"\n")
-                    res=MyArmor.remove(id_inconsistent)
-                    response_complete.remove(id_inconsistent)
-
-                    if res.armor_response.success==False:
-                        print("Error in removing\n")
-
     else:
-        solution=ask_solution()
+        for j in response_complete:
+            if len(response_complete[j].armor_response.queried_objects)!=0:
+                response_inconsistent=[]
+                response_inconsistent.append(MyArmor.ask_inconsistent())
+            
+                # Look for possible inconsistent hypothesis and in case remove them
+                if len(response_inconsistent.armor_response.queried_objects)!=0:
+
+                    for i in response_inconsistent:
+                        str_inconsistent=response_inconsistent[i].armor_response.queried_objects[0]
+                        str_inconsistent=str_inconsistent[40:]
+                        id_inconsistent=str_inconsistent[:-1]
+                        print("ID_inconsistent "+str(id_inconsistent) +"\n")
+                        res=MyArmor.remove(id_inconsistent)
+                        response_complete.remove(id_inconsistent)
+
+                        if res.armor_response.success==False:
+                            print("Error in removing\n")
+
+    
+        solution=ask_solution.call()
         for res in response_complete:
             id_consistent=res.armor_response.queried_objects[0]
             if solution == id_consistent:
-                print("\nSolution found!: "+ solution)
+                print("\nSolution found!: "+ str(solution))
                 res=ConsistencyResponse()
-                res.ok=True
+                res.solution_found=True
                 consistency_service(res)
 
         print("Solution is not correct")
-        
-
-
-    
+        res=ConsistencyResponse()
+        res.solution_found=False
+        consistency_service(res)
 
 
 def main():
@@ -166,10 +163,10 @@ def main():
     global ask_solution, update_service, consistency_service
     rospy.init_node('ontology_interface')
    
-    consistency_service=rospy.Service('/conosistency_request', Consistency, try_solution)
-    update_service= rospy.Service('/update_request', Update, update_ontology)
-    ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
-    rospy.Subscriber('/oracle_hint', ErlOracle, receive_hint)
+    consistency_service=rospy.Service('/ontology_interface/try_solution', Consistency, try_solution)
+    update_service= rospy.Service('/ontology_interface/update_request', Update, update_ontology)
+    ask_solution=rospy.ServiceProxy('/ontology_interface/oracle_solution', Oracle)
+    rospy.Service('/ontology_interface/add_hint', Hint, receive_hint)
 
 
     # path = dirname(realpath(__file__))

@@ -517,22 +517,22 @@
         </inertial>
 
         <collision>
-            <origin rpy="0 3.1415 -1.57" xyz="-0.032 0.048 0.04" />
+            <origin rpy="0 3.1415 -1.57" xyz="-0.032 0.048 0.01" />
             <geometry>
-                <box size="0.06 0.02 0.08" />
+                <box size="0.06 0.02 0.04" />
             </geometry>
         </collision>
         <visual>
-            <origin rpy="0 3.1415 -1.57" xyz="-0.032 0.048 0.04" />
+            <origin rpy="0 3.1415 -1.57" xyz="-0.032 0.048 0.01" />
             <geometry>
-                <box size="0.06 0.02 0.08" />
+                <box size="0.06 0.02 0.04" />
             </geometry>
             <material name="white" />
         </visual>
     </link>
     <joint name="right_grip_joint" type="prismatic">
         <axis xyz="1 0 0" />
-        <limit effort="1000.0" lower="-0.04" upper="0.035" velocity="6.5" />
+        <limit effort="1000.0" lower="-0.01" upper="0.035" velocity="6.5" />
         <origin rpy="0 0 0" xyz="-0.015 0 0.0" />
         <parent link="arm_link_04" />
         <child link="right_grip_link" />
@@ -546,22 +546,22 @@
         </inertial>
 
         <collision>
-            <origin rpy="0 3.1415 -1.57" xyz="0.06 0.048 0.04" />
+            <origin rpy="0 3.1415 -1.57" xyz="0.06 0.048 0.01" />
             <geometry>
-                <box size="0.06 0.02 0.08" />
+                <box size="0.06 0.02 0.04" />
             </geometry>
         </collision>
         <visual>
-            <origin rpy="0 3.1415 -1.57" xyz="0.06 0.048 0.04" />
+            <origin rpy="0 3.1415 -1.57" xyz="0.06 0.048 0.01" />
             <geometry>
-                <box size="0.06 0.02 0.08" />
+                <box size="0.06 0.02 0.04" />
             </geometry>
             <material name="white" />
         </visual>
     </link>
     <joint name="left_grip_joint" type="prismatic">
         <axis xyz="1 0 0" />
-        <limit effort="1000.0" lower="-0.035" upper="0.04" velocity="6.5" />
+        <limit effort="1000.0" lower="-0.035" upper="0.01" velocity="6.5" />
         <origin rpy="0 0 0" xyz="-0.015 0 0.0" />
         <parent link="arm_link_04" />
         <child link="left_grip_link" />
