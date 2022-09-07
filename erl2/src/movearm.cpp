@@ -40,14 +40,15 @@ public:
         const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
         group.setStartStateToCurrentState();
-        group.setNamedTarget("initial_pose");
+        group.setNamedTarget("try_pose");
         
         group.setGoalOrientationTolerance(0.1);
         group.setGoalPositionTolerance(0.1);
-        group.move(); //Non finisce questa parte 
+        ROS_INFO("Fin qui ok");
+        group.move(); //Non finisce questa parte    
+        ROS_INFO("Prova");
 
         movearm_server.start();
-         
     }
 
 

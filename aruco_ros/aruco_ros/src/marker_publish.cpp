@@ -70,9 +70,11 @@ public:
   ArucoMarkerPublisher() :
       nh_("~"), it_(nh_), useCamInfo_(true)
   {
-    image_sub_ = it_.subscribe("/image", 1, &ArucoMarkerPublisher::image_callback, this);
+    image_sub_ = it_.subscribe("/robot/camera1/image_raw", 1, &ArucoMarkerPublisher::image_callback, this);
+    ROS_INFO("tutto bene 0");
     image_pub_ = it_.advertise("result", 1);
     debug_pub_ = it_.advertise("debug", 1);
+    ROS_INFO("tutto bene 1");
 
     marker_id_pub=nh_.advertise<std_msgs::Int32>("/marker_id", 20);
     
@@ -82,26 +84,40 @@ public:
 
   void image_callback(const sensor_msgs::ImageConstPtr& msg)
   {
+    ROS_INFO("dendtro la callback");
     bool publishImage = image_pub_.getNumSubscribers() > 0;
     bool publishDebug = debug_pub_.getNumSubscribers() > 0;
+    ROS_INFO("Dentro la callback 2");
 
+    ROS_INFO("1");
     ros::Time curr_stamp = msg->header.stamp;
+    ROS_INFO("2");
     cv_bridge::CvImagePtr cv_ptr;
+    ROS_INFO("3");
     
     try
     {
+      ROS_INFO("4");
       cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+      ROS_INFO("5");
       inImage_ = cv_ptr->image;
+      ROS_INFO("6");
    
       // clear out previous detection results
+      ROS_INFO("7");
       markers_.clear();
 
       // ok, let's detect
+      ROS_INFO("8");
       mDetector_.detect(inImage_, markers_, camParam_, marker_size_, false);
+      ROS_INFO("Detect eseguito");
+
 
 		std::cout << "The id of the detected marker detected is: ";
         for (std::size_t i = 0; i < markers_.size(); ++i)
+        
         {
+          ROS_INFO("Dentro al for");
           std_msgs::Int32 id;
           id.data=markers_.at(i).id;
           marker_id_pub.publish(id);

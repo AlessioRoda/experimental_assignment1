@@ -1,0 +1,44 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/alessio/ROS/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/alessio/ROS/src/experimental_assignment1/aruco_ros/aruco/include/**",
+        "/home/alessio/ROS/src/experimental_assignment1/aruco_ros/aruco_ros/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_planners/chomp/chomp_motion_planner/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_planners/chomp/chomp_interface/include/**",
+        "/home/alessio/ROS/src/moveit_resources/prbt_ikfast_manipulator_plugin/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_ros/benchmarks/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_plugins/moveit_ros_control_interface/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_ros/move_group/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_ros/occupancy_map_monitor/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_ros/robot_interaction/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_ros/moveit_servo/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_setup_assistant/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_plugins/moveit_simple_controller_manager/include/**",
+        "/home/alessio/ROS/src/occupancy_grid_utils/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_planners/pilz_industrial_motion_planner/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_planners/pilz_industrial_motion_planner_testutils/include/**",
+        "/home/alessio/ROS/src/rosplan_demos/rosplan_demos_interfaces/rosplan_interface_mapping/include/**",
+        "/home/alessio/ROS/src/rosplan_demos/rosplan_demos_interfaces/rosplan_interface_movebase/include/**",
+        "/home/alessio/ROS/src/ROSPlan/rosplan_knowledge_base/include/**",
+        "/home/alessio/ROS/src/ROSPlan/rosplan_planning_system/include/**",
+        "/home/alessio/ROS/src/moveit/moveit_planners/sbpl/core/sbpl_interface/include/**",
+        "/home/alessio/ROS/src/srdfdom/include/**",
+        "/home/alessio/ROS/src/thesis/ueye_cam/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

@@ -167,10 +167,10 @@ def main():
     pub_move_base=actionlib.SimpleActionClient('move_base', MoveBaseAction)
     movearm_client=actionlib.SimpleActionClient('movearm_action', MoveAction)
     sub_ID=rospy.Subscriber('/marker_id', Int32, IDs_callback)
-    client_ID_msg=rospy.client('/oracle_hint', Marker)
-    client_add_hint=rospy.client('/ontology_interface/add_hint', Hint)
-    client_update_ontology=rospy.client('/ontology_interface/update_request', Update)
-    client_try_solution=rospy.client('/ontology_interface/try_solution', Consistency)
+    client_ID_msg=rospy.ServiceProxy('/oracle_hint', Marker)
+    client_add_hint=rospy.ServiceProxy('/ontology_interface/add_hint', Hint)
+    client_update_ontology=rospy.ServiceProxy('/ontology_interface/update_request', Update)
+    client_try_solution=rospy.ServiceProxy('/ontology_interface/try_solution', Consistency)
 
     init_scene()
 

@@ -314,64 +314,6 @@
 
 
 
-<link name="right_grip_link">
-  	<inertial>
-  		<mass value="0.01"/>
-  		<origin xyz="0 0 0" rpy="0 0 0" />
-  		<inertia ixx="0.000010279" ixy="0" ixz="0" iyy="0.000010279" iyz="0" izz="0.000007225"/>
-  	</inertial>
-  	<collision>
-  	  <origin xyz="-0.032 0.048 0.01" rpy="0 3.1415 -1.57"/>
-      <geometry>
-        <box size="0.06 0.02 0.04"/>
-      </geometry>
-  	</collision>
-  	<visual>
-  	  <origin xyz="-0.032 0.048 0.01" rpy="0 3.1415 -1.57"/>
-      <geometry>
-        <box size="0.06 0.02 0.04"/>
-      </geometry>
-      <material name="white" />
-  	</visual>
-  </link>
-
-  <joint name="right_grip_joint" type="prismatic">
-  	<axis xyz="1 0 0"/>
-  	<limit effort="1000.0" lower="-0.01" upper="0.035" velocity="6.5"/>
-  	<origin rpy="0 0 0" xyz="-0.015 0 0.0"/>
-  	<parent link="arm_link_04"/>
-  	<child link="right_grip_link"/>
-  </joint>
-
-  <link name="left_grip_link">
-  	<inertial>
-  		<mass value="0.01"/>
-  		<origin xyz="0 0 0" rpy="0 0 0" />
-  		<inertia ixx="0.000010279" ixy="0" ixz="0" iyy="0.000010279" iyz="0" izz="0.000007225"/>
-  	</inertial>
-  	<collision>
-  	  <origin xyz="0.06 0.048 0.01" rpy="0 3.1415 -1.57"/>
-      <geometry>
-        <box size="0.06 0.02 0.04"/>
-      </geometry>
-  	</collision>
-  	<visual>
-  	  <origin xyz="0.06 0.048 0.01" rpy="0 3.1415 -1.57"/>
-      <geometry>
-        <box size="0.06 0.02 0.04"/>
-      </geometry>
-      <material name="white" />
-  	</visual>
-  </link>
-
-  <joint name="left_grip_joint" type="prismatic">
-  	<axis xyz="1 0 0"/>
-  	<limit effort="1000.0" upper="0.01" lower="-0.035" velocity="6.5"/>
-  	<origin rpy="0 0 0" xyz="-0.015 0 0.0"/>
-  	<parent link="arm_link_04"/>
-  	<child link="left_grip_link"/>
-  </joint>
-
 
 
 
@@ -419,28 +361,6 @@
 	</actuator>
 </transmission>
 
-
-<transmission name="left_grip_trans">
-	<type>transmission_interface/SimpleTransmission</type>
-	<joint name="left_grip_joint">
-		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-	</joint>
-	<actuator name="motor6">
-		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-		<mechanicalInterface>1</mechanicalInterface>
-	</actuator>
-</transmission>
-
-<transmission name="right_grip_trans">
-	<type>transmission_interface/SimpleTransmission</type>
-	<joint name="right_grip_joint">
-		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-	</joint>
-	<actuator name="motor7">
-		<hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
-		<mechanicalInterface>1</mechanicalInterface>
-	</actuator>
-</transmission>
 
 
 </robot>
