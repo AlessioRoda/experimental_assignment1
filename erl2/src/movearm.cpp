@@ -25,9 +25,6 @@ public:
     Movearm_class(ros::NodeHandle node_handler) :
     movearm_server(node_handler, "movearm_action", boost::bind(&Movearm_class::movearm_request, this, _1), false)
     {
-        validity_service=node_handler.serviceClient<moveit_msgs::GetStateValidity>("/check_state_validity");
-        planning_scene_service=node_handler.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
-
         robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
 
         const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
@@ -40,10 +37,11 @@ public:
         const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
         group.setStartStateToCurrentState();
-        group.setNamedTarget("try_pose");
-        
-        group.setGoalOrientationTolerance(0.1);
-        group.setGoalPositionTolerance(0.1);
+    
+        group.setGoalOrientationTolerance(1);
+        group.setGoalPositionTolerance(1);
+
+        group.setNamedTarget("initial_pose");
         ROS_INFO("Fin qui ok");
         group.move(); //Non finisce questa parte    
         ROS_INFO("Prova");

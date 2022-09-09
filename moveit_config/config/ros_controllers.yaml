@@ -13,8 +13,6 @@ hardware_interface:
     - arm_joint_02
     - arm_joint_03
     - arm_joint_04
-    - left_grip_joint
-    - right_grip_joint
     - joint_left_wheel
     - joint_right_wheel
   sim_control_mode: 1  # 0: position, 1: velocity
@@ -42,17 +40,17 @@ arm_controller:
     - arm_joint_04
   gains:
     arm_joint_01:
-      p: 50
+      p: 30
       d: 0
       i: 0
       i_clamp: 0
     arm_joint_02:
-      p: 40
+      p: 30
       d: 0.02
       i: 0.02
       i_clamp: 0
     arm_joint_03:
-      p: 40
+      p: 30
       d: 0.01
       i: 0.01
       i_clamp: 0
