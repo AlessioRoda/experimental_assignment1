@@ -47,7 +47,6 @@ void oracleCallback(const gazebo_msgs::LinkStates::ConstPtr& msg)
 		   for(int j=0; j<4;j++){
 				if ((distfromtarget(msg->pose[i].position.x, msg->pose[i].position.y, msg->pose[i].position.z, markx[j],marky[j],markz[j])<0.25) && ((lastmarkx !=markx[j]) || (lastmarky != marky[j]))){
 				erl2::ErlOracle oracle_msg;
-				 std::cout << "OI CI SEI!!!!!!!!!!!!" << std::endl;
 				oracle_msg.ID = rand() % 6;
 				if(rand()%4==1){
 					int a = rand()%5;

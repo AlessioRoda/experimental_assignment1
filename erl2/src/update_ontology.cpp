@@ -5,12 +5,7 @@
 #include <cmath>
 #include <erl2/Update.h>
 
-
-float pose_x;
-float pose_y;
-float orientation;
 ros::ServiceClient client_update;
-
 
 namespace KCL_rosplan {
 

@@ -36,6 +36,7 @@ namespace KCL_rosplan {
 	}
 }
 
+
 	int main(int argc, char **argv) {
 		ros::init(argc, argv, "check_consistency", ros::init_options::AnonymousName);
 		ros::NodeHandle nh("~");
