@@ -103,74 +103,74 @@ namespace KCL_rosplan {
             std::cout << "Error in getting the scene " << std::endl;
         }
         
-        // std::vector<double> joint_values;
-        // double timeout = 1;
-        // bool found_ik = kinematic_state->setFromIK(joint_model_group, pose, timeout);
+        std::vector<double> joint_values;
+        double timeout = 1;
+        bool found_ik = kinematic_state->setFromIK(joint_model_group, pose, timeout);
 
-        // if (found_ik)
-        // {
-        //     kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
-        //     for (std::size_t i = 0; i < joint_names.size(); ++i)
-        //     {
-        //     ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
-        //     }
-        // }
-        // else
-        // {
-        //     ROS_INFO("Did not find IK solution");
-        // }
+        if (found_ik)
+        {
+            kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
+            for (std::size_t i = 0; i < joint_names.size(); ++i)
+            {
+            ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+            }
+        }
+        else
+        {
+            ROS_INFO("Did not find IK solution");
+        }
 
-        // group.setJointValueTarget(joint_values);
-        // group.setStartStateToCurrentState();
-        // group.setGoalOrientationTolerance(2*M_PI); //Don't care about orientation
-        // group.setGoalPositionTolerance(0.1);
+        group.setJointValueTarget(joint_values);
+        group.setStartStateToCurrentState();
+        group.setGoalOrientationTolerance(2*M_PI); //Don't care about orientation
+        group.setGoalPositionTolerance(0.1);
 
-        // // Plan and execute
-        // moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-        // group.plan(my_plan); 
-        // group.execute(my_plan);
+        // Plan and execute
+        moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+        group.plan(my_plan); 
+        group.execute(my_plan);
         
-        // std::cout << "Quote 1.75 reached" << std::endl;
-        // sleep(2.0);
+        std::cout << "Quote 1.75 reached" << std::endl;
+        sleep(2.0);
 
-        // pose.position.z =  0.75;
+        pose.position.z =  0.75;
 
-        // group.setStartStateToCurrentState();
-        // group.setApproximateJointValueTarget(pose, "cluedo_link");
-        // found_ik = kinematic_state->setFromIK(joint_model_group, pose, timeout);
+        group.setStartStateToCurrentState();
+        group.setApproximateJointValueTarget(pose, "cluedo_link");
+        found_ik = kinematic_state->setFromIK(joint_model_group, pose, timeout);
 
-        // if (found_ik)
-        // {
-        //     kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
-        //     for (std::size_t i = 0; i < joint_names.size(); ++i)
-        //     {
-        //     ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
-        //     }
-        // }
-        // else
-        // {
-        //     ROS_INFO("Did not find IK solution");
-        // }
+        if (found_ik)
+        {
+            kinematic_state->copyJointGroupPositions(joint_model_group, joint_values);
+            for (std::size_t i = 0; i < joint_names.size(); ++i)
+            {
+            ROS_INFO("Joint %s: %f", joint_names[i].c_str(), joint_values[i]);
+            }
+        }
+        else
+        {
+            ROS_INFO("Did not find IK solution");
+        }
         
         
-        // group.setJointValueTarget(joint_values);
-        // group.setStartStateToCurrentState();
-        // group.setGoalOrientationTolerance(1000);
-        // group.setGoalPositionTolerance(0.01);
+        group.setJointValueTarget(joint_values);
+        group.setStartStateToCurrentState();
+        group.setGoalOrientationTolerance(1000);
+        group.setGoalPositionTolerance(0.01);
 
-        // // Plan and execute
-        // group.plan(my_plan); 
-        // group.execute(my_plan);
+        // Plan and execute
+        group.plan(my_plan); 
+        group.execute(my_plan);
 
-        // sleep(2.0);
+        sleep(2.0);
 
-        // group.setNamedTarget("initial_pose");
-	    // group.move(); 
-        // sleep(1);
-
-        group.setNamedTarget("reach_target");
+        group.setNamedTarget("initial_pose");
 	    group.move(); 
         sleep(1);
+
+        // group.setNamedTarget("reach_target");
+	    // group.move(); 
+        // sleep(1);
 
         group.setNamedTarget("initial_pose");
 	    group.move(); 

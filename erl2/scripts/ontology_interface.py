@@ -4,7 +4,7 @@ from posixpath import dirname, realpath
 import rospy
 from classes.myArmor import MyArmor
 #from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle
-from experimental_assignment1.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle 
+from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle 
 from erl2.msg import ErlOracle, ResetAction, ResetActionGoal
 from armor_msgs.srv import *
 from armor_msgs.msg import *
