@@ -31,6 +31,7 @@
   <include file="$(find moveit_config)/launch/gazebo.launch" >
     <arg name="paused" value="$(arg paused)"/>
     <arg name="gazebo_gui" value="$(arg gazebo_gui)"/>
+    <arg name="urdf_path" value="$(arg urdf_path)"/>
   </include>
 
   <!-- If needed, broadcast static tf for robot root -->

@@ -1,5 +1,6 @@
 #! /usr/bin/env python3
 
+from time import sleep
 import rospy
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 import smach
@@ -8,7 +9,7 @@ from classes.place import Place
 import actionlib
 from std_msgs.msg import Int32
 from erl2.msg import MoveAction, MoveActionGoal
-from erl2.srv import MarkerRequest, Marker, Hint, HintRequest, Consistency, Update
+from erl2.srv import MarkerRequest, Marker, Hint, HintRequest, Consistency, Update, UpdateRequest
 
 
 pub_move_base=None
@@ -41,8 +42,8 @@ oracle_room=None
 
 def IDs_callback(id):
     global IDs
-    if id not in IDs:
-        IDs.append(id)
+    if id.data not in IDs:
+        IDs.append(id.data)
 
 
 def init_scene():
@@ -104,11 +105,7 @@ class Explore(smach.State):
             return 'solution'
         
         else:
-            # Move the arm to explore the room
-            goal=MoveActionGoal()
-            #movearm_client.wait_for_server()
-            movearm_client.send_goal(goal)
-            movearm_client.wait_for_result()
+            sleep(5)
 
             return 'check_consistency'
 
@@ -119,22 +116,32 @@ class Check_Consistency(smach.State):
                              outcomes=['explore'])
 
     def execute(self, userdata):
-        global IDs, tried_IDs, client_ID_msg, oracle
+        global IDs, tried_IDs, client_ID_msg, oracle, client_update_ontology
 
         for id in IDs:
             if id not in tried_IDs:
+                print("1")
                 req=MarkerRequest()
                 req.markerId=id
-                res=client_ID_msg.call(req)
+                res=client_ID_msg(req)
+                print("Risposta: "+str(res))
+                print("2")
                 req=HintRequest()
                 req.oracle_hint=res
-                res=client_add_hint.call(req)
-
+                res=client_add_hint(req)
+                print("3")
+            
                 tried_IDs.append(id)
+                print("4")
                 IDs.remove(id)
+                print("5")
 
         #After having added all the hints to the ontology, perform "reason" operation
-        client_update_ontology.call()
+        rospy.wait_for_service('/ontology_interface/update_request')
+        req=UpdateRequest()
+        req.req=True
+        client_update_ontology(req)
+        print("6")
         #Update oracle flag to send robot in the oracle room to try a solution
         oracle=True
 
@@ -148,7 +155,7 @@ class Try_Solution(smach.State):
                              outcomes=['explore', 'correct'])
 
     def execute(self, userdata):
-        res=client_try_solution.call()
+        res=client_try_solution()
 
         if res.solution_found==True:
             print("Solution found!")

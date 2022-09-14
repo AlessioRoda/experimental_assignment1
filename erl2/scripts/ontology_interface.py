@@ -87,16 +87,18 @@ def init_scene():
 
 def receive_hint(hint):
     global ID, key, value
-    ID.append(hint.ID)
-    key.append(hint.key)
-    value.append(hint.value)
+    print("Hint ricevuto: "+str(hint))
+    ID.append(hint.oracle_hint.ID)
+    key.append(hint.oracle_hint.key)
+    value.append(hint.oracle_hint.value)
 
 
 
-def update_ontology():
+def update_ontology(msg):
     global ID, key, value
     i=0
-    while i<ID.count():
+    print("Dentro Update Ontology")
+    while i<len(ID):
         MyArmor.add_hypothesis(key[i], ID[i], value[i])
         i+=1
 
@@ -168,7 +170,6 @@ def main():
     update_service= rospy.Service('/ontology_interface/update_request', Update, update_ontology)
     ask_solution=rospy.ServiceProxy('/ontology_interface/oracle_solution', Oracle)
     rospy.Service('/ontology_interface/add_hint', Hint, receive_hint)
-
 
     # path = dirname(realpath(__file__))
     # path = path[:-7] + "cluedo_ontology.owl"
