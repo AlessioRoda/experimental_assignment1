@@ -8,8 +8,8 @@ import smach_ros
 from classes.place import Place
 import actionlib
 from std_msgs.msg import Int32
-from erl2.msg import MoveAction, MoveActionGoal
-from erl2.srv import MarkerRequest, Marker, Hint, HintRequest, Consistency, Update, UpdateRequest
+from erl2.msg import MoveAction, MoveActionGoal, ErlOracle
+from erl2.srv import MarkerRequest, Marker, Hint, HintRequest, TrySolution, TrySolutionRequest, Update
 
 
 pub_move_base=None
@@ -38,11 +38,12 @@ response_complete=None
 oracle_room=None
 ''' Initialize the Oracle_Room
 '''
+stop=False
 
 
 def IDs_callback(id):
     global IDs
-    if id.data not in IDs:
+    if id.data not in IDs and stop==False:
         IDs.append(id.data)
 
 
@@ -116,7 +117,10 @@ class Check_Consistency(smach.State):
                              outcomes=['explore'])
 
     def execute(self, userdata):
-        global IDs, tried_IDs, client_ID_msg, oracle, client_update_ontology
+        global IDs, tried_IDs, client_ID_msg, oracle, client_update_ontology, stop
+
+        #Stop adding elements in the list
+        stop=True
 
         for id in IDs:
             if id not in tried_IDs:
@@ -126,24 +130,26 @@ class Check_Consistency(smach.State):
                 res=client_ID_msg(req)
                 print("Risposta: "+str(res))
                 print("2")
+                oracle_hint=ErlOracle()
+                oracle_hint.ID=res.oracle_hint.ID
+                oracle_hint.key=res.oracle_hint.key
+                oracle_hint.value=res.oracle_hint.value
                 req=HintRequest()
-                req.oracle_hint=res
-                res=client_add_hint(req)
+                req.oracle_hint=oracle_hint
+                client_add_hint(req)
                 print("3")
             
                 tried_IDs.append(id)
-                print("4")
-                IDs.remove(id)
-                print("5")
 
         #After having added all the hints to the ontology, perform "reason" operation
         rospy.wait_for_service('/ontology_interface/update_request')
-        req=UpdateRequest()
-        req.req=True
-        client_update_ontology(req)
-        print("6")
-        #Update oracle flag to send robot in the oracle room to try a solution
+        client_update_ontology()
+
+        print("4")
+        #Clear ID list and update oracle flag to send robot in the oracle room to try a solution
+        IDs.clear()
         oracle=True
+        stop=False
 
         return 'explore'
 
@@ -155,7 +161,7 @@ class Try_Solution(smach.State):
                              outcomes=['explore', 'correct'])
 
     def execute(self, userdata):
-        res=client_try_solution()
+        res=client_try_solution(TrySolutionRequest())
 
         if res.solution_found==True:
             print("Solution found!")
@@ -177,7 +183,7 @@ def main():
     client_ID_msg=rospy.ServiceProxy('/oracle_hint', Marker)
     client_add_hint=rospy.ServiceProxy('/ontology_interface/add_hint', Hint)
     client_update_ontology=rospy.ServiceProxy('/ontology_interface/update_request', Update)
-    client_try_solution=rospy.ServiceProxy('/ontology_interface/try_solution', Consistency)
+    client_try_solution=rospy.ServiceProxy('/ontology_interface/try_solution', TrySolution)
 
     init_scene()
 
