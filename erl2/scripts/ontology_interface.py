@@ -102,15 +102,15 @@ def update_ontology(msg):
     while i<len(ID):
         MyArmor.add_hypothesis(key[i], ID[i], value[i])
         i+=1
-    print(1)
+    print("Update 1")
     #Clear the arrays after having sent the hypotesis
     ID.clear()
     key.clear()
     value.clear()
-    print(2)
+    print("Update 2")
     
     MyArmor.reason()
-    print(3)
+    print("Update 3")
     res=UpdateResponse()
     res.updated=True
     return res
@@ -135,6 +135,7 @@ def try_solution(msg):
 
             response_inconsistent=MyArmor.ask_inconsistent()
             print(str(response_inconsistent))
+            print("Risposte compelte: "+str(list_complete))
         
             # Look for possible inconsistent hypothesis and in case remove them
             if len(response_inconsistent.armor_response.queried_objects)!=0:
@@ -149,16 +150,18 @@ def try_solution(msg):
                     if res.armor_response.success==False:
                         print("Error in removing\n")
 
-    
-        solution=ask_solution(OracleRequest())
-        for id in list_complete:
-            if str(solution.ID) == id:
-                print("\nSolution found!: "+ str(solution.ID))
-                res=TrySolutionResponse()
-                res.solution_found=True
-                return res
+        print("Risposte consistenti: "+str(list_complete))
+        if len(list_complete)>0:
+            solution=ask_solution(OracleRequest())
+            for id in list_complete:
+                if str(solution.ID) == id:
+                    print("\nSolution found!: "+ str(solution.ID))
+                    res=TrySolutionResponse()
+                    res.solution_found=True
+                    return res
+                else:
+                    print("Solution ID "+str(solution.ID) +" is not correct")
 
-        print("Solution is not correct")
         res=TrySolutionResponse()
         res.solution_found=False
         return res
@@ -174,7 +177,7 @@ def main():
    
     consistency_service=rospy.Service('/ontology_interface/try_solution', TrySolution, try_solution)
     update_service= rospy.Service('/ontology_interface/update_request', Update, update_ontology)
-    ask_solution=rospy.ServiceProxy('/ontology_interface/oracle_solution', Oracle)
+    ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
     rospy.Service('/ontology_interface/add_hint', Hint, receive_hint)
 
     # path = dirname(realpath(__file__))

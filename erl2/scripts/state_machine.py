@@ -43,7 +43,7 @@ stop=False
 
 def IDs_callback(id):
     global IDs
-    if id.data not in IDs and stop==False:
+    if id.data not in IDs and stop==False and id.data<=40:
         IDs.append(id.data)
 
 
@@ -124,12 +124,13 @@ class Check_Consistency(smach.State):
 
         for id in IDs:
             if id not in tried_IDs:
-                print("1")
+                print("State machine 1")
                 req=MarkerRequest()
                 req.markerId=id
+                rospy.wait_for_service('/oracle_hint')
                 res=client_ID_msg(req)
                 print("Risposta: "+str(res))
-                print("2")
+                print("State machine 2")
                 oracle_hint=ErlOracle()
                 oracle_hint.ID=res.oracle_hint.ID
                 oracle_hint.key=res.oracle_hint.key
@@ -137,7 +138,7 @@ class Check_Consistency(smach.State):
                 req=HintRequest()
                 req.oracle_hint=oracle_hint
                 client_add_hint(req)
-                print("3")
+                print("State machine 3")
             
                 tried_IDs.append(id)
 
@@ -145,7 +146,7 @@ class Check_Consistency(smach.State):
         rospy.wait_for_service('/ontology_interface/update_request')
         client_update_ontology()
 
-        print("4")
+        print("State machine 4")
         #Clear ID list and update oracle flag to send robot in the oracle room to try a solution
         IDs.clear()
         oracle=True
