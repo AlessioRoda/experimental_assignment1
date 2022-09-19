@@ -1,5 +1,43 @@
 #! /usr/bin/env python3
 
+'''
+.. module:: state_machine
+   :platform: Unix
+   :synopsis: Node implementing a finite state machine that represents the steps of the Cluedo game
+	
+.. moduleauthor:: Alessio Roda alessioroda98@gmail.com
+This node allows to simulate the cluedo game 
+Client: 
+     
+    /oracle_hint custom service to ask the hint (ID, type and message) associated to a specific marker ID 
+    /ontology_interface/add_hint service to send a new hint to the oracle_interface node 
+    /ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the "REASON" command
+    /ontology_interface/try_solution service to send a request to the oracle_interface to find the coplete and consistent hypotesis in the ontology
+
+
+     /marker_id custom service to get the ID of a marker when it's detected by the camera
+
+
+ It's performed as the node that permits to simulate the entire Cluedo game, it's the main of the whole architecture and with the smach 
+ StateMachine can simulate the game by switching from three states:
+ 
+ -MOVE: to simulate the motion of the robot from a room to another, it's referred to the Explore class. The game begins with the robot in the Oracle_Room 
+        and in order to simulate the motion a Move custom service message with the actual 
+        position of the robot and the target to reach is sent to the go_to_point node. Once the motion has been performed to the go_to_point node
+        it can switch to two possible steps: if the robot wants to try a solution (and so in this case the variable oracle==True) it switches
+        to the SOLUTION state, otherwise it switches to the ENTER_ROOM, that means that it wants to explore the rooms to collect hints
+ -ENTER_ROOM: the state represented with the Enter_Room class that represents the moment in which the robot enters in a room to acquire hints.
+              In order to get hints it sends a request to the oracle node, then it gets a hint defined by an ID
+              and three arrays (what, where and who) that represent some information about weapons, places and people.
+              After having obtained the hint it adds it to the ontology by using the MyArmor class methods, if the hypothesis uploaded is 
+              completed and consistent, then the variable oracle=True, that means that the robot must go to the Oracle_Room to ask to the
+              oracle if the hypothesis is the possible solution. 
+ -SOLUTION: the state that represents the moment in which the robot is trying to generate a solution for the Cluedo game. It's defined with
+            the Try_Solution class and gets the person, the place and the weapon associated with the complete and consistent hypothesis,
+            then it sends them to the oracle node with the Solution custom service message. If the oracle confirms that the solution is exact
+            the game ends, otherwise it continue by switching to the MOVE state.          
+'''
+
 from time import sleep
 import rospy
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
@@ -149,6 +187,17 @@ class Check_Consistency(smach.State):
         print("State machine 4")
         #Clear ID list and update oracle flag to send robot in the oracle room to try a solution
         IDs.clear()
+
+        #Ask for complete and consistent hypotesis as potential solutions
+        res=client_try_solution(TrySolutionRequest())
+
+        if res.solution_found==True:
+            print("Solution found!")
+            return 'correct'
+        else:
+            print("Solution not correct")
+            return 'explore'
+
         oracle=True
         stop=False
 
