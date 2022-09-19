@@ -47,7 +47,7 @@ from classes.place import Place
 import actionlib
 from std_msgs.msg import Int32
 from erl2.msg import MoveAction, MoveActionGoal, ErlOracle
-from erl2.srv import MarkerRequest, Marker, Hint, HintRequest, TrySolution, TrySolutionRequest, Update
+from erl2.srv import MarkerRequest, Marker, Hint, HintRequest, Consistent, ConsistentRequest, Update, Oracle, OracleRequest
 
 
 pub_move_base=None
@@ -57,9 +57,11 @@ client_ID_msg=None
 client_add_hint=None
 client_update_ontology=None
 client_try_solution=None
+ask_solution=None
 
 IDs=[]
 tried_IDs=[]
+conistent_ids=[]
 
 places=[]
 ''' Array with the places of the scene
@@ -155,7 +157,7 @@ class Check_Consistency(smach.State):
                              outcomes=['explore'])
 
     def execute(self, userdata):
-        global IDs, tried_IDs, client_ID_msg, oracle, client_update_ontology, stop
+        global IDs, tried_IDs, client_ID_msg, oracle, client_update_ontology, stop, conistent_ids
 
         #Stop adding elements in the list
         stop=True
@@ -189,18 +191,13 @@ class Check_Consistency(smach.State):
         IDs.clear()
 
         #Ask for complete and consistent hypotesis as potential solutions
-        res=client_try_solution(TrySolutionRequest())
+        res=client_try_solution(ConsistentRequest())
 
-        if res.solution_found==True:
-            print("Solution found!")
-            return 'correct'
-        else:
-            print("Solution not correct")
-            return 'explore'
-
-        oracle=True
+        if len(res.consistent)>0:
+            conistent_ids=res.consistent
+            oracle=True
+        
         stop=False
-
         return 'explore'
 
 
@@ -211,18 +208,22 @@ class Try_Solution(smach.State):
                              outcomes=['explore', 'correct'])
 
     def execute(self, userdata):
-        res=client_try_solution(TrySolutionRequest())
+        global conistent_ids
 
-        if res.solution_found==True:
-            print("Solution found!")
-            return 'correct'
-        else:
-            print("Solution not correct")
-            return 'explore'
+        solution=ask_solution(OracleRequest())
+        for id in conistent_ids:
+            if str(solution.ID) == id:
+                print("\nSolution found!: "+ str(solution.ID))
+                return 'correct'
+            else:
+                print("Solution ID "+str(solution.ID) +" is not correct")
+                return 'explore'
+
+        
 
 
 def main():
-    global pub_move_base, movearm_client, sub_ID, client_ID_msg, client_add_hint, client_update_ontology, client_try_solution
+    global pub_move_base, movearm_client, sub_ID, client_ID_msg, client_add_hint, client_update_ontology, client_try_solution, ask_solution
 
     # Initialize the node
     rospy.init_node('state_machine')
@@ -233,7 +234,8 @@ def main():
     client_ID_msg=rospy.ServiceProxy('/oracle_hint', Marker)
     client_add_hint=rospy.ServiceProxy('/ontology_interface/add_hint', Hint)
     client_update_ontology=rospy.ServiceProxy('/ontology_interface/update_request', Update)
-    client_try_solution=rospy.ServiceProxy('/ontology_interface/try_solution', TrySolution)
+    client_try_solution=rospy.ServiceProxy('/ontology_interface/check_consistency', Consistent)
+    ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
 
     init_scene()
 

@@ -4,7 +4,7 @@ from posixpath import dirname, realpath
 import rospy
 from classes.myArmor import MyArmor
 #from erl2.srv import Update, UpdateResponse, TrySolution, TrySolutionResponse, Oracle
-from erl2.srv import Update, UpdateResponse, TrySolution, TrySolutionResponse, Oracle, Hint, HintResponse, OracleRequest
+from erl2.srv import Update, UpdateResponse, Consistent, ConsistentResponse, Hint, HintResponse
 from erl2.msg import ErlOracle
 from armor_msgs.srv import *
 from armor_msgs.msg import *
@@ -115,7 +115,7 @@ def update_ontology(msg):
     res.updated=True
     return res
         
-def try_solution(msg):
+def find_cosnistent(msg):
     global ask_solution, solution
 
     print("Trying solution ")
@@ -150,20 +150,10 @@ def try_solution(msg):
                     if res.armor_response.success==False:
                         print("Error in removing\n")
 
-        print("Risposte consistenti: "+str(list_complete))
+        print("Conistent hypotheses: "+str(list_complete))
+        res=ConsistentResponse()
         if len(list_complete)>0:
-            solution=ask_solution(OracleRequest())
-            for id in list_complete:
-                if str(solution.ID) == id:
-                    print("\nSolution found!: "+ str(solution.ID))
-                    res=TrySolutionResponse()
-                    res.solution_found=True
-                    return res
-                else:
-                    print("Solution ID "+str(solution.ID) +" is not correct")
-
-        res=TrySolutionResponse()
-        res.solution_found=False
+            res.consistent=list_complete
         return res
 
 
@@ -175,10 +165,12 @@ def main():
     global ask_solution, update_service, consistency_service
     rospy.init_node('ontology_interface')
    
-    consistency_service=rospy.Service('/ontology_interface/try_solution', TrySolution, try_solution)
+    consistency_service=rospy.Service('/ontology_interface/check_consistency', Consistent, find_cosnistent)
     update_service= rospy.Service('/ontology_interface/update_request', Update, update_ontology)
-    ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
     rospy.Service('/ontology_interface/add_hint', Hint, receive_hint)
+
+    rospy.wait_for_service("/armor_interface_srv")
+    rospy.wait_for_service("/armor_interface_serialized_srv")
 
     # path = dirname(realpath(__file__))
     # path = path[:-7] + "cluedo_ontology.owl"
