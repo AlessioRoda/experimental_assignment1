@@ -1,11 +1,24 @@
 #! /usr/bin/env python3
 
-from posixpath import dirname, realpath
+'''
+.. module:: ontology_interface
+   :platform: Unix
+   :synopsis: Node implementing an interface for comunicating with the ARMOR ontology
+	
+.. moduleauthor:: Alessio Roda alessioroda98@gmail.com
+This node allows to modify the ontology and perform queries
+Service:
+ 	/ontology_interface/check_consistency
+    /ontology_interface/update_request
+
+It's the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the state_machine node,
+then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation; 
+finally it also searches for complete and consistent hypothesys when /ontology_interface/check_consistency is called
+'''
+
 import rospy
 from classes.myArmor import MyArmor
-#from erl2.srv import Update, UpdateResponse, TrySolution, TrySolutionResponse, Oracle
 from erl2.srv import Update, UpdateResponse, Consistent, ConsistentResponse, Hint, HintResponse
-from erl2.msg import ErlOracle
 from armor_msgs.srv import *
 from armor_msgs.msg import *
 
@@ -16,16 +29,26 @@ places_ontology=["conservatory", "lounge", "kitchen", "library", "hall", "study"
 ''' Define all the places of the scene
 '''
 weapons_ontology=["candlestick", "dagger", "leadPipe", "revolver", "rope", "spanner"]
+''' Define all the weapons of the scene
+'''
 
 
 ID=[]
+''' Initialize ID list 
+'''
 key=[]
+''' Initialize key list (each element is referred to the corresponding element in the ID list)
+'''
 value=[]
-ask_solution=None
+''' Initialize value list (each element is referred to the corresponding element in the ID list)
+'''
 update_service=None
+''' Initialize /ontology_interface/update_request service server
+'''
 consistency_service=None
+''' Initialize value /ontology_interface/check_consistency service server
+'''
 
-solution=None
 
 def init_scene():
     '''
@@ -35,10 +58,7 @@ def init_scene():
     that they are different. Finally it preforms 'REASON' command to update the ontology.
     
     '''
-
-
     ## Add people, weapons and places o the ontology
-
     j=0
     while j!=len(people_ontology):
         res=MyArmor.add_item(people_ontology[j], 'PERSON')
@@ -86,8 +106,16 @@ def init_scene():
 
 
 def receive_hint(hint):
+    '''
+        Callback to get the hints from the state_machine node; eache element of the hint is appended in a list 
+
+        Args: 
+            hint(Hint): is the hint received from the state_machine node
+        Returns:
+            res(HintResponse): not utilized
+    '''
     global ID, key, value
-    print("Hint ricevuto: "+str(hint))
+    print("Received hint: "+str(hint))
     ID.append(str(hint.oracle_hint.ID))
     key.append(hint.oracle_hint.key)
     value.append(hint.oracle_hint.value)
@@ -96,27 +124,39 @@ def receive_hint(hint):
 
 
 def update_ontology(msg):
+    '''
+        Callback to upadte the ontology when the /ontology_interface/update_request is called; it adds all the hypothesis in the ontology,
+        then updates it by using the REASON command.
+
+        Args: 
+            msg(Update): not utilized
+        Returns:
+            res(UpdateResponse): not utilized
+    '''
     global ID, key, value
     i=0
-    print("Dentro Update Ontology")
     while i<len(ID):
         MyArmor.add_hypothesis(key[i], ID[i], value[i])
         i+=1
-    print("Update 1")
     #Clear the arrays after having sent the hypotesis
     ID.clear()
     key.clear()
     value.clear()
-    print("Update 2")
     
     MyArmor.reason()
-    print("Update 3")
     res=UpdateResponse()
     res.updated=True
     return res
         
-def find_cosnistent(msg):
-    global ask_solution, solution
+def find_consistent(msg):
+    '''
+        Callback to to find coplete and consistent hypothesis when the /ontology_interface/check_consistency is called
+
+        Args: 
+            msg(Consistent): not utilized
+        Returns:
+            res(ConsistentResponse): not utilized
+    '''
 
     print("Trying solution ")
     response_complete=MyArmor.ask_complete()
@@ -160,21 +200,18 @@ def find_cosnistent(msg):
 
 def main():
     '''
-    Main function 
+    Main function of the onotlogy_interface node; it declares the node itself, initializes all the services and calls the init_scene
+    function to initialize the ontology
     '''
-    global ask_solution, update_service, consistency_service
+    global update_service, consistency_service
     rospy.init_node('ontology_interface')
    
-    consistency_service=rospy.Service('/ontology_interface/check_consistency', Consistent, find_cosnistent)
+    consistency_service=rospy.Service('/ontology_interface/check_consistency', Consistent, find_consistent)
     update_service= rospy.Service('/ontology_interface/update_request', Update, update_ontology)
     rospy.Service('/ontology_interface/add_hint', Hint, receive_hint)
 
     rospy.wait_for_service("/armor_interface_srv")
     rospy.wait_for_service("/armor_interface_serialized_srv")
-
-    # path = dirname(realpath(__file__))
-    # path = path[:-7] + "cluedo_ontology.owl"
-    # print("PATH: "+str(path))
 
     path=rospy.get_param("~ontology")
     print("PATH: "+str(path))
