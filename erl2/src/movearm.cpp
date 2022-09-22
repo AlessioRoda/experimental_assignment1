@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     moveit::planning_interface::MoveGroupInterface group("arm");
     const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
 
-    ros::AsyncSpinner spinner(1); //Nuova aggiunta, vedi se funziona
+    ros::AsyncSpinner spinner(1);
     spinner.start();
 
     while(1)
