@@ -48,7 +48,7 @@ from classes.place import Place
 import actionlib
 from std_msgs.msg import Int32
 from erl2.msg import MoveAction, MoveActionGoal, ErlOracle
-from erl2.srv import MarkerRequest, Marker, Hint, HintRequest, Consistent, ConsistentRequest, Update, Oracle, OracleRequest
+from erl2.srv import MarkerRequest, Marker, Hint, HintRequest, Consistent, ConsistentRequest, Update, Oracle, OracleRequest, Solution, SolutionRequest
 
 
 pub_move_base=None
@@ -74,6 +74,9 @@ client_try_solution=None
 '''
 ask_solution=None
 ''' Initialize the /oracle_solution service client
+'''
+armor_solution=None
+''' Initialize the /ontology_interface/ask_solution service client
 '''
 
 IDs=[]
@@ -302,9 +305,15 @@ class Try_Solution(smach.State):
         for id in conistent_ids:
             if str(solution.ID) == id:
                 print("\nSolution found!: "+ str(solution.ID))
+
+                req=SolutionRequest()
+                req.ID=id
+                res=armor_solution(req)
+                print("Person: "+res.person+" Weapon: "+res.weapon+" Place: "+res.place)
+
                 return 'correct'
             else:
-                print("Solution ID "+str(solution.ID) +" is not correct")
+                print("Solution ID "+id +" is not correct")
 
         conistent_ids.clear()
         return 'explore'
@@ -318,6 +327,7 @@ def main():
     It also defines the SMACH state machine and runs it to start the simulation
     '''
     global pub_move_base, movearm_client, sub_ID, client_ID_msg, client_add_hint, client_update_ontology, client_try_solution, ask_solution
+    global armor_solution
 
     # Initialize the node
     rospy.init_node('state_machine')
@@ -330,6 +340,7 @@ def main():
     client_update_ontology=rospy.ServiceProxy('/ontology_interface/update_request', Update)
     client_try_solution=rospy.ServiceProxy('/ontology_interface/check_consistency', Consistent)
     ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
+    armor_solution=rospy.ServiceProxy('/ontology_interface/ask_solution', Solution)
 
     init_scene()
 

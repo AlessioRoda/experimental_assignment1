@@ -74,6 +74,7 @@ add_service_files(
    Consistent.srv
    Marker.srv
    Hint.srv
+   Solution.srv
 #   Service2.srv
  )
 

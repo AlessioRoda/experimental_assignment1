@@ -18,7 +18,7 @@ finally it also searches for complete and consistent hypothesys when /ontology_i
 
 import rospy
 from classes.myArmor import MyArmor
-from erl2.srv import Update, UpdateResponse, Consistent, ConsistentResponse, Hint, HintResponse
+from erl2.srv import Update, UpdateResponse, Consistent, ConsistentResponse, Hint, HintResponse, Solution, SolutionResponse
 from armor_msgs.srv import *
 from armor_msgs.msg import *
 
@@ -196,6 +196,37 @@ def find_consistent(msg):
             res.consistent=list_complete
         return res
 
+def ask_solution(msg):
+    res=SolutionResponse()
+
+    #Ask weapon
+    armor_res=MyArmor.ask_item(ID=msg.ID, type="what")
+    print(str(armor_res))
+    if len(armor_res.armor_response.queried_objects)==0:
+        print("Error in asking query")
+    else:
+        for str_what in armor_res.armor_response.queried_objects:
+                    str_what=str_what[40:]
+                    res.weapon=str_what[:-1]
+     #Ask person
+    armor_res=MyArmor.ask_item(ID=msg.ID, type="who")
+    print(str(armor_res))
+    if len(armor_res.armor_response.queried_objects)==0:
+        print("Error in asking query")
+    else:
+        for str_who in armor_res.armor_response.queried_objects:
+                    str_who=str_who[40:]
+                    res.person=str_who[:-1]
+     #Ask place
+    armor_res=MyArmor.ask_item(ID=msg.ID, type="where")
+    print(str(armor_res))
+    if len(armor_res.armor_response.queried_objects)==0:
+        print("Error in asking query")
+    else:
+        for str_where in armor_res.armor_response.queried_objects:
+                    str_where=str_where[40:]
+                    res.place=str_where[:-1]
+    return res
 
 
 def main():
@@ -209,6 +240,7 @@ def main():
     consistency_service=rospy.Service('/ontology_interface/check_consistency', Consistent, find_consistent)
     update_service= rospy.Service('/ontology_interface/update_request', Update, update_ontology)
     rospy.Service('/ontology_interface/add_hint', Hint, receive_hint)
+    rospy.Service('/ontology_interface/ask_solution', Solution, ask_solution)
 
     rospy.wait_for_service("/armor_interface_srv")
     rospy.wait_for_service("/armor_interface_serialized_srv")
