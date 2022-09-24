@@ -46,7 +46,8 @@ The ontology_interface node receives the previously described services to intera
 * It initializes the ontology by adding all the places, weapons and people of the game
 * When the /ontology_interface/add_hint reques is receive, it stores the hints in three different lists 
 * When /ontology_interface/update_request service request is received it adds the hints to the ontology and uodate it with the REASON armor command
-* When /ontology_interface/check_consistency service request is rereceived it uses the armor commands to query all the complete and consistent hypothesis IDs of the ontology and returns them as service response; after that it removes them from the ontology 
+* When /ontology_interface/check_consistency service request is rereceived it uses the armor commands to query all the complete and consistent hypothesis IDs of the ontology and returns them as service response 
+* When /ontology_interface/ask_solution service request is received, it uses armor commands to query the perso, the wapon and the place of the cluedo game given the solution ID provides in the request
 
 All the armor operations are performed by calling the MyArmor class, a custom class that provides a morea agile way to send armor messages (for more informations about, please have alook at the sphinx documentation)
 
