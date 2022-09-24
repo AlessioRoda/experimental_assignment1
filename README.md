@@ -30,8 +30,7 @@ Inside the erl2 folder you can find:
 
 The exp_assignment3 package has't been modified 
 
-### Component diagram
-![UML_diagram](https://user-images.githubusercontent.com/48511957/191712935-781f0542-6f30-49ae-a2de-c6724364a7f7.png)
+### Component diagram![UML_diagram_1](https://user-images.githubusercontent.com/48511957/192112566-e148c48a-2451-4152-b598-c8555e20262d.png)
 
 Here is provideded the component diagram to better expalin how the architecture works. As it's possible to notice, the state_machine node is the "heart" of the entire architecture, in particular:
 * It initializes Place objects to define the rooms (name, x, y) 
