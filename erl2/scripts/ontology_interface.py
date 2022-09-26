@@ -13,7 +13,8 @@ Service:
 
 It's the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the state_machine node,
 then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation; 
-finally it also searches for complete and consistent hypothesys when /ontology_interface/check_consistency is called
+then it searches for complete and consistent hypothesys when /ontology_interface/check_consistency is called. Finally it also provides the 
+solution to the cluedo game given the solution ID when /ontology_interface/check_consistency is called. 
 '''
 
 import rospy
@@ -129,7 +130,7 @@ def update_ontology(msg):
         then updates it by using the REASON command.
 
         Args: 
-            msg(Update): not utilized
+            msg(UpdateRequest): not utilized
         Returns:
             res(UpdateResponse): not utilized
     '''
@@ -150,10 +151,10 @@ def update_ontology(msg):
         
 def find_consistent(msg):
     '''
-        Callback to to find coplete and consistent hypothesis when the /ontology_interface/check_consistency is called
+        Callback to find coplete and consistent hypothesis when the /ontology_interface/check_consistency is called
 
         Args: 
-            msg(Consistent): not utilized
+            msg(ConsistentRequest): not utilized
         Returns:
             res(ConsistentResponse): not utilized
     '''
@@ -197,6 +198,14 @@ def find_consistent(msg):
         return res
 
 def ask_solution(msg):
+    '''
+        Callback to find the solution of the cluiedo game when the /ontology_interface/ask_solution is called
+
+        Args: 
+            msg(SolutionRequest): Request service message with the ID of the cluedo solution
+        Returns:
+            res(SolutionResponse): the Response service mesasge with the person (who), the place (where) and the wapon (what)
+    '''
     res=SolutionResponse()
 
     #Ask weapon
