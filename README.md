@@ -128,7 +128,11 @@ rosrun erl2 movearm
 You should see the Gazebo and Rviz simulation running, for the Rviz one you should manually add the robot model, the map, the camera and the navigation plan to see everything properly.
 
 ## Simulation recording
-Here you can find the video recording about the whole simulation (). Above there are some screenshots from the gazebo and Rviz simulation.
+Here you can find the video recording about the whole simulation (). Above there are some screenshots from the Gazebo and Rviz simulation.![Schermata del 2022-09-26 14-01-32](https://user-images.githubusercontent.com/48511957/192271328-439a1999-38e8-4b8b-9d3a-20d558f5aba8.png)
+![Schermata del 2022-09-26 14-06-34](https://user-images.githubusercontent.com/48511957/192272202-eee03e31-5896-49f6-8505-a527c19b6686.png)
+
+
+
 
 ## System features and limitations
 The code was tested either on a native Ubuntu 20.04 distribution and on a Docker image running on Windows 10. It's important to notice that, since the mapping of the area requires a good level of computational power, in the native Docker distribution the creation of the map may generate some "errors", like detecting obstacles that aren't in fact in the simulation, while it doesn't happen on the native Ubuntu distribution. Also, in the Docker image the robot is slower and the simulation may require more time to finish. Anyway, the resulting performance of the systems are considered reasonably fine in both the environments. Another limitation that has been encountered during the tests is that the ontology_interface node sometimes cold not upload correctly the people, the weapons and the places of the ontology, since the armor nodes returns an error; closing the terminal with the ontology_interface node and running it again, all the elements are uploaded correctly and the "Ontology loaded successfully" log appears on the terminal. 
