@@ -6,7 +6,7 @@
    :synopsis: Node implementing a finite state machine that represents the steps of the Cluedo game
 	
 .. moduleauthor:: Alessio Roda alessioroda98@gmail.com
-This node allows to simulate the cluedo game 
+This node allows to simulate the Cluedo game 
 
 Subscriber:
     /marker_id custom to get the ID of a marker when it's detected by the camera
@@ -15,8 +15,8 @@ Client:
     /oracle_hint custom service to ask the hint (ID, type and message) associated to a specific marker ID 
     /ontology_interface/add_hint service to send a new hint to the oracle_interface node 
     /ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the "REASON" command
-    /ontology_interface/check_consistency service to send a request to the oracle_interface to find the coplete and consistent hypotesis in the ontology
-    /oracle_solution service asks to the final_module node to send the solution ID of the cluedo game
+    /ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology
+    /oracle_solution service asks to the final_module node to send the solution ID of the Cluedo game
 
 ActionClient:
     movebase to move to a specific position
@@ -28,15 +28,15 @@ ActionClient:
  
  -MOVE: It's defined by the Explore class and performs the motion of the robot from a room to another by using the move_base action service. Each time that the MOVE state is executed, 
         it checks if the robot must go to the Oracle Room (oracle==True) or in one of the other rooms: in this case all the rooms (that are defined as
-        a Place object, with their name and coordinates) are stored in a list and, each time the robot moves, it reches the last one that is stored in the list.
+        a Place object, with their name and coordinates) are stored in a list and, each time the robot moves, it reaches the last one that is stored in the list.
  -CHECK_CONSISTENCY: It's defined by the Check_Consistency class in this state all the aruco IDs that are received from the topic /marker_id and haven't already 
                     been checked are sent via the /oracle_hint to receive the corresponding hint; then the new hints are added to the ontology via /ontology_interface/add_hint service. 
-                    After having added all the hints, the ontology is updated with the REASO operation, by calling the service /ontology_interface/update_request, it asks for all the complete 
-                    and consistent hypotesis in the ontology calling /ontology_interface/check_consistency service. If there are complete and consistent hypothesis the robot moves to the Oracle Room 
-                    (oracle set to True), otherwhise it will move to another room (oracle is kept to False value).
+                    After having added all the hints, the ontology is updated with the REASON operation, by calling the service /ontology_interface/update_request, it asks for all the complete 
+                    and consistent hypothesis in the ontology calling /ontology_interface/check_consistency service. If there are complete and consistent hypothesis the robot moves to the Oracle Room 
+                    (oracle set to True), otherwise it will move to another room (oracle is kept to False value).
  -SOLUTION: the state that represents the moment in which the robot is trying to generate a solution for the Cluedo game. It's defined with
             the Try_Solution class and during its execution checks if one of the complete and consistent IDs corresponds to the solution of the game, that is obtained via /oracle_solution service.
-            If the solution is found the simulation ends, otherwhise the robot returns in the MOVE state.           
+            If the solution is found the simulation ends, otherwise the robot returns in the MOVE state.           
 '''
 
 from time import sleep
@@ -85,8 +85,8 @@ IDs=[]
 tried_IDs=[]
 ''' Array with the IDs that have already been included in the ontology
 '''
-conistent_ids=[]
-''' Array with the consitent_ids that have been found
+consistent_ids=[]
+''' Array with the consistent_ids that have been found
 '''
 
 places=[]
@@ -155,7 +155,7 @@ class Explore(smach.State):
         '''
         Description of the execute method:
         It generates a move_base action goal with the coordinates of the last room in the list or, 
-        in case a possible solution is found (oracle==True), of the Oracle Room, then sends it and waits untill 
+        in case a possible solution is found (oracle==True), of the Oracle Room, then sends it and waits until 
         the target is reached.
             Args:
                 userdata to store the variables between the states
@@ -205,7 +205,7 @@ class Explore(smach.State):
 
 class Check_Consistency(smach.State):
     '''
-        A class used to interact with the ARMOR ontology, asking for complete and conistent hypothesis as possible solutions
+        A class used to interact with the ARMOR ontology, asking for complete and consistent hypothesis as possible solutions
         ...
         Methods
         -------
@@ -222,7 +222,7 @@ class Check_Consistency(smach.State):
     def execute(self, userdata):
         '''
         Description of the execute method:
-        It checks if there are new IDs to try as a possible solution and in that case it adds them to the ontology, uodates it and then
+        It checks if there are new IDs to try as a possible solution and in that case it adds them to the ontology, updates it and then
         asks for complete and consistent hypothesis to use as a possible solution.
             Args:
                 userdata to store the variables between the states 
@@ -230,7 +230,7 @@ class Check_Consistency(smach.State):
             Returns:
                 'explore'(string): it must go to the MOVE state
         '''
-        global IDs, tried_IDs, client_ID_msg, oracle, client_update_ontology, stop, conistent_ids
+        global IDs, tried_IDs, client_ID_msg, oracle, client_update_ontology, stop, consistent_ids
 
         #Stop adding elements in the list
         stop=True
@@ -259,11 +259,11 @@ class Check_Consistency(smach.State):
         #Clear ID list and update oracle flag to send robot in the oracle room to try a solution
         IDs.clear()
 
-        #Ask for complete and consistent hypotesis as potential solutions
+        #Ask for complete and consistent hypothesis as potential solutions
         res=client_try_solution(ConsistentRequest())
 
         if len(res.consistent)>0:
-            conistent_ids=res.consistent
+            consistent_ids=res.consistent
             oracle=True
         
         stop=False
@@ -279,7 +279,7 @@ class Try_Solution(smach.State):
             __init__(outcomes=['explore', 'correct'])
                 initialize the state
             execute(userdata)
-               implement the behaviour
+               implement the behavior
     '''
     def __init__(self):
 
@@ -289,7 +289,7 @@ class Try_Solution(smach.State):
     def execute(self, userdata):
         '''
         Description of the execute method:
-        It calls the /oracle_solution service to get the solution of the game, then it checks if one of the complete and consistent hypotesis 
+        It calls the /oracle_solution service to get the solution of the game, then it checks if one of the complete and consistent hypothesis 
         corresponds to the solution. If it's correct the game ends, otherwise it removes the incorrect hypothesis from the ontology, 
         then returns to the MOVE state.
             Args:
@@ -299,10 +299,10 @@ class Try_Solution(smach.State):
                 'explore'(string): it must go to the MOVE state
                 'correct'(string): the solution is correct and the state machine is stopped
         '''
-        global conistent_ids
+        global consistent_ids
 
         solution=ask_solution(OracleRequest())
-        for id in conistent_ids:
+        for id in consistent_ids:
             if str(solution.ID) == id:
                 print("\nSolution found!: "+ str(solution.ID))
 
@@ -315,7 +315,7 @@ class Try_Solution(smach.State):
             else:
                 print("Solution ID "+id +" is not correct")
 
-        conistent_ids.clear()
+        consistent_ids.clear()
         return 'explore'
 
         
@@ -369,7 +369,7 @@ def main():
     sis.start()
 
     # Execute the state machine
-    outcome = sm.execute()
+    sm.execute()
 
     # Wait for ctrl-c to stop the application
     rospy.spin()
