@@ -11,7 +11,7 @@
 float pose_x;
 float pose_y;
 float orientation;
-ros::ServiceClient client_conistency;
+ros::ServiceClient client_consistency;
 
 
 namespace KCL_rosplan {
@@ -24,7 +24,7 @@ namespace KCL_rosplan {
 			// here the implementation of the action 
 		erl2::Consistency req;
 		req.request.req=true;
-	    client_conistency.call(req);
+	    client_consistency.call(req);
         if (req.response.res==true)
 		{
             return true;
@@ -40,7 +40,7 @@ namespace KCL_rosplan {
 	int main(int argc, char **argv) {
 		ros::init(argc, argv, "check_consistency", ros::init_options::AnonymousName);
 		ros::NodeHandle nh("~");
-        client_conistency= nh.serviceClient<erl2::Consistency>("/conosistency_request");
+        client_consistency= nh.serviceClient<erl2::Consistency>("/consistency_request");
 		KCL_rosplan::CheckConsistencyActionInterface my_aci(nh);
 		my_aci.runActionInterface();
 		return 0;

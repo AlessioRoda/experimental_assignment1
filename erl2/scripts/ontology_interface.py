@@ -4,8 +4,8 @@ from posixpath import dirname, realpath
 import rospy
 from classes.myArmor import MyArmor
 #from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle
-from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle 
-from erl2.msg import ErlOracle, ResetAction, ResetActionGoal
+from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle, OracleRequest
+from erl2.msg import ErlOracle, ResetAction, ResetGoal
 from armor_msgs.srv import *
 from armor_msgs.msg import *
 import actionlib
@@ -37,8 +37,6 @@ def init_scene():
     that they are different. Finally it preforms 'REASON' command to update the ontology.
     
     '''
-
-
 
     ## Add people, weapons and places o the ontology
 
@@ -87,84 +85,85 @@ def init_scene():
     res=MyArmor.reason()
 
 
-
-
 def receive_hint(hint):
     global ID, key, value
-    ID.append(hint.ID)
+    
+    print("Received hint: "+str(hint))
+    ID.append(str(hint.ID))
     key.append(hint.key)
     value.append(hint.value)
 
 
-
-def update_ontology():
+def update_ontology(msg):
     global ID, key, value
     i=0
-    while i<ID.count():
+    while i<len(ID):
         MyArmor.add_hypothesis(key[i], ID[i], value[i])
         i+=1
-
-
-    #Clear the arrays after having sent the hypotesis
-    for i in ID:
-        ID.remove(i)
-        key.remove(i)
-        value.remove(i)
+    #Clear the lists after having sent the hypothesis
+    ID.clear()
+    key.clear()
+    value.clear()
     
     MyArmor.reason()
     res=UpdateResponse()
     res.updated=True
-    update_service(res)
+    return res
+
         
-def try_solution():
+def try_solution(msg):
     global ask_solution, solution
 
-    print("Trying solution: ")
-    response_complete=[]
-    response_complete.append(MyArmor.ask_complete())
+    print("Check consistent and complete IDs")
+    response_complete=MyArmor.ask_complete()
+    list_complete=[]
+    print(str(response_complete))
     if response_complete.armor_response.success==False:
         print("\nError in asking query")
-    
-    for j in response_complete:
-        if len(response_complete[j].armor_response.queried_objects)!=0:
-            response_inconsistent=[]
-            response_inconsistent.append(MyArmor.ask_inconsistent())
+    else:
+        if len(response_complete.armor_response.queried_objects)!=0:
+
+            for complete in response_complete.armor_response.queried_objects:
+                complete=complete[40:]
+                id_complete=complete[:-1]
+                print("ID_complete "+str(id_complete) +"\n")
+                list_complete.append(id_complete)
+
+            response_inconsistent=MyArmor.ask_inconsistent()
+            print("Inconsistent responses: "+str(response_inconsistent))
+            print("Complete responses: "+str(list_complete))
         
             # Look for possible inconsistent hypothesis and in case remove them
             if len(response_inconsistent.armor_response.queried_objects)!=0:
 
-                for i in response_inconsistent:
-                    str_inconsistent=response_inconsistent[i].armor_response.queried_objects[0]
+                for str_inconsistent in response_inconsistent.armor_response.queried_objects:
                     str_inconsistent=str_inconsistent[40:]
                     id_inconsistent=str_inconsistent[:-1]
                     print("ID_inconsistent "+str(id_inconsistent) +"\n")
                     res=MyArmor.remove(id_inconsistent)
-                    response_complete.remove(id_inconsistent)
+                    list_complete.remove(id_inconsistent)
 
                     if res.armor_response.success==False:
-                        print("Error in removing\n")
+                        print("Error in removing inconsistent ID\n")
 
-    else:
-        solution=ask_solution()
-        for res in response_complete:
-            id_consistent=res.armor_response.queried_objects[0]
-            if solution == id_consistent:
-                print("\nSolution found!: "+ solution)
-                res=ConsistencyResponse()
-                res.ok=True
-                consistency_service(res)
+    if len(list_complete>0):
+        print("Trying solution: ")
+        solution=ask_solution(OracleRequest())
+        for id in list_complete:
+            if str(solution.ID) == id:
+                print("\nSolution found!: "+ str(solution.ID))
 
-        print("Reload the plan")
-        goal=ResetActionGoal()
-        reset_action_client.wait_for_server()
-        reset_action_client.send_goal(goal.goal)
-        res=reset_action_client.wait_for_result()
-        if res.succeed==False:
-            print("Error in replanning")
-        
+                return ConsistencyResponse()
 
+    print("Reload the plan")
+    goal=ResetGoal()
+    reset_action_client.wait_for_server()
+    reset_action_client.send_goal(goal)
+    res=reset_action_client.wait_for_result()
+    if res.succeed==False:
+        print("Error in replanning")
 
-    
+    return ConsistencyResponse()
 
 
 def main():
@@ -174,17 +173,12 @@ def main():
     global ask_solution, update_service, consistency_service, reset_action_client
     rospy.init_node('ontology_interface')
    
-    consistency_service=rospy.Service('/conosistency_request', Consistency, try_solution)
+    consistency_service=rospy.Service('/consistency_request', Consistency, try_solution)
     update_service= rospy.Service('/update_request', Update, update_ontology)
     ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
     rospy.Subscriber('/oracle_hint', ErlOracle, receive_hint)
     reset_action_client=actionlib.SimpleActionClient("reset_planning_action", ResetAction)
     
-
-    # path = dirname(realpath(__file__))
-    # path = path[:-7] + "cluedo_ontology.owl"
-    # print("PATH: "+str(path))
-
     path=rospy.get_param("~ontology")
     print("PATH: "+str(path))
     
