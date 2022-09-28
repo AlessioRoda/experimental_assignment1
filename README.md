@@ -128,7 +128,7 @@ rosrun erl2 movearm
 You should see the Gazebo and Rviz simulation running, for the Rviz one you should manually add the robot model, the map, the camera and the navigation plan to see everything properly.
 
 ## Simulation recording
-Here you can find the video recording about the whole simulation (). Above there are some screenshots from the Gazebo and Rviz simulation.![Schermata del 2022-09-26 14-01-32](https://user-images.githubusercontent.com/48511957/192271328-439a1999-38e8-4b8b-9d3a-20d558f5aba8.png)
+Here you can find the video recording about the whole simulation (https://unigeit-my.sharepoint.com/:v:/g/personal/s4458313_studenti_unige_it/EXP8GTaeLm5Mg-Y5b9QvYxwBjRVdcFz7oujsz0dF8JyuhQ?e=RTSIeX). Above there are some screenshots from the Gazebo and Rviz simulation.![Schermata del 2022-09-26 14-01-32](https://user-images.githubusercontent.com/48511957/192271328-439a1999-38e8-4b8b-9d3a-20d558f5aba8.png)
 ![Schermata del 2022-09-26 14-06-34](https://user-images.githubusercontent.com/48511957/192272202-eee03e31-5896-49f6-8505-a527c19b6686.png)
 
 
