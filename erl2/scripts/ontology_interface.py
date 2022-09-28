@@ -3,18 +3,21 @@
 '''
 .. module:: ontology_interface
    :platform: Unix
-   :synopsis: Node implementing an interface for comunicating with the ARMOR ontology
+   :synopsis: Node implementing an interface for communicating with the ARMOR ontology
 	
 .. moduleauthor:: Alessio Roda alessioroda98@gmail.com
-This node allows to modify the ontology and perform queries
-Service:
- 	/ontology_interface/check_consistency
-    /ontology_interface/update_request
 
-It's the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the state_machine node,
-then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation; 
-then it searches for complete and consistent hypothesys when /ontology_interface/check_consistency is called. Finally it also provides the 
-solution to the cluedo game given the solution ID when /ontology_interface/check_consistency is called. 
+This node allows to modify the ontology and perform queries 
+                                                                                                                                
+Service:
+ 	/ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology
+    /ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the "REASON" command
+
+ It's the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the state_machine node,
+ then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation; 
+ then it searches for complete and consistent hypotheses when /ontology_interface/check_consistency is called and removes inconsistent ones from the ontology. Finally it also provides the 
+ solution to the cluedo game given the solution ID when /ontology_interface/ask_solution is called. 
+
 '''
 
 import rospy
@@ -24,41 +27,52 @@ from armor_msgs.srv import *
 from armor_msgs.msg import *
 
 people_ontology=["MissScarlett", "ColonelMustard", "MrsWhite", "MrGreen", "MrsPeacock", "ProfPlum"]
+
 ''' Define all the people of the scene
+
 '''
 places_ontology=["conservatory", "lounge", "kitchen", "library", "hall", "study", "bathroom", "diningRoom", "billiardRoom"]
+
 ''' Define all the places of the scene
+
 '''
 weapons_ontology=["candlestick", "dagger", "leadPipe", "revolver", "rope", "spanner"]
+
 ''' Define all the weapons of the scene
+
 '''
 
 
 ID=[]
 ''' Initialize ID list 
+
 '''
 key=[]
 ''' Initialize key list (each element is referred to the corresponding element in the ID list)
+
 '''
 value=[]
 ''' Initialize value list (each element is referred to the corresponding element in the ID list)
+
 '''
 update_service=None
 ''' Initialize /ontology_interface/update_request service server
+
 '''
 consistency_service=None
 ''' Initialize value /ontology_interface/check_consistency service server
+
 '''
 
 
 def init_scene():
     '''
-    Function to initialize the scene, it defines three rooms as Place objects, then defines the starting position in the Oracle_Room (x=0, y=0)
-    then it adds all the information about the scene to the armor ontology, by loading all the people, places and weapons.
+    Function to initialize the scene, it adds all the information about the scene to the armor ontology by loading all the people, places and weapons.
     When a new element is loaded in the ontology it must be disjointed respect to the others of the same class, in order to notify the ontology
     that they are different. Finally it preforms 'REASON' command to update the ontology.
     
     '''
+
     ## Add people, weapons and places o the ontology
     j=0
     while j!=len(people_ontology):
@@ -108,13 +122,15 @@ def init_scene():
 
 def receive_hint(hint):
     '''
-        Callback to get the hints from the state_machine node; eache element of the hint is appended in a list 
+    Callback to get the hints from the state_machine node; each element of the hint is appended in a list 
 
-        Args: 
-            hint(Hint): is the hint received from the state_machine node
-        Returns:
-            res(HintResponse): not utilized
+    Args: 
+        hint(Hint): is the hint received from the state_machine node
+    Returns:
+        res(HintResponse): not utilized
+
     '''
+
     global ID, key, value
     print("Received hint: "+str(hint))
     ID.append(str(hint.oracle_hint.ID))
@@ -126,20 +142,22 @@ def receive_hint(hint):
 
 def update_ontology(msg):
     '''
-        Callback to upadte the ontology when the /ontology_interface/update_request is called; it adds all the hypothesis in the ontology,
-        then updates it by using the REASON command.
+    Callback to update the ontology when the /ontology_interface/update_request is called; it adds all the hypothesis in the ontology,
+    then updates it by using the REASON command.
 
-        Args: 
-            msg(UpdateRequest): not utilized
-        Returns:
-            res(UpdateResponse): not utilized
+    Args: 
+        msg(UpdateRequest): not utilized
+    Returns:
+        res(UpdateResponse): not utilized
+
     '''
+
     global ID, key, value
     i=0
     while i<len(ID):
         MyArmor.add_hypothesis(key[i], ID[i], value[i])
         i+=1
-    #Clear the arrays after having sent the hypotesis
+    #Clear the arrays after having sent the hypothesis
     ID.clear()
     key.clear()
     value.clear()
@@ -151,15 +169,16 @@ def update_ontology(msg):
         
 def find_consistent(msg):
     '''
-        Callback to find coplete and consistent hypothesis when the /ontology_interface/check_consistency is called
+    Callback to find complete and consistent hypothesis when the /ontology_interface/check_consistency is called, it also removes
+    inconsistent IDs
 
-        Args: 
-            msg(ConsistentRequest): not utilized
-        Returns:
-            res(ConsistentResponse): not utilized
+    Args: 
+        msg(ConsistentRequest): not utilized
+    Returns:
+        res(ConsistentResponse): not utilized
+
     '''
 
-    print("Trying solution ")
     response_complete=MyArmor.ask_complete()
     list_complete=[]
     print(str(response_complete))
@@ -176,7 +195,7 @@ def find_consistent(msg):
 
             response_inconsistent=MyArmor.ask_inconsistent()
             print(str(response_inconsistent))
-            print("Risposte compelte: "+str(list_complete))
+            print("Complete responses: "+str(list_complete))
         
             # Look for possible inconsistent hypothesis and in case remove them
             if len(response_inconsistent.armor_response.queried_objects)!=0:
@@ -191,7 +210,7 @@ def find_consistent(msg):
                     if res.armor_response.success==False:
                         print("Error in removing\n")
 
-        print("Conistent hypotheses: "+str(list_complete))
+        print("Consistent hypotheses: "+str(list_complete))
         res=ConsistentResponse()
         if len(list_complete)>0:
             res.consistent=list_complete
@@ -199,13 +218,15 @@ def find_consistent(msg):
 
 def ask_solution(msg):
     '''
-        Callback to find the solution of the cluiedo game when the /ontology_interface/ask_solution is called
+    Callback to find the solution of the cluedo game when the /ontology_interface/ask_solution is called
 
-        Args: 
-            msg(SolutionRequest): Request service message with the ID of the cluedo solution
-        Returns:
-            res(SolutionResponse): the Response service mesasge with the person (who), the place (where) and the wapon (what)
+    Args: 
+        msg(SolutionRequest): Request service message with the ID of the cluedo solution
+    Returns:
+        res(SolutionResponse): the Response service message with the person (who), the place (where) and the weapon (what)
+
     '''
+
     res=SolutionResponse()
 
     #Ask weapon
@@ -240,9 +261,11 @@ def ask_solution(msg):
 
 def main():
     '''
-    Main function of the onotlogy_interface node; it declares the node itself, initializes all the services and calls the init_scene
+    Main function of the ontology_interface node; it declares the node itself, initializes all the services and calls the init_scene
     function to initialize the ontology
+
     '''
+
     global update_service, consistency_service
     rospy.init_node('ontology_interface')
    
