@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Indices &mdash; Third_assignment 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="#" class="icon icon-home"> Third_assignment
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Indices</a></li>
+<li><a class="reference internal" href="#third-assignment-documentation">Third assignment documentation!</a><ul>
+<li><a class="reference internal" href="#module-scripts.state_machine">State Machine Module</a></li>
+<li><a class="reference internal" href="#module-scripts.ontology_interface">OntologyInterface Module</a></li>
+<li><a class="reference internal" href="#movearm">Movearm</a></li>
+</ul>
+</li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">Third_assignment</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home"></a> &raquo;</li>
+      <li>Indices</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="toctree-wrapper compound">
+</div>
+<div class="section" id="indices">
+<h1>Indices<a class="headerlink" href="#indices" title="Permalink to this headline"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Indice</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</div>
+<div class="section" id="third-assignment-documentation">
+<h1>Third assignment documentation!<a class="headerlink" href="#third-assignment-documentation" title="Permalink to this headline"></a></h1>
+<p>This is the documentation of the erl2 package</p>
+<div class="section" id="module-scripts.state_machine">
+<span id="state-machine-module"></span><h2>State Machine Module<a class="headerlink" href="#module-scripts.state_machine" title="Permalink to this headline"></a></h2>
+<span class="target" id="module-state_machine"></span><p>This node allows to simulate the Cluedo game</p>
+<dl>
+<dt>Subscriber:</dt><dd><p>/marker_id custom service to get the ID of a marker when it’s detected by the camera</p>
+</dd>
+<dt>Client:</dt><dd><p>/oracle_hint custom service to ask the hint (ID, type and message) associated to a specific marker ID
+/ontology_interface/add_hint service to send a new hint to the oracle_interface node
+/ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the “REASON” command
+/ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology
+/oracle_solution service asks to the final_module node to send the solution ID of the Cluedo game
+/ontology_interface/ask_solution to query the place, the person and the weapon corresponding to a certain ID</p>
+</dd>
+<dt>ActionClient:</dt><dd><blockquote>
+<div><p>movebase to move to a specific position</p>
+</div></blockquote>
+<p>It’s performed as the node that permits to simulate the entire Cluedo game, it’s the main of the whole architecture and with the smach
+StateMachine can simulate the game by switching from three states:</p>
+<dl class="simple">
+<dt>-MOVE: It’s defined by the Explore class and performs the motion of the robot from a room to another by using the move_base action service. Each time the MOVE state is executed,</dt><dd><p>it checks if the robot must go to the Oracle Room (oracle==True) or in one of the other rooms: in this case all the rooms (that are defined as
+Place objects, with their name and coordinates) are stored in a list and, each time the robot moves, it reaches the last element in the list.</p>
+</dd>
+<dt>-CHECK_CONSISTENCY: It’s defined by the Check_Consistency class, in this state all the aruco IDs that are received from the topic /marker_id and haven’t already</dt><dd><p>been checked are sent via the /oracle_hint to receive the corresponding hint; then the new hints are stored in the ontology_interface node via /ontology_interface/add_hint service.
+After having stored all the hints, the ontology is updated with the new hints, by calling the service /ontology_interface/update_request; then it also asks for all the complete
+and consistent hypothesis in the ontology calling /ontology_interface/check_consistency service and removes inconsistent hypothesis. If there are complete and consistent hypothesis the robot moves to the Oracle Room
+(oracle set to True), otherwise it will move to another room (oracle is kept to False value).</p>
+</dd>
+<dt>-SOLUTION: the state that represents the moment in which the robot is trying to generate a solution for the Cluedo game. It’s defined with</dt><dd><p>the Try_Solution class and during its execution checks if one of the complete and consistent IDs corresponds to the solution of the game, that is obtained via /oracle_solution service.
+If the solution is found, it asks the place, the person and the weapon corresponding to the solution ID and the simulation ends, otherwise the robot returns in the MOVE state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.Check_Consistency">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">Check_Consistency</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#Check_Consistency"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Check_Consistency" title="Permalink to this definition"></a></dt>
+<dd><p>A class to interact with the ARMOR ontology, asking for complete and consistent hypothesis as possible solutions</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.Check_Consistency.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Check_Consistency.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Check_Consistency.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Description of the execute method:
+It checks if there are new IDs to try as a possible solution and in that case it sends them to the ontology_interface node, updates the ontology and then
+asks for complete and consistent hypothesis to use as a possible solution, then removes the inconsistent hypotheses (if any).</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>userdata to store the variables between the states</p>
+</dd>
+<dt>Returns:</dt><dd><p>‘explore’(string): it must go to the MOVE state</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.Explore">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">Explore</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#Explore"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Explore" title="Permalink to this definition"></a></dt>
+<dd><p>A class to represent the behavior of the robot when it moves from a place to another</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.Explore.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Explore.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Explore.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Description of the execute method:
+It generates a move_base action goal with the coordinates of the last room in the list or,
+in case a possible solution is found (oracle==True), the coordinates of the Oracle Room, then sends it and waits until
+the target is reached.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>userdata to store the variables between the states</p>
+</dd>
+<dt>Returns:</dt><dd><p>‘solution’(string): if it must go to the SOLUTION state
+‘enter_room’(string): if it must go to the ENTER_ROOM state</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.IDs">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">IDs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#scripts.state_machine.IDs" title="Permalink to this definition"></a></dt>
+<dd><p>List with the new IDs that are received</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.IDs_callback">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">IDs_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#IDs_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.IDs_callback" title="Permalink to this definition"></a></dt>
+<dd><p>Callback to get the IDs of the marker that have been detected by the aruco_ros node</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.state_machine.Try_Solution">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">Try_Solution</span></span><a class="reference internal" href="_modules/scripts/state_machine.html#Try_Solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Try_Solution" title="Permalink to this definition"></a></dt>
+<dd><p>A class to represent the behavior of the robot when it tries to generate a solution</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.state_machine.Try_Solution.execute">
+<span class="sig-name descname"><span class="pre">execute</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">userdata</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#Try_Solution.execute"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.Try_Solution.execute" title="Permalink to this definition"></a></dt>
+<dd><p>Description of the execute method:
+It calls the /oracle_solution service to get the solution of the game, then it checks if one of the complete and consistent hypothesis
+corresponds to the solution. If it’s correct it prints the solution associated to the ID, then the game ends, otherwise it
+returns to the MOVE state.</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>userdata to store the variables between the states (not utilized)</p>
+</dd>
+<dt>Returns:</dt><dd><p>‘explore’(string): it must go to the MOVE state
+‘correct’(string): the solution is correct and the state machine is stopped</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.actual_pose">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">actual_pose</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.actual_pose" title="Permalink to this definition"></a></dt>
+<dd><p>Actual position of the robot in the environment</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.armor_solution">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">armor_solution</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.armor_solution" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the /ontology_interface/ask_solution service client</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.ask_solution">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">ask_solution</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.ask_solution" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the /oracle_solution service client</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.client_ID_msg">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">client_ID_msg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.client_ID_msg" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the /oracle_hint service client</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.client_add_hint">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">client_add_hint</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.client_add_hint" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the /ontology_interface/add_hint service client</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.client_try_solution">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">client_try_solution</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.client_try_solution" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the /ontology_interface/check_consistency service client</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.client_update_ontology">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">client_update_ontology</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.client_update_ontology" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the /ontology_interface/update_request service client</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.consistent_ids">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">consistent_ids</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#scripts.state_machine.consistent_ids" title="Permalink to this definition"></a></dt>
+<dd><p>List with the consistent_ids that have been found</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.init_scene">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">init_scene</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#init_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.init_scene" title="Permalink to this definition"></a></dt>
+<dd><p>Function to initialize the scenario with the rooms of the simulation</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.state_machine.main">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/state_machine.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.state_machine.main" title="Permalink to this definition"></a></dt>
+<dd><p>It’s the main of the state_machine node, it performs the initialization of the node itself and initializes all the services and subscribers.
+It also defines the SMACH state machine and runs it to start the simulation</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.oracle">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">oracle</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#scripts.state_machine.oracle" title="Permalink to this definition"></a></dt>
+<dd><p>Boolean to know if the robot must go to the Oracle_Room</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.oracle_room">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">oracle_room</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.oracle_room" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the Oracle_Room</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.places">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">places</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#scripts.state_machine.places" title="Permalink to this definition"></a></dt>
+<dd><p>List with the places of the scene</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.pub_move_base">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">pub_move_base</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.pub_move_base" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize the action client for performing the motion of the robot via move_base action</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.stop">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">stop</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#scripts.state_machine.stop" title="Permalink to this definition"></a></dt>
+<dd><p>Flag to stop storing new IDs in the IDs list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.10)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.sub_ID">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">sub_ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.state_machine.sub_ID" title="Permalink to this definition"></a></dt>
+<dd><p>Subscriber to /marker_id topic</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.state_machine.tried_IDs">
+<span class="sig-prename descclassname"><span class="pre">scripts.state_machine.</span></span><span class="sig-name descname"><span class="pre">tried_IDs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#scripts.state_machine.tried_IDs" title="Permalink to this definition"></a></dt>
+<dd><p>List with the IDs that have already been included in the ontology</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-scripts.ontology_interface">
+<span id="ontologyinterface-module"></span><h2>OntologyInterface Module<a class="headerlink" href="#module-scripts.ontology_interface" title="Permalink to this headline"></a></h2>
+<span class="target" id="module-ontology_interface"></span><p>This node allows to modify the ontology and perform queries</p>
+<dl>
+<dt>Service:</dt><dd><blockquote>
+<div><p>/ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology
+/ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the “REASON” command</p>
+</div></blockquote>
+<p>It’s the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the state_machine node,
+then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation;
+then it searches for complete and consistent hypotheses when /ontology_interface/check_consistency is called and removes inconsistent ones from the ontology. Finally it also provides the
+solution to the cluedo game given the solution ID when /ontology_interface/ask_solution is called.</p>
+</dd>
+</dl>
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.ontology_interface.ID">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">ID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#scripts.ontology_interface.ID" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize ID list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ontology_interface.ask_solution">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">ask_solution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ontology_interface.html#ask_solution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ontology_interface.ask_solution" title="Permalink to this definition"></a></dt>
+<dd><p>Callback to find the solution of the cluedo game when the /ontology_interface/ask_solution is called</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>SolutionRequest</em>) – Request service message with the ID of the cluedo solution</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the Response service message with the person (who), the place (where) and the weapon (what)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>res(SolutionResponse)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.ontology_interface.consistency_service">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">consistency_service</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.ontology_interface.consistency_service" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize value /ontology_interface/check_consistency service server</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ontology_interface.find_consistent">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">find_consistent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ontology_interface.html#find_consistent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ontology_interface.find_consistent" title="Permalink to this definition"></a></dt>
+<dd><p>Callback to find complete and consistent hypothesis when the /ontology_interface/check_consistency is called, it also removes
+inconsistent IDs</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>ConsistentRequest</em>) – not utilized</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>not utilized</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>res(ConsistentResponse)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ontology_interface.init_scene">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">init_scene</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ontology_interface.html#init_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ontology_interface.init_scene" title="Permalink to this definition"></a></dt>
+<dd><p>Function to initialize the scene, it adds all the information about the scene to the armor ontology by loading all the people, places and weapons.
+When a new element is loaded in the ontology it must be disjointed respect to the others of the same class, in order to notify the ontology
+that they are different. Finally it preforms ‘REASON’ command to update the ontology.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.ontology_interface.key">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">key</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#scripts.ontology_interface.key" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize key list (each element is referred to the corresponding element in the ID list)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ontology_interface.main">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ontology_interface.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ontology_interface.main" title="Permalink to this definition"></a></dt>
+<dd><p>Main function of the ontology_interface node; it declares the node itself, initializes all the services and calls the init_scene
+function to initialize the ontology</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.ontology_interface.people_ontology">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">people_ontology</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['MissScarlett',</span> <span class="pre">'ColonelMustard',</span> <span class="pre">'MrsWhite',</span> <span class="pre">'MrGreen',</span> <span class="pre">'MrsPeacock',</span> <span class="pre">'ProfPlum']</span></em><a class="headerlink" href="#scripts.ontology_interface.people_ontology" title="Permalink to this definition"></a></dt>
+<dd><p>Define all the people of the scene</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.ontology_interface.places_ontology">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">places_ontology</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['conservatory',</span> <span class="pre">'lounge',</span> <span class="pre">'kitchen',</span> <span class="pre">'library',</span> <span class="pre">'hall',</span> <span class="pre">'study',</span> <span class="pre">'bathroom',</span> <span class="pre">'diningRoom',</span> <span class="pre">'billiardRoom']</span></em><a class="headerlink" href="#scripts.ontology_interface.places_ontology" title="Permalink to this definition"></a></dt>
+<dd><p>Define all the places of the scene</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ontology_interface.receive_hint">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">receive_hint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hint</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ontology_interface.html#receive_hint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ontology_interface.receive_hint" title="Permalink to this definition"></a></dt>
+<dd><p>Callback to get the hints from the state_machine node; each element of the hint is appended in a list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>hint</strong> (<em>Hint</em>) – is the hint received from the state_machine node</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>not utilized</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>res(HintResponse)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="scripts.ontology_interface.update_ontology">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">update_ontology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/ontology_interface.html#update_ontology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.ontology_interface.update_ontology" title="Permalink to this definition"></a></dt>
+<dd><p>Callback to update the ontology when the /ontology_interface/update_request is called; it adds all the hypothesis in the ontology,
+then updates it by using the REASON command.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>msg</strong> (<em>UpdateRequest</em>) – not utilized</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>not utilized</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>res(UpdateResponse)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.ontology_interface.update_service">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">update_service</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#scripts.ontology_interface.update_service" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize /ontology_interface/update_request service server</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.ontology_interface.value">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">value</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#scripts.ontology_interface.value" title="Permalink to this definition"></a></dt>
+<dd><p>Initialize value list (each element is referred to the corresponding element in the ID list)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.ontology_interface.weapons_ontology">
+<span class="sig-prename descclassname"><span class="pre">scripts.ontology_interface.</span></span><span class="sig-name descname"><span class="pre">weapons_ontology</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['candlestick',</span> <span class="pre">'dagger',</span> <span class="pre">'leadPipe',</span> <span class="pre">'revolver',</span> <span class="pre">'rope',</span> <span class="pre">'spanner']</span></em><a class="headerlink" href="#scripts.ontology_interface.weapons_ontology" title="Permalink to this definition"></a></dt>
+<dd><p>Define all the weapons of the scene</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.10)">list</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.10)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="movearm">
+<h2>Movearm<a class="headerlink" href="#movearm" title="Permalink to this headline"></a></h2>
+<p>Node to perform the motion of the robotic arm. </p>
+<p>
+description: It’s a simple node in which the robot arm moves in five different positions already defined with the moveit_setup_assistant. <dl class="simple">
+<dt><strong>Version</strong></dt><dd><p>1.0 </p>
+</dd>
+<dt><strong>Author</strong></dt><dd><p>Alessio Roda </p>
+</dd>
+<dt><strong>Date</strong></dt><dd><p>September 2022</p>
+</dd>
+</dl>
+</p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv44mainiPPc">
+<span id="_CPPv34mainiPPc"></span><span id="_CPPv24mainiPPc"></span><span id="main__i.cPP"></span><span class="target" id="movearm_8cpp_1a3c04138a5bfe5d72780bb7e82a18e627"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">main</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">argc</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">argv</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv44mainiPPc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Main function of the node. </p>
+<p>int main(argc, argv)</p>
+<p>
+description: The main function, makes all the initializations as follows:</p>
+<p><ul class="simple">
+<li><p>Initializess the node</p></li>
+<li><p>Loads the arm model of the robot described with the moveit_setup_assistant</p></li>
+<li><p>Get the “arm” move group to move the robotic arm</p></li>
+<li><p>Moves the arm in an infinite loop in five different poses, such that the robot can explore the environment with the camera, It starts from the default position, than it rotates around 360 degrees and folds in order to see better the markers that are on the floor </p></li>
+</ul>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>argc</strong> – the number of argument passed as parameters</p></li>
+<li><p><strong>argv</strong> – the vector of string containing each argument</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>0 when the program ends</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Alessio Roda.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

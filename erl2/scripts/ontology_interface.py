@@ -4,13 +4,13 @@
 .. module:: ontology_interface
    :platform: Unix
    :synopsis: Node implementing an interface for communicating with the ARMOR ontology
-	
+
 .. moduleauthor:: Alessio Roda alessioroda98@gmail.com
 
-This node allows to modify the ontology and perform queries 
-                                                                                                                                
+This node allows to modify the ontology and perform queries
+	                                                                                                                            
 Service:
- 	/ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology
+    /ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology
     /ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the "REASON" command
 
  It's the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the state_machine node,
@@ -28,31 +28,31 @@ from armor_msgs.msg import *
 
 people_ontology=["MissScarlett", "ColonelMustard", "MrsWhite", "MrGreen", "MrsPeacock", "ProfPlum"]
 
-''' Define all the people of the scene
+''' list[str]: Define all the people of the scene
 
 '''
 places_ontology=["conservatory", "lounge", "kitchen", "library", "hall", "study", "bathroom", "diningRoom", "billiardRoom"]
 
-''' Define all the places of the scene
+''' list[str]: Define all the places of the scene
 
 '''
 weapons_ontology=["candlestick", "dagger", "leadPipe", "revolver", "rope", "spanner"]
 
-''' Define all the weapons of the scene
+''' list[str]: Define all the weapons of the scene
 
 '''
 
 
 ID=[]
-''' Initialize ID list 
+''' list: Initialize ID list 
 
 '''
 key=[]
-''' Initialize key list (each element is referred to the corresponding element in the ID list)
+''' list: Initialize key list (each element is referred to the corresponding element in the ID list)
 
 '''
 value=[]
-''' Initialize value list (each element is referred to the corresponding element in the ID list)
+''' list: Initialize value list (each element is referred to the corresponding element in the ID list)
 
 '''
 update_service=None
@@ -157,7 +157,7 @@ def update_ontology(msg):
     while i<len(ID):
         MyArmor.add_hypothesis(key[i], ID[i], value[i])
         i+=1
-    #Clear the arrays after having sent the hypothesis
+    #Clear the lists after having sent the hypothesis
     ID.clear()
     key.clear()
     value.clear()

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scripts.ontology_interface &mdash; Third_assignment 1.0 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> Third_assignment
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Third_assignment</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>scripts.ontology_interface</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scripts.ontology_interface</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python3</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">.. module:: ontology_interface</span>
+<span class="sd">   :platform: Unix</span>
+<span class="sd">   :synopsis: Node implementing an interface for communicating with the ARMOR ontology</span>
+
+<span class="sd">.. moduleauthor:: Alessio Roda alessioroda98@gmail.com</span>
+
+<span class="sd">This node allows to modify the ontology and perform queries</span>
+<span class="sd">	                                                                                                                            </span>
+<span class="sd">Service:</span>
+<span class="sd">    /ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology</span>
+<span class="sd">    /ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the &quot;REASON&quot; command</span>
+
+<span class="sd"> It&#39;s the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the state_machine node,</span>
+<span class="sd"> then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation; </span>
+<span class="sd"> then it searches for complete and consistent hypotheses when /ontology_interface/check_consistency is called and removes inconsistent ones from the ontology. Finally it also provides the </span>
+<span class="sd"> solution to the cluedo game given the solution ID when /ontology_interface/ask_solution is called. </span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">rospy</span>
+<span class="kn">from</span> <span class="nn">classes.myArmor</span> <span class="kn">import</span> <span class="n">MyArmor</span>
+<span class="kn">from</span> <span class="nn">erl2.srv</span> <span class="kn">import</span> <span class="n">Update</span><span class="p">,</span> <span class="n">UpdateResponse</span><span class="p">,</span> <span class="n">Consistent</span><span class="p">,</span> <span class="n">ConsistentResponse</span><span class="p">,</span> <span class="n">Hint</span><span class="p">,</span> <span class="n">HintResponse</span><span class="p">,</span> <span class="n">Solution</span><span class="p">,</span> <span class="n">SolutionResponse</span>
+<span class="kn">from</span> <span class="nn">armor_msgs.srv</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">armor_msgs.msg</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">people_ontology</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MissScarlett&quot;</span><span class="p">,</span> <span class="s2">&quot;ColonelMustard&quot;</span><span class="p">,</span> <span class="s2">&quot;MrsWhite&quot;</span><span class="p">,</span> <span class="s2">&quot;MrGreen&quot;</span><span class="p">,</span> <span class="s2">&quot;MrsPeacock&quot;</span><span class="p">,</span> <span class="s2">&quot;ProfPlum&quot;</span><span class="p">]</span>
+
+<span class="sd">&#39;&#39;&#39; list[str]: Define all the people of the scene</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">places_ontology</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;conservatory&quot;</span><span class="p">,</span> <span class="s2">&quot;lounge&quot;</span><span class="p">,</span> <span class="s2">&quot;kitchen&quot;</span><span class="p">,</span> <span class="s2">&quot;library&quot;</span><span class="p">,</span> <span class="s2">&quot;hall&quot;</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">,</span> <span class="s2">&quot;bathroom&quot;</span><span class="p">,</span> <span class="s2">&quot;diningRoom&quot;</span><span class="p">,</span> <span class="s2">&quot;billiardRoom&quot;</span><span class="p">]</span>
+
+<span class="sd">&#39;&#39;&#39; list[str]: Define all the places of the scene</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">weapons_ontology</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;candlestick&quot;</span><span class="p">,</span> <span class="s2">&quot;dagger&quot;</span><span class="p">,</span> <span class="s2">&quot;leadPipe&quot;</span><span class="p">,</span> <span class="s2">&quot;revolver&quot;</span><span class="p">,</span> <span class="s2">&quot;rope&quot;</span><span class="p">,</span> <span class="s2">&quot;spanner&quot;</span><span class="p">]</span>
+
+<span class="sd">&#39;&#39;&#39; list[str]: Define all the weapons of the scene</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="n">ID</span><span class="o">=</span><span class="p">[]</span>
+<span class="sd">&#39;&#39;&#39; list: Initialize ID list </span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">key</span><span class="o">=</span><span class="p">[]</span>
+<span class="sd">&#39;&#39;&#39; list: Initialize key list (each element is referred to the corresponding element in the ID list)</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">value</span><span class="o">=</span><span class="p">[]</span>
+<span class="sd">&#39;&#39;&#39; list: Initialize value list (each element is referred to the corresponding element in the ID list)</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">update_service</span><span class="o">=</span><span class="kc">None</span>
+<span class="sd">&#39;&#39;&#39; Initialize /ontology_interface/update_request service server</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">consistency_service</span><span class="o">=</span><span class="kc">None</span>
+<span class="sd">&#39;&#39;&#39; Initialize value /ontology_interface/check_consistency service server</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="init_scene"><a class="viewcode-back" href="../../index.html#scripts.ontology_interface.init_scene">[docs]</a><span class="k">def</span> <span class="nf">init_scene</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Function to initialize the scene, it adds all the information about the scene to the armor ontology by loading all the people, places and weapons.</span>
+<span class="sd">    When a new element is loaded in the ontology it must be disjointed respect to the others of the same class, in order to notify the ontology</span>
+<span class="sd">    that they are different. Finally it preforms &#39;REASON&#39; command to update the ontology.</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1">## Add people, weapons and places o the ontology</span>
+    <span class="n">j</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">j</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">people_ontology</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">people_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="s1">&#39;PERSON&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error in loading PERSON in the ontology&quot;</span><span class="p">)</span>
+        <span class="c1">## Disjoint all the elements</span>
+        <span class="k">if</span> <span class="n">j</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">count</span><span class="o">=</span><span class="n">j</span>
+            <span class="k">while</span> <span class="n">count</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">MyArmor</span><span class="o">.</span><span class="n">disjoint</span><span class="p">(</span><span class="n">people_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">people_ontology</span><span class="p">[</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="n">j</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">j</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">places_ontology</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">places_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="s1">&#39;PLACE&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error in loading PERSON in the ontology&quot;</span><span class="p">)</span>
+        <span class="c1">## Disjoint all the elements</span>
+        <span class="k">if</span> <span class="n">j</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">count</span><span class="o">=</span><span class="n">j</span>
+            <span class="k">while</span> <span class="n">count</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">MyArmor</span><span class="o">.</span><span class="n">disjoint</span><span class="p">(</span><span class="n">places_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">places_ontology</span><span class="p">[</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="n">j</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">j</span><span class="o">!=</span><span class="nb">len</span><span class="p">(</span><span class="n">weapons_ontology</span><span class="p">):</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span><span class="n">weapons_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="s1">&#39;WEAPON&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error in loading PERSON in the ontology&quot;</span><span class="p">)</span>
+        <span class="c1">## Disjoint all the elements</span>
+        <span class="k">if</span> <span class="n">j</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">count</span><span class="o">=</span><span class="n">j</span>
+            <span class="k">while</span> <span class="n">count</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+                <span class="n">MyArmor</span><span class="o">.</span><span class="n">disjoint</span><span class="p">(</span><span class="n">weapons_ontology</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">weapons_ontology</span><span class="p">[</span><span class="n">count</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="n">count</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">j</span><span class="o">=</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span>
+
+    <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">reason</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="receive_hint"><a class="viewcode-back" href="../../index.html#scripts.ontology_interface.receive_hint">[docs]</a><span class="k">def</span> <span class="nf">receive_hint</span><span class="p">(</span><span class="n">hint</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Callback to get the hints from the state_machine node; each element of the hint is appended in a list </span>
+
+<span class="sd">    Args: </span>
+<span class="sd">        hint(Hint): is the hint received from the state_machine node</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        res(HintResponse): not utilized</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">global</span> <span class="n">ID</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Received hint: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">hint</span><span class="p">))</span>
+    <span class="n">ID</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">hint</span><span class="o">.</span><span class="n">oracle_hint</span><span class="o">.</span><span class="n">ID</span><span class="p">))</span>
+    <span class="n">key</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hint</span><span class="o">.</span><span class="n">oracle_hint</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+    <span class="n">value</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hint</span><span class="o">.</span><span class="n">oracle_hint</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">HintResponse</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="update_ontology"><a class="viewcode-back" href="../../index.html#scripts.ontology_interface.update_ontology">[docs]</a><span class="k">def</span> <span class="nf">update_ontology</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Callback to update the ontology when the /ontology_interface/update_request is called; it adds all the hypothesis in the ontology,</span>
+<span class="sd">    then updates it by using the REASON command.</span>
+
+<span class="sd">    Args: </span>
+<span class="sd">        msg(UpdateRequest): not utilized</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        res(UpdateResponse): not utilized</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">global</span> <span class="n">ID</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span>
+    <span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">while</span> <span class="n">i</span><span class="o">&lt;</span><span class="nb">len</span><span class="p">(</span><span class="n">ID</span><span class="p">):</span>
+        <span class="n">MyArmor</span><span class="o">.</span><span class="n">add_hypothesis</span><span class="p">(</span><span class="n">key</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">ID</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">value</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="c1">#Clear the lists after having sent the hypothesis</span>
+    <span class="n">ID</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">key</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="n">value</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    
+    <span class="n">MyArmor</span><span class="o">.</span><span class="n">reason</span><span class="p">()</span>
+    <span class="n">res</span><span class="o">=</span><span class="n">UpdateResponse</span><span class="p">()</span>
+    <span class="n">res</span><span class="o">.</span><span class="n">updated</span><span class="o">=</span><span class="kc">True</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+        
+<div class="viewcode-block" id="find_consistent"><a class="viewcode-back" href="../../index.html#scripts.ontology_interface.find_consistent">[docs]</a><span class="k">def</span> <span class="nf">find_consistent</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Callback to find complete and consistent hypothesis when the /ontology_interface/check_consistency is called, it also removes</span>
+<span class="sd">    inconsistent IDs</span>
+
+<span class="sd">    Args: </span>
+<span class="sd">        msg(ConsistentRequest): not utilized</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        res(ConsistentResponse): not utilized</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">response_complete</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">ask_complete</span><span class="p">()</span>
+    <span class="n">list_complete</span><span class="o">=</span><span class="p">[]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">response_complete</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">response_complete</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error in asking query&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response_complete</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+
+            <span class="k">for</span> <span class="n">complete</span> <span class="ow">in</span> <span class="n">response_complete</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">:</span>
+                <span class="n">complete</span><span class="o">=</span><span class="n">complete</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span>
+                <span class="n">id_complete</span><span class="o">=</span><span class="n">complete</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ID_inconsistent &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">id_complete</span><span class="p">)</span> <span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">list_complete</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">id_complete</span><span class="p">)</span>
+
+            <span class="n">response_inconsistent</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">ask_inconsistent</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">response_inconsistent</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Complete responses: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">list_complete</span><span class="p">))</span>
+        
+            <span class="c1"># Look for possible inconsistent hypothesis and in case remove them</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">response_inconsistent</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">)</span><span class="o">!=</span><span class="mi">0</span><span class="p">:</span>
+
+                <span class="k">for</span> <span class="n">str_inconsistent</span> <span class="ow">in</span> <span class="n">response_inconsistent</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">:</span>
+                    <span class="n">str_inconsistent</span><span class="o">=</span><span class="n">str_inconsistent</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span>
+                    <span class="n">id_inconsistent</span><span class="o">=</span><span class="n">str_inconsistent</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;ID_inconsistent &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">id_inconsistent</span><span class="p">)</span> <span class="o">+</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">id_inconsistent</span><span class="p">)</span>
+                    <span class="n">list_complete</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">id_inconsistent</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">False</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error in removing</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Consistent hypotheses: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">list_complete</span><span class="p">))</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">ConsistentResponse</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">list_complete</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">consistent</span><span class="o">=</span><span class="n">list_complete</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="ask_solution"><a class="viewcode-back" href="../../index.html#scripts.ontology_interface.ask_solution">[docs]</a><span class="k">def</span> <span class="nf">ask_solution</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Callback to find the solution of the cluedo game when the /ontology_interface/ask_solution is called</span>
+
+<span class="sd">    Args: </span>
+<span class="sd">        msg(SolutionRequest): Request service message with the ID of the cluedo solution</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        res(SolutionResponse): the Response service message with the person (who), the place (where) and the weapon (what)</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">res</span><span class="o">=</span><span class="n">SolutionResponse</span><span class="p">()</span>
+
+    <span class="c1">#Ask weapon</span>
+    <span class="n">armor_res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">ask_item</span><span class="p">(</span><span class="n">ID</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;what&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">armor_res</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">armor_res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error in asking query&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">str_what</span> <span class="ow">in</span> <span class="n">armor_res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">:</span>
+                    <span class="n">str_what</span><span class="o">=</span><span class="n">str_what</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">weapon</span><span class="o">=</span><span class="n">str_what</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+     <span class="c1">#Ask person</span>
+    <span class="n">armor_res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">ask_item</span><span class="p">(</span><span class="n">ID</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;who&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">armor_res</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">armor_res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error in asking query&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">str_who</span> <span class="ow">in</span> <span class="n">armor_res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">:</span>
+                    <span class="n">str_who</span><span class="o">=</span><span class="n">str_who</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">person</span><span class="o">=</span><span class="n">str_who</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+     <span class="c1">#Ask place</span>
+    <span class="n">armor_res</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">ask_item</span><span class="p">(</span><span class="n">ID</span><span class="o">=</span><span class="n">msg</span><span class="o">.</span><span class="n">ID</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;where&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">armor_res</span><span class="p">))</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">armor_res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error in asking query&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">str_where</span> <span class="ow">in</span> <span class="n">armor_res</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">queried_objects</span><span class="p">:</span>
+                    <span class="n">str_where</span><span class="o">=</span><span class="n">str_where</span><span class="p">[</span><span class="mi">40</span><span class="p">:]</span>
+                    <span class="n">res</span><span class="o">.</span><span class="n">place</span><span class="o">=</span><span class="n">str_where</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../index.html#scripts.ontology_interface.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Main function of the ontology_interface node; it declares the node itself, initializes all the services and calls the init_scene</span>
+<span class="sd">    function to initialize the ontology</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">global</span> <span class="n">update_service</span><span class="p">,</span> <span class="n">consistency_service</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">init_node</span><span class="p">(</span><span class="s1">&#39;ontology_interface&#39;</span><span class="p">)</span>
+   
+    <span class="n">consistency_service</span><span class="o">=</span><span class="n">rospy</span><span class="o">.</span><span class="n">Service</span><span class="p">(</span><span class="s1">&#39;/ontology_interface/check_consistency&#39;</span><span class="p">,</span> <span class="n">Consistent</span><span class="p">,</span> <span class="n">find_consistent</span><span class="p">)</span>
+    <span class="n">update_service</span><span class="o">=</span> <span class="n">rospy</span><span class="o">.</span><span class="n">Service</span><span class="p">(</span><span class="s1">&#39;/ontology_interface/update_request&#39;</span><span class="p">,</span> <span class="n">Update</span><span class="p">,</span> <span class="n">update_ontology</span><span class="p">)</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">Service</span><span class="p">(</span><span class="s1">&#39;/ontology_interface/add_hint&#39;</span><span class="p">,</span> <span class="n">Hint</span><span class="p">,</span> <span class="n">receive_hint</span><span class="p">)</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">Service</span><span class="p">(</span><span class="s1">&#39;/ontology_interface/ask_solution&#39;</span><span class="p">,</span> <span class="n">Solution</span><span class="p">,</span> <span class="n">ask_solution</span><span class="p">)</span>
+
+    <span class="n">rospy</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="s2">&quot;/armor_interface_srv&quot;</span><span class="p">)</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">wait_for_service</span><span class="p">(</span><span class="s2">&quot;/armor_interface_serialized_srv&quot;</span><span class="p">)</span>
+
+    <span class="n">path</span><span class="o">=</span><span class="n">rospy</span><span class="o">.</span><span class="n">get_param</span><span class="p">(</span><span class="s2">&quot;~ontology&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;PATH: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+    
+    <span class="c1"># Loads the ontology</span>
+    <span class="n">response</span><span class="o">=</span><span class="n">MyArmor</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">armor_response</span><span class="o">.</span><span class="n">success</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Ontology loaded successfully&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">ERROR: Ontology not loaded correctly&quot;</span><span class="p">)</span>
+    
+    <span class="n">init_scene</span><span class="p">()</span>
+    <span class="n">rospy</span><span class="o">.</span><span class="n">spin</span><span class="p">()</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Alessio Roda.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

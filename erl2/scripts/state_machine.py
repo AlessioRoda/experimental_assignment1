@@ -88,20 +88,20 @@ armor_solution=None
 '''
 
 IDs=[]
-''' Array with the new IDs that are received
+''' list: List with the new IDs that are received
 
 '''
 tried_IDs=[]
-''' Array with the IDs that have already been included in the ontology
+''' list: List with the IDs that have already been included in the ontology
 
 '''
 consistent_ids=[]
-''' Array with the consistent_ids that have been found
+''' list: List with the consistent_ids that have been found
 
 '''
 
 places=[]
-''' Array with the places of the scene
+''' list: List with the places of the scene
 
 '''
 actual_pose=None
@@ -109,7 +109,7 @@ actual_pose=None
 
 '''
 oracle=False
-''' Boolean to know if the robot must go to the Oracle_Room
+''' bool: Boolean to know if the robot must go to the Oracle_Room
 
 '''
 oracle_room=None
@@ -117,7 +117,7 @@ oracle_room=None
 
 '''
 stop=False
-''' Flag to stop storing new IDs in the IDs list
+''' bool: Flag to stop storing new IDs in the IDs list
 
 '''
 
