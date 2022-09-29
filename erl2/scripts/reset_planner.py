@@ -1,21 +1,26 @@
 #! /usr/bin/env python3
 
 import rospy
-from erl2.msg import ResetAction, ResetActionResult
-import actionlib
+from erl2.srv import Reset
 
 from classes.planner import Planner
 
 reset_action_server=None
+solution_correct=False
 
-def reset():
-    print("Reset the planning")
+def reset(goal):
+    global solution_correct
+    print("Check if simulation finishes")
+    solution_correct=goal.finished
+    return
 
-    #1 Clear all
+
+def replan():
+#1 Clear all
     res=Planner.clear_planner()
     print("Clear planner: "+str(res))
 
-    #2 Add all the insances
+    #2 Add all the instances
     res=Planner.add_instance(name="sherlock", instance_type="robot")
     print("Add instance: "+str(res))
     Planner.add_instance(name="w1", instance_type="waypoint")
@@ -35,6 +40,8 @@ def reset():
     Planner.add_attribute(attribute_name="not_visited", key=["waypoint"], value= ["w2"])
     Planner.add_attribute(attribute_name="not_visited", key=["waypoint"], value=["w3"])
     Planner.add_attribute(attribute_name="not_visited", key=["waypoint"], value=["w4"])
+    Planner.add_attribute(attribute_name="not_visited", key=["waypoint"], value=["oracle_room"])
+    print("All attributes are added")
 
     key=[]
     value=[]
@@ -43,6 +50,8 @@ def reset():
     key.append("robot")
     value.append("sherlock")
     Planner.add_attribute(attribute_name="in_position", key=key, value=value)
+
+    print("Now add functions")
 
     ##4 Add functions 
     Planner.add_function(func_name="waypoints", key=[], value=[], func_value=0)
@@ -69,6 +78,7 @@ def reset():
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w4", "w2"], func_value=7.25)
 
 
+    print("Add goal")
     #5 Add the goal
     Planner.add_goal(attribute_name="visited", key=["waypoint"], value=["w1"])
     Planner.add_goal(attribute_name="visited", key=["waypoint"], value=["w2"])
@@ -83,6 +93,8 @@ def reset():
     value_goal.append("sherlock")
     Planner.add_goal(attribute_name="in_position", key=key_goal, value=value_goal)
 
+    print("Generate the problem")
+
     #6 Generate the problem
     Planner.generate_problem()
     #7 Generate the plan
@@ -92,16 +104,12 @@ def reset():
     #9 Dispatch the plan and get solution
     solution=Planner.dispatch_plan()
 
-    result=ResetActionResult()
-
     if solution.goal_achieved:
         print("A solution was found")
-        result.result.succeed=True
     else:
         print("No solution for the planner")
-        result.result.succeed=False
 
-    reset_action_server.set_succeeded(result.result)
+    return
 
 
 
@@ -109,17 +117,14 @@ def main():
     '''
     Main function 
     '''
+    global solution_correct
     rospy.init_node('reset_planning')
 
-    Planner.generate_problem()
-    Planner.generate_plan()
-    Planner.parse_plan()
-    Planner.dispatch_plan()
+    rospy.Service("reset_planning", Reset, reset)
 
-   
-    reset_action_server=actionlib.SimpleActionServer("reset_planning_action", ResetAction, reset, auto_start=False)
-    reset_action_server.start()
-    
+    while solution_correct==False:
+        replan()
+
     rospy.spin()
 
 

@@ -28,7 +28,7 @@ class Planner(object):
         req.knowledge.instance_name=name
         req.knowledge.instance_type=instance_type
         req.update_type=0
-        req.knowledge.knowledge_type=1
+        req.knowledge.knowledge_type=0
         res=knowledge_update(req)
         return res
 
@@ -39,7 +39,7 @@ class Planner(object):
         req.knowledge.is_negative=is_negative
         req.update_type=0
         req.knowledge.knowledge_type=1
-        assert len(key)!=len(value), "The key elements and the value one do not correspond in add_attribute method"
+        assert len(key)==len(value), "The key elements and the value one do not correspond in add_attribute method"
         for i, j in zip(key, value):
             key_value=KeyValue()
             key_value.key=i
@@ -48,15 +48,14 @@ class Planner(object):
         res=knowledge_update(req)
         return res
 
-    def add_goal(attribute_name, key, value, instance_name, is_negative=False):
+    def add_goal(attribute_name, key, value, is_negative=False):
         rospy.wait_for_service('rosplan_knowledge_base/update')
         req=KnowledgeUpdateServiceRequest()
         req.knowledge.attribute_name=attribute_name
-        req.update_type=0
+        req.update_type=1
         req.knowledge.knowledge_type=1
         req.knowledge.is_negative=is_negative
-        req.knowledge.instance_name=instance_name
-        assert len(key)!=len(value), "The key elements and the value one do not correspond in add_goal method"
+        assert len(key)==len(value), "The key elements and the value one do not correspond in add_goal method"
         for i, j in zip(key, value):
             key_value=KeyValue()
             key_value.key=i
@@ -71,7 +70,7 @@ class Planner(object):
         req = KnowledgeUpdateServiceRequest()
         req.knowledge.attribute_name = func_name
         req.knowledge.knowledge_type = req.knowledge.FUNCTION
-        assert len(key)!=len(value), "The key elements and the value one do not correspond in add_goal method"
+        assert len(key)==len(value), "The key elements and the value one do not correspond in add_goal method"
         for i, j in zip(key, value):
             key_value=KeyValue()
             key_value.key=i

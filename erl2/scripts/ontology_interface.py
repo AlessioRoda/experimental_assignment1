@@ -4,8 +4,8 @@ from posixpath import dirname, realpath
 import rospy
 from classes.myArmor import MyArmor
 #from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle
-from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle, OracleRequest
-from erl2.msg import ErlOracle, ResetAction, ResetGoal
+from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle, OracleRequest, Reset, ResetRequest
+from erl2.msg import ErlOracle
 from armor_msgs.srv import *
 from armor_msgs.msg import *
 import actionlib
@@ -25,7 +25,7 @@ value=[]
 ask_solution=None
 update_service=None
 consistency_service=None
-reset_action_client=None
+reset_client=None
 
 solution=None
 
@@ -117,7 +117,7 @@ def try_solution(msg):
     print("Check consistent and complete IDs")
     response_complete=MyArmor.ask_complete()
     list_complete=[]
-    print(str(response_complete))
+    print("Response complete: "+str(response_complete))
     if response_complete.armor_response.success==False:
         print("\nError in asking query")
     else:
@@ -146,22 +146,60 @@ def try_solution(msg):
                     if res.armor_response.success==False:
                         print("Error in removing inconsistent ID\n")
 
-    if len(list_complete>0):
+    goal=ResetRequest()
+
+    if len(list_complete)>0:
         print("Trying solution: ")
+        print("Complete and consistent: "+str(list_complete))
         solution=ask_solution(OracleRequest())
         for id in list_complete:
             if str(solution.ID) == id:
                 print("\nSolution found!: "+ str(solution.ID))
 
-                return ConsistencyResponse()
+                #Query the corresponding person, weapon and place of the solution
+                person=None
+                weapon=None
+                place=None
 
-    print("Reload the plan")
-    goal=ResetGoal()
-    reset_action_client.wait_for_server()
-    reset_action_client.send_goal(goal)
-    res=reset_action_client.wait_for_result()
-    if res.succeed==False:
-        print("Error in replanning")
+                #Ask weapon
+                armor_res=MyArmor.ask_item(ID=id, type="what")
+                print(str(armor_res))
+                if len(armor_res.armor_response.queried_objects)==0:
+                    print("Error in asking query")
+                else:
+                    for str_what in armor_res.armor_response.queried_objects:
+                                str_what=str_what[40:]
+                                weapon=str_what[:-1]
+                #Ask person
+                armor_res=MyArmor.ask_item(ID=id, type="who")
+                print(str(armor_res))
+                if len(armor_res.armor_response.queried_objects)==0:
+                    print("Error in asking query")
+                else:
+                    for str_who in armor_res.armor_response.queried_objects:
+                                str_who=str_who[40:]
+                                person=str_who[:-1]
+                #Ask place
+                armor_res=MyArmor.ask_item(ID=id, type="where")
+                print(str(armor_res))
+                if len(armor_res.armor_response.queried_objects)==0:
+                    print("Error in asking query")
+                else:
+                    for str_where in armor_res.armor_response.queried_objects:
+                                str_where=str_where[40:]
+                                place=str_where[:-1]
+
+                print("Solution: \nPerson: "+person+"\nPlace: "+place+"\nWeapon: "+weapon)
+                goal.finished=True
+                
+            else:
+                print(id+" is not the solution")
+                print("Reload the plan")
+                goal.finished=False
+    print("1")
+    #reset_action_client.wait_for_server()
+    print("2")
+    res=reset_client(goal)
 
     return ConsistencyResponse()
 
@@ -170,14 +208,14 @@ def main():
     '''
     Main function 
     '''
-    global ask_solution, update_service, consistency_service, reset_action_client
+    global ask_solution, update_service, consistency_service, reset_client
     rospy.init_node('ontology_interface')
    
     consistency_service=rospy.Service('/consistency_request', Consistency, try_solution)
     update_service= rospy.Service('/update_request', Update, update_ontology)
     ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
     rospy.Subscriber('/oracle_hint', ErlOracle, receive_hint)
-    reset_action_client=actionlib.SimpleActionClient("reset_planning_action", ResetAction)
+    reset_client=rospy.ServiceProxy("reset_planning", Reset)
     
     path=rospy.get_param("~ontology")
     print("PATH: "+str(path))

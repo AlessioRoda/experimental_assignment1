@@ -74,6 +74,7 @@ add_service_files(
    Oracle.srv
    Update.srv
    Consistency.srv
+   Reset.srv
 #   Service2.srv
  )
 
@@ -82,7 +83,6 @@ add_service_files(
  add_action_files(
    FILES
    Move.action
-   Reset.action
 #   Action2.action
  )
 
