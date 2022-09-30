@@ -75,7 +75,12 @@
 <span class="sd">	                                                                                                                            </span>
 <span class="sd">Service:</span>
 <span class="sd">    /ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology</span>
+
 <span class="sd">    /ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the &quot;REASON&quot; command</span>
+
+<span class="sd">    /ontology_interface/add_hint service to receive the hints from the state_machine node</span>
+<span class="sd">    </span>
+<span class="sd">    /ontology_interface/ask_solution service to receive the solution ID from the final_oracle node</span>
 
 <span class="sd"> It&#39;s the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the state_machine node,</span>
 <span class="sd"> then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation; </span>

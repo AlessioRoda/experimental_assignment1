@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 
 '''
-.. module:: go_to_point
+.. module:: place
    :platform: Unix
    :synopsis: Class to define the places in the scene
 	

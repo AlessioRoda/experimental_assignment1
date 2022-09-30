@@ -1,13 +1,17 @@
 #! /usr/bin/env python
 
 '''
-.. module:: go_to_point
+.. module:: myArmor
    :platform: Unix
    :synopsis: Class implementing the main operations to use ARMOR
 	
 .. moduleauthor:: Alessio Roda alessioroda98@gmail.com
 
+Service: 
+    /armor_interface_srv service to send the messages to ARMOR
+
 This class implements the ARMOR operations to use during the Cluedo game.  
+
 This class is created to use in a more comfortable way the ARMOR commands, providing some methods that already create and
 sends the correct messages to the armor_interface_srv service.
 

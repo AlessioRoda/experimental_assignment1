@@ -14,10 +14,15 @@ Subscriber:
 
 Client: 
     /oracle_hint custom service to ask the hint (ID, type and message) associated to a specific marker ID 
+
     /ontology_interface/add_hint service to send a new hint to the oracle_interface node 
+
     /ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the "REASON" command
+    
     /ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology
+    
     /oracle_solution service asks to the final_module node to send the solution ID of the Cluedo game
+    
     /ontology_interface/ask_solution to query the place, the person and the weapon corresponding to a certain ID
 
 ActionClient:

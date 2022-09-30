@@ -91,12 +91,12 @@
 <dl>
 <dt>Subscriber:</dt><dd><p>/marker_id custom service to get the ID of a marker when it’s detected by the camera</p>
 </dd>
-<dt>Client:</dt><dd><p>/oracle_hint custom service to ask the hint (ID, type and message) associated to a specific marker ID
-/ontology_interface/add_hint service to send a new hint to the oracle_interface node
-/ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the “REASON” command
-/ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology
-/oracle_solution service asks to the final_module node to send the solution ID of the Cluedo game
-/ontology_interface/ask_solution to query the place, the person and the weapon corresponding to a certain ID</p>
+<dt>Client:</dt><dd><p>/oracle_hint custom service to ask the hint (ID, type and message) associated to a specific marker ID</p>
+<p>/ontology_interface/add_hint service to send a new hint to the oracle_interface node</p>
+<p>/ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the “REASON” command</p>
+<p>/ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology</p>
+<p>/oracle_solution service asks to the final_module node to send the solution ID of the Cluedo game</p>
+<p>/ontology_interface/ask_solution to query the place, the person and the weapon corresponding to a certain ID</p>
 </dd>
 <dt>ActionClient:</dt><dd><blockquote>
 <div><p>movebase to move to a specific position</p>
@@ -339,8 +339,10 @@ It also defines the SMACH state machine and runs it to start the simulation</p>
 <span class="target" id="module-ontology_interface"></span><p>This node allows to modify the ontology and perform queries</p>
 <dl>
 <dt>Service:</dt><dd><blockquote>
-<div><p>/ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology
-/ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the “REASON” command</p>
+<div><p>/ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology</p>
+<p>/ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the “REASON” command</p>
+<p>/ontology_interface/add_hint service to receive the hints from the state_machine node</p>
+<p>/ontology_interface/ask_solution service to receive the solution ID from the final_oracle node</p>
 </div></blockquote>
 <p>It’s the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the state_machine node,
 then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation;
@@ -514,8 +516,12 @@ then updates it by using the REASON command.</p>
 </div>
 <div class="section" id="module-scripts.classes.myArmor">
 <span id="myarmor-class"></span><h2>MyArmor Class<a class="headerlink" href="#module-scripts.classes.myArmor" title="Permalink to this headline"></a></h2>
-<span class="target" id="module-go_to_point"></span><p>This class implements the ARMOR operations to use during the Cluedo game.
-This class is created to use in a more comfortable way the ARMOR commands, providing some methods that already create and
+<span class="target" id="module-myArmor"></span><dl class="simple">
+<dt>Service:</dt><dd><p>/armor_interface_srv service to send the messages to ARMOR</p>
+</dd>
+</dl>
+<p>This class implements the ARMOR operations to use during the Cluedo game.</p>
+<p>This class is created to use in a more comfortable way the ARMOR commands, providing some methods that already create and
 sends the correct messages to the armor_interface_srv service.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor">
@@ -669,7 +675,7 @@ ind1(string): the name of the second element</p>
 </div>
 <div class="section" id="module-scripts.classes.place">
 <span id="place-class"></span><h2>Place Class<a class="headerlink" href="#module-scripts.classes.place" title="Permalink to this headline"></a></h2>
-<span class="target" id="module-0"></span><p>This class represents a way to define the places of the Cluedo game</p>
+<span class="target" id="module-place"></span><p>This class represents a way to define the places of the Cluedo game</p>
 <p>This class provides a simple way to define the places of the scene as objects characterized by a name and their x and y coordinates</p>
 </div>
 <div class="section" id="movearm">
