@@ -12,6 +12,8 @@ This node allows to modify the ontology and perform queries
 Service:
     /ontology_interface/check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology
     /ontology_interface/update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the "REASON" command
+    /ontology_interface/add_hint service to receive the hints from the state_machine node
+    /ontology_interface/ask_solution service to receive the solution ID from the final_oracle node
 
  It's the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the state_machine node,
  then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation; 

@@ -41,6 +41,8 @@
 <li><a class="reference internal" href="#third-assignment-documentation">Third assignment documentation!</a><ul>
 <li><a class="reference internal" href="#module-scripts.state_machine">State Machine Module</a></li>
 <li><a class="reference internal" href="#module-scripts.ontology_interface">OntologyInterface Module</a></li>
+<li><a class="reference internal" href="#module-scripts.classes.myArmor">MyArmor Class</a></li>
+<li><a class="reference internal" href="#module-scripts.classes.place">Place Class</a></li>
 <li><a class="reference internal" href="#movearm">Movearm</a></li>
 </ul>
 </li>
@@ -509,6 +511,166 @@ then updates it by using the REASON command.</p>
 </dl>
 </dd></dl>
 
+</div>
+<div class="section" id="module-scripts.classes.myArmor">
+<span id="myarmor-class"></span><h2>MyArmor Class<a class="headerlink" href="#module-scripts.classes.myArmor" title="Permalink to this headline"></a></h2>
+<span class="target" id="module-go_to_point"></span><p>This class implements the ARMOR operations to use during the Cluedo game.
+This class is created to use in a more comfortable way the ARMOR commands, providing some methods that already create and
+sends the correct messages to the armor_interface_srv service.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">scripts.classes.myArmor.</span></span><span class="sig-name descname"><span class="pre">MyArmor</span></span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor" title="Permalink to this definition"></a></dt>
+<dd><p>Simple class to use in a more comfortable way the ARMOR commands, providing some methods that already create and
+send the correct messages to the armor_interface_srv service.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor.add_hypothesis">
+<span class="sig-name descname"><span class="pre">add_hypothesis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor.add_hypothesis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor.add_hypothesis" title="Permalink to this definition"></a></dt>
+<dd><p>Add the hypothesis to the ontology</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args: type(string): the type of element to add (what, where or who)</dt><dd><p>ID(string): the ID of the hypothesis
+arg(string): the name of the place/weapon/person to add to the ontology</p>
+</dd>
+<dt>Returns:</dt><dd><p>res(ArmorDirectiveRes): the response received from ARMOR</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor.add_item">
+<span class="sig-name descname"><span class="pre">add_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor.add_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor.add_item" title="Permalink to this definition"></a></dt>
+<dd><p>Add an element to the ontology</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>name(string): the name of the element
+type(string): the type of the element (PERSON/PLACE/WEAPON)</p>
+</dd>
+<dt>Returns:</dt><dd><p>res(ArmorDirectiveRes): the response received from ARMOR</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor.ask_complete">
+<span class="sig-name descname"><span class="pre">ask_complete</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor.ask_complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor.ask_complete" title="Permalink to this definition"></a></dt>
+<dd><p>Asks to the ontology for completed hypothesis</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Returns:</dt><dd><p>res(ArmorDirectiveRes): the response received from ARMOR</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor.ask_inconsistent">
+<span class="sig-name descname"><span class="pre">ask_inconsistent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor.ask_inconsistent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor.ask_inconsistent" title="Permalink to this definition"></a></dt>
+<dd><p>Asks to the ontology for inconsistent hypothesis</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Returns:</dt><dd><p>res(ArmorDirectiveRes): the response received from ARMOR</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor.ask_item">
+<span class="sig-name descname"><span class="pre">ask_item</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ID</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor.ask_item"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor.ask_item" title="Permalink to this definition"></a></dt>
+<dd><p>Ask the name of a certain element of a hypothesis</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>type(string): the type of the element (what, where or who)
+ID(string): the ID of the hypothesis</p>
+</dd>
+<dt>Returns:</dt><dd><p>res(ArmorDirectiveRes): the response received from ARMOR</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor.disjoint">
+<span class="sig-name descname"><span class="pre">disjoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ind2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor.disjoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor.disjoint" title="Permalink to this definition"></a></dt>
+<dd><p>Disjoint two elements to notify the otology that they are different</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>ind1(string): the name of the first element
+ind1(string): the name of the second element</p>
+</dd>
+<dt>Returns:</dt><dd><p>res(ArmorDirectiveRes): the response received from ARMOR</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor.load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor.load" title="Permalink to this definition"></a></dt>
+<dd><p>Load the ontology from file</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>path(string): the path in which there’s the file with the ontology to load</p>
+</dd>
+<dt>Returns:</dt><dd><p>response(ArmorDirectiveRes): the response received from ARMOR</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor.reason">
+<span class="sig-name descname"><span class="pre">reason</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor.reason"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor.reason" title="Permalink to this definition"></a></dt>
+<dd><p>Perform reason to update the ontology</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Returns:</dt><dd><p>res(ArmorDirectiveRes): the response received from ARMOR</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor.remove"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor.remove" title="Permalink to this definition"></a></dt>
+<dd><p>Remove a hypothesis from the ontology</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Args:</dt><dd><p>name(string): the name of the hypothesis to remove</p>
+</dd>
+<dt>Returns:</dt><dd><p>res(ArmorDirectiveRes): the response received from ARMOR</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.MyArmor.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/scripts/classes/myArmor.html#MyArmor.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scripts.classes.myArmor.MyArmor.save" title="Permalink to this definition"></a></dt>
+<dd><p>Save the current ontology</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Returns:</dt><dd><p>res(ArmorDirectiveReq): the response received from ARMOR</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="scripts.classes.myArmor.armor_interface">
+<span class="sig-prename descclassname"><span class="pre">scripts.classes.myArmor.</span></span><span class="sig-name descname"><span class="pre">armor_interface</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;rospy.impl.tcpros_service.ServiceProxy</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#scripts.classes.myArmor.armor_interface" title="Permalink to this definition"></a></dt>
+<dd><p>Defines the armor_interface_srv service to send the messages to ARMOR</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-scripts.classes.place">
+<span id="place-class"></span><h2>Place Class<a class="headerlink" href="#module-scripts.classes.place" title="Permalink to this headline"></a></h2>
+<span class="target" id="module-0"></span><p>This class represents a way to define the places of the Cluedo game</p>
+<p>This class provides a simple way to define the places of the scene as objects characterized by a name and their x and y coordinates</p>
 </div>
 <div class="section" id="movearm">
 <h2>Movearm<a class="headerlink" href="#movearm" title="Permalink to this headline"></a></h2>
