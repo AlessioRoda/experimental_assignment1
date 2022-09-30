@@ -11,28 +11,47 @@ from armor_msgs.msg import *
 import actionlib
 
 people_ontology=["missScarlett", "colonelMustard", "mrsWhite", "mrGreen", "mrsPeacock", "profPlum"]
-''' Define all the people of the scene
+''' list[str]: Define all the people of the scene
+
 '''
 places_ontology=["conservatory", "lounge", "kitchen", "library", "hall", "study", "bathroom", "diningRoom", "billiardRoom"]
-''' Define all the places of the scene
+''' list[str]: Define all the places of the scene
+
 '''
 weapons_ontology=["candlestick", "dagger", "leadPipe", "revolver", "rope", "spanner"]
+''' list[str]: Define all the weapons of the scene
+
+'''
 
 
 ID=[]
+''' list: Initialize ID list 
+
+'''
 key=[]
+''' list: Initialize key list (each element is referred to the corresponding element in the ID list)
+
+'''
 value=[]
+''' list: Initialize value list (each element is referred to the corresponding element in the ID list)
+
+'''
 ask_solution=None
 update_service=None
+''' Initialize /update_request service server
+
+'''
 consistency_service=None
+''' Initialize value /consistency_request service server
+
+'''
 reset_client=None
 
 solution=None
 
 def init_scene():
     '''
-    Function to initialize the scene, it defines three rooms as Place objects, then defines the starting position in the Oracle_Room (x=0, y=0)
-    then it adds all the information about the scene to the armor ontology, by loading all the people, places and weapons.
+    Function to initialize the scene, it adds all the information about the scene to the armor ontology by loading all the people, places and weapons.
     When a new element is loaded in the ontology it must be disjointed respect to the others of the same class, in order to notify the ontology
     that they are different. Finally it preforms 'REASON' command to update the ontology.
     
@@ -191,14 +210,14 @@ def try_solution(msg):
 
                 print("Solution: \nPerson: "+person+"\nPlace: "+place+"\nWeapon: "+weapon)
                 goal.finished=True
+                break
                 
             else:
                 print(id+" is not the solution")
+                MyArmor.remove(id)
                 print("Reload the plan")
                 goal.finished=False
-    print("1")
-    #reset_action_client.wait_for_server()
-    print("2")
+
     res=reset_client(goal)
 
     return ConsistencyResponse()

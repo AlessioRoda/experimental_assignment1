@@ -1,7 +1,8 @@
 #! /usr/bin/env python3
 
+from time import sleep
 import rospy
-from erl2.srv import Reset
+from erl2.srv import Reset, ResetResponse
 
 from classes.planner import Planner
 
@@ -12,7 +13,7 @@ def reset(goal):
     global solution_correct
     print("Check if simulation finishes")
     solution_correct=goal.finished
-    return
+    return ResetResponse()
 
 
 def replan():
@@ -56,14 +57,14 @@ def replan():
     ##4 Add functions 
     Planner.add_function(func_name="waypoints", key=[], value=[], func_value=0)
     Planner.add_function(func_name="cost", key=[], value=[], func_value=0)
-    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w1", "w2"], func_value=5)
-    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w2", "w1"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w1", "w3"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w3", "w1"], func_value=5)
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w1", "w4"], func_value=5)
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w4", "w1"], func_value=5)
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w2", "w3"], func_value=5)
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w3", "w2"], func_value=5)
-    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w3", "w4"], func_value=5)
-    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w4", "w3"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w2", "w4"], func_value=5)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w4", "w2"], func_value=5)
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w1", "oracle_room"], func_value=3.5)
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w2", "oracle_room"], func_value=3.5)
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w3", "oracle_room"], func_value=3.5)
@@ -72,10 +73,10 @@ def replan():
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["oracle_room", "w2"], func_value=3.5)
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["oracle_room", "w3"], func_value=3.5)
     Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["oracle_room", "w4"], func_value=3.5)
-    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w1", "w3"], func_value=7.25)
-    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w2", "w4"], func_value=7.25)
-    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w3", "w1"], func_value=7.25)
-    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w4", "w2"], func_value=7.25)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w1", "w2"], func_value=7.25)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w3", "w4"], func_value=7.25)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w2", "w1"], func_value=7.25)
+    Planner.add_function(func_name="distance", key=["waypoint", "waypoint"], value=["w4", "w3"], func_value=7.25)
 
 
     print("Add goal")
@@ -124,6 +125,7 @@ def main():
 
     while solution_correct==False:
         replan()
+        sleep(1)
 
     rospy.spin()
 

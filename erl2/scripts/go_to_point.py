@@ -26,6 +26,9 @@ position_ = 0
 state_ = 0
 pub_ = None
 
+ang_coef=2
+lin_coef=1.7
+
 # parameters for control
 yaw_precision_ = math.pi / 9  # +/- 20 degree allowed
 yaw_precision_2_ = math.pi / 90  # +/- 2 degree allowed
@@ -79,6 +82,7 @@ def fix_yaw(des_pos):
             twist_msg.angular.z = ub_a
         elif twist_msg.angular.z < lb_a:
             twist_msg.angular.z = lb_a
+    twist_msg.angular.z=twist_msg.angular.z*ang_coef
     pub_.publish(twist_msg)
     # state change conditions
     if math.fabs(err_yaw) <= yaw_precision_2_:
@@ -101,6 +105,9 @@ def go_straight_ahead(des_pos):
            twist_msg.linear.x = ub_d
 
         twist_msg.angular.z = kp_a*err_yaw
+
+        twist_msg.angular.z=twist_msg.angular.z*ang_coef
+        twist_msg.linear.x=twist_msg.linear.x*lin_coef
         pub_.publish(twist_msg)
     else: # state change conditions
         #print ('Position error: [%s]' % err_pos)
@@ -121,6 +128,9 @@ def fix_final_yaw(des_yaw):
             twist_msg.angular.z = ub_a
         elif twist_msg.angular.z < lb_a:
             twist_msg.angular.z = lb_a
+
+    twist_msg.angular.z=twist_msg.angular.z*ang_coef
+    twist_msg.linear.x=twist_msg.linear.x*lin_coef
     pub_.publish(twist_msg)
     # state change conditions
     if math.fabs(err_yaw) <= yaw_precision_2_:
