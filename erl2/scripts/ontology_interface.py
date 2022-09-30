@@ -1,14 +1,29 @@
 #! /usr/bin/env python3
 
-from posixpath import dirname, realpath
+'''
+.. module:: ontology_interface
+   :platform: Unix
+   :synopsis: Node implementing an interface for communicating with the ARMOR ontology
+
+.. moduleauthor:: Alessio Roda alessioroda98@gmail.com
+
+This node allows to modify the ontology and perform queries
+	                                                                                                                            
+Service:
+    /check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology and
+                        to use them as possible solutions to the cluedo game
+    /update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the "REASON" command
+ 
+  
+
+'''
+
 import rospy
 from classes.myArmor import MyArmor
-#from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle
 from erl2.srv import Update, UpdateResponse, Consistency, ConsistencyResponse, Oracle, OracleRequest, Reset, ResetRequest
 from erl2.msg import ErlOracle
 from armor_msgs.srv import *
 from armor_msgs.msg import *
-import actionlib
 
 people_ontology=["missScarlett", "colonelMustard", "mrsWhite", "mrGreen", "mrsPeacock", "profPlum"]
 ''' list[str]: Define all the people of the scene
@@ -23,7 +38,6 @@ weapons_ontology=["candlestick", "dagger", "leadPipe", "revolver", "rope", "span
 
 '''
 
-
 ID=[]
 ''' list: Initialize ID list 
 
@@ -37,6 +51,9 @@ value=[]
 
 '''
 ask_solution=None
+''' Initialize value /oracle_solution service client
+
+'''
 update_service=None
 ''' Initialize /update_request service server
 
@@ -46,8 +63,9 @@ consistency_service=None
 
 '''
 reset_client=None
+''' Initialize value /reset_planning service client
 
-solution=None
+'''
 
 def init_scene():
     '''
@@ -105,6 +123,13 @@ def init_scene():
 
 
 def receive_hint(hint):
+    '''
+    Callback to get the hints from the state_machine node; each element of the hint is appended in a list 
+
+    Args: 
+        hint(Hint): is the hint received from the state_machine node
+
+    '''
     global ID, key, value
     
     print("Received hint: "+str(hint))
@@ -114,6 +139,17 @@ def receive_hint(hint):
 
 
 def update_ontology(msg):
+    '''
+    Callback to update the ontology when the /update_request is called; it adds all the hypothesis in the ontology,
+    then updates it by using the REASON command.
+
+    Args: 
+        msg(UpdateRequest): not utilized
+    Returns:
+        res(UpdateResponse): not utilized
+
+    '''
+
     global ID, key, value
     i=0
     while i<len(ID):
@@ -131,7 +167,20 @@ def update_ontology(msg):
 
         
 def try_solution(msg):
-    global ask_solution, solution
+    '''
+    Callback to find complete and consistent hypothesis when the /check_consistency is called, it also removes
+    inconsistent IDs. It also uses the complete and consistent hypothesis as possible solutions, by comparing their IDs with the 
+    solution ID provided by the /oracle_solution service; in case one of them corresponds to the solution ID, it 
+    queries the place, the person and the weapon of the solution and sets the ResetRequest to True, 
+    otherwise the ID is removed by the ontology and the ResetRequest is set to False  
+
+    Args: 
+        msg(ConsistencyRequest): not utilized
+    Returns:
+        res(ConsistencyResponse): not utilized
+
+    '''
+    global ask_solution
 
     print("Check consistent and complete IDs")
     response_complete=MyArmor.ask_complete()
@@ -165,7 +214,7 @@ def try_solution(msg):
                     if res.armor_response.success==False:
                         print("Error in removing inconsistent ID\n")
 
-    goal=ResetRequest()
+    req=ResetRequest()
 
     if len(list_complete)>0:
         print("Trying solution: ")
@@ -209,23 +258,24 @@ def try_solution(msg):
                                 place=str_where[:-1]
 
                 print("Solution: \nPerson: "+person+"\nPlace: "+place+"\nWeapon: "+weapon)
-                goal.finished=True
+                req.finished=True
                 break
                 
             else:
                 print(id+" is not the solution")
                 MyArmor.remove(id)
-                print("Reload the plan")
-                goal.finished=False
+                req.finished=False
 
-    res=reset_client(goal)
+    res=reset_client(req)
 
     return ConsistencyResponse()
 
 
 def main():
     '''
-    Main function 
+    Main function of the ontology_interface node; it declares the node itself, initializes all the services and calls the init_scene
+    function to initialize the ontology
+
     '''
     global ask_solution, update_service, consistency_service, reset_client
     rospy.init_node('ontology_interface')
@@ -234,7 +284,7 @@ def main():
     update_service= rospy.Service('/update_request', Update, update_ontology)
     ask_solution=rospy.ServiceProxy('/oracle_solution', Oracle)
     rospy.Subscriber('/oracle_hint', ErlOracle, receive_hint)
-    reset_client=rospy.ServiceProxy("reset_planning", Reset)
+    reset_client=rospy.ServiceProxy("/reset_planning", Reset)
     
     path=rospy.get_param("~ontology")
     print("PATH: "+str(path))

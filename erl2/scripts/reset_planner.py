@@ -121,7 +121,7 @@ def main():
     global solution_correct
     rospy.init_node('reset_planning')
 
-    rospy.Service("reset_planning", Reset, reset)
+    rospy.Service("/reset_planning", Reset, reset)
 
     while solution_correct==False:
         replan()
