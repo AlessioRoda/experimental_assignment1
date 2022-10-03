@@ -1,23 +1,63 @@
 #! /usr/bin/env python3
 
+'''
+.. module:: reset_planner
+   :platform: Unix
+   :synopsis: Node implementing the reset of the ROSPlan knowledge base
+	
+.. moduleauthor:: Alessio Roda alessioroda98@gmail.com
+
+This node manages the creation of the ROSPlan plan given a certain problem
+
+Service:
+    /reset_planning to know if the solution was found or not 
+ 
+ It's the main node in the architecture: it defines the problem to solve and generates a plan by calling the rosplan_knowledge_base
+ services with the Planner class methods; once the problem was solved it checks if the solution was found (the /reset_planning message
+ returns finished=True) and in that case the simulation ends, otherwise it clears the knowledge base, defines the problem again and
+ executes it.
+
+'''
+
 from time import sleep
 import rospy
 from erl2.srv import Reset, ResetResponse
 
 from classes.planner import Planner
 
-reset_action_server=None
 solution_correct=False
+'''
+bool: defines if the solution to the cluedo game was found or not 
 
-def reset(goal):
+'''
+
+def reset(msg):
+    '''
+    Callback to receive the /reset_planning Request message and updates the solution_correct variable in case the solution was found
+
+    Args: 
+            msg(ResetRequest): the /reset_planning Request message
+
+    Returns:
+        (ResetRequest): the /reset_planning Response
+
+    '''
+
     global solution_correct
     print("Check if simulation finishes")
-    solution_correct=goal.finished
+    solution_correct=msg.finished
     return ResetResponse()
 
 
 def replan():
-#1 Clear all
+    '''
+    Function to mange the creation of the ROSPlan plan: it clears the knowledge base, than defines the problem by adding all the
+    instances, the functions, the attributes and the goals thanks to the Planner class methods. Finally it generates the new problem, the 
+    new plan, parse it and dispatch it
+
+    '''
+
+    #1 Clear all
     res=Planner.clear_planner()
     print("Clear planner: "+str(res))
 
@@ -116,7 +156,9 @@ def replan():
 
 def main():
     '''
-    Main function 
+    Main function that performs the initialization of the node itself and initializes all the services. It also provides a loop 
+    for the generation of the ROSPlan plan, until the correct solution of the cluedo gamer is found
+
     '''
     global solution_correct
     rospy.init_node('reset_planning')

@@ -1,3 +1,18 @@
+/*************************************************************************************************************************//**
+ * \file   gotoWaypoint.cpp
+ * 
+ * \brief Node to perform the go_to_waypoint action of the PDDL domain
+ * 
+ * \version 1.0
+ * \author Alessio Roda
+ * \date   October 2022
+ * 
+ * description:
+ *    This node implements the ROSPlan GoToWaypointActionInterface: the corresponding behaviour for the go_to_waypoint
+ * 	  action in the PDDl file
+ * 
+*****************************************************************************************************************************/
+
 #include "erl2/go_to_waypoint.h"
 #include <unistd.h>
 #include <actionlib/client/simple_action_client.h>
@@ -9,8 +24,11 @@
 
 #define _USE_MATH_DEFINES
 
+//Declares the x coordinate pose to reach
 float pose_x;
+//Declares the y coordinate pose to reach
 float pose_y;
+//Declares the orientation to reach
 float orientation;
 
 
@@ -18,14 +36,27 @@ float orientation;
 namespace KCL_rosplan {
 
 	GoToWaypointActionInterface::GoToWaypointActionInterface(ros::NodeHandle &nh) {
-			// here the initialization
+
 	}
 
+	/**
+	 * bool GoToWaypointActionInterface::concreteCallback(const rosplan_dispatch_msgs::ActionDispatch::ConstPtr& msg)
+	 * 
+	 * \brief Callback of the GoToWaypointActionInterface
+	 * 
+	 * \param msg: action request for the GoToWaypointActionInterface
+	 *  
+	 * 
+	 * description:
+	 *    This callback sends a target pose to reach (x, y coordinates and orientation) to the go_to_point node via go_to_point_action
+	 * 	  action request on the basis of the waypoint passed as parameter from the PDDL plan. Once the ActionGoal is sent, it waits until
+	 * 	  the action is completed.
+	 **/
 	bool GoToWaypointActionInterface::concreteCallback(const rosplan_dispatch_msgs::ActionDispatch::ConstPtr& msg) {
 			// here the implementation of the action 
 		std::cout << "Going from " << msg->parameters[0].value << " to " << msg->parameters[1].value << std::endl;
 		
-		actionlib::SimpleActionClient<erl2::MoveAction> ac("reaching_goal", true);
+		actionlib::SimpleActionClient<erl2::MoveAction> ac("go_to_point_action", true);
 		erl2::MoveAction goal;
 		
 		if(msg->parameters[1].value == "w1"){
@@ -77,6 +108,22 @@ namespace KCL_rosplan {
 	}
 }
 
+	/** 
+	 * int main(argc, argv)
+	 * 
+	 * \brief Main function of the node
+	 * 
+	 * \param argc: the number of argument passed as parameters
+	 * 
+	 * \param argv: the vector of string containing each argument
+	 * 
+	 * \return 0 when the program ends
+	 * 
+	 * description:
+	 *    The main function, declares the GoToWaypointActionInterface
+	 * 	  and runs it
+	 *    
+	 **/
 	int main(int argc, char **argv) {
 		ros::init(argc, argv, "goto_waypoint_action", ros::init_options::AnonymousName);
 		ros::NodeHandle nh("~");

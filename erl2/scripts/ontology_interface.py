@@ -12,9 +12,15 @@ This node allows to modify the ontology and perform queries
 Service:
     /check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology and
                         to use them as possible solutions to the cluedo game
+
     /update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the "REASON" command
  
-  
+ It's the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the /oracle_hint service,
+ then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation; 
+ then it searches for complete and consistent hypotheses when /check_consistency is called, removes the inconsistent ones from the ontology and  
+ compares the complete and consistent ones with the solution ID provided by the /oracle_solution service. If the solution is correct it 
+ also queries the person, the place and the weapon of the solution and prints them sends the ResetRequest with the finish parameter equal to True;
+ otherwise it removes the incorrect IDs and returns the sends the ResetRequest with the finish parameter equal to False 
 
 '''
 

@@ -1,8 +1,22 @@
+/*************************************************************************************************************************//**
+ * \file   movearm.cpp
+ * 
+ * \brief Node to perform the movearm action of the PDDL domain
+ * 
+ * \version 1.0
+ * \author Alessio Roda
+ * \date   October 2022
+ * 
+ * description:
+ *    This node implements the ROSPlan MovearmActionInterface: the corresponding behaviour for the movearm
+ * 	  action in the PDDl file
+ * 
+*****************************************************************************************************************************/
+
 #include "erl2/movearm.h"
 #include <unistd.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
-//#include <motion_plan/PlanningAction.h>
 #include <ros/ros.h>
 // MoveIt
 #include <moveit/move_group_interface/move_group_interface.h>
@@ -17,18 +31,31 @@
 
 #define _USE_MATH_DEFINES
 
-
+//Initialize the /check_state_validity ServiceClient
 ros::ServiceClient validity_service;
+//Initialize the /check_state_validity ServiceClient
 ros::ServiceClient planning_scene_service;
 
 namespace KCL_rosplan {
 
 	MovearmActionInterface::MovearmActionInterface(ros::NodeHandle &nh) {
-			// here the initialization
+
 	}
 
-	bool MovearmActionInterface::concreteCallback(const rosplan_dispatch_msgs::ActionDispatch::ConstPtr& msg) {
-			// here the implementation of the action 
+	/**
+	 * bool MovearmActionInterface::concreteCallback(const rosplan_dispatch_msgs::ActionDispatch::ConstPtr& msg)
+	 * 
+	 * \brief Callback of the MovearmActionInterface
+	 * 
+	 * \param msg: action request for the MovearmActionInterface
+	 *  
+	 * 
+	 * description:
+	 *    This callback performs the motion of the robotic arm to reach the markers by moving it through three poses already 
+	 * 	  defined with the moveit setup assistant: it starts with the arm stretched in the initial_pose, then moves to the 
+	 * 	  reach_target pose with which it can reach the marker for sure, then comes back to the initial_pose 
+	 **/
+	bool MovearmActionInterface::concreteCallback(const rosplan_dispatch_msgs::ActionDispatch::ConstPtr& msg) { 
 
         robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
         const moveit::core::RobotModelPtr& kinematic_model = robot_model_loader.getModel();
@@ -39,33 +66,6 @@ namespace KCL_rosplan {
         const moveit::core::JointModelGroup* joint_model_group = kinematic_model->getJointModelGroup("arm");
         moveit::planning_interface::MoveGroupInterface group("arm");
         const std::vector<std::string>& joint_names = joint_model_group->getVariableNames();
-
-        
-       // Poition to reach
-        geometry_msgs::Pose pose;
-
-        if(msg->parameters[1].value == "w1"){
-            pose.position.x=-3;
-            pose.position.y=0;
-        }
-        else if (msg->parameters[1].value == "w2"){
-		pose.position.x=3;
-		pose.position.y=0.0;
-		}
-		else if (msg->parameters[1].value == "w3"){
-		pose.position.x=0.0;
-		pose.position.y=3;
-		}
-		else if (msg->parameters[1].value == "w4"){
-		pose.position.x=0.0;
-		pose.position.y=-3;
-		}
-
-        pose.position.z=1.25;
-        pose.orientation.w = 0;
-	    pose.orientation.x = 0;
-	    pose.orientation.y = 0;
-	    pose.orientation.z = 0;
 
         group.setNamedTarget("initial_pose");
 	    group.move(); 
@@ -85,12 +85,28 @@ namespace KCL_rosplan {
 
 }
 
+	/** 
+	 * int main(argc, argv)
+	 * 
+	 * \brief Main function of the node
+	 * 
+	 * \param argc: the number of argument passed as parameters
+	 * 
+	 * \param argv: the vector of string containing each argument
+	 * 
+	 * \return 0 when the program ends
+	 * 
+	 * description:
+	 *    The main function, initializes the client for the /check_state_validity and /get_planning_scene services, declares the MovearmActionInterface
+	 * 	  and runs it
+	 *    
+	 **/
 	int main(int argc, char **argv) {
 		ros::init(argc, argv, "movearm_action", ros::init_options::AnonymousName);
 		ros::NodeHandle nh("~");
         validity_service=nh.serviceClient<moveit_msgs::GetStateValidity>("/check_state_validity");
         planning_scene_service=nh.serviceClient<moveit_msgs::GetPlanningScene>("/get_planning_scene");
-        ros::AsyncSpinner spinner(1); //Nuova aggiunta, vedi se funziona
+        ros::AsyncSpinner spinner(1);
         spinner.start();
 		KCL_rosplan::MovearmActionInterface my_aci(nh);
 		my_aci.runActionInterface();

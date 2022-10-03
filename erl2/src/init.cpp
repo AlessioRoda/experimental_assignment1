@@ -1,7 +1,20 @@
+/*************************************************************************************************************************//**
+ * \file   init.cpp
+ * 
+ * \brief Node to move the arm in the correct initial position
+ * 
+ * \version 1.0
+ * \author Alessio Roda
+ * \date   October 2022
+ * 
+ * description:
+ *    This node moves the robotic arm to the initial_pose defined with the moveit setup assistant
+ * 
+*****************************************************************************************************************************/
+
 #include <unistd.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/client/terminal_state.h>
-//#include <motion_plan/PlanningAction.h>
 #include <ros/ros.h>
 // MoveIt
 #include <moveit/move_group_interface/move_group_interface.h>
@@ -11,11 +24,25 @@
 #include <geometry_msgs/Pose.h>
 #include <moveit_msgs/GetStateValidity.h>
 #include <moveit_msgs/GetPlanningScene.h>
-#include<unistd.h>
+#include <unistd.h>
 
 
-
-
+/** 
+ * int main(argc, argv)
+ * 
+ * \brief Main function of the node
+ * 
+ * \param argc: the number of argument passed as parameters
+ * 
+ * \param argv: the vector of string containing each argument
+ * 
+ * \return 0 when the program ends
+ * 
+ * description:
+ *    The main function, initializes the node, loads the arm model of the robot described with the moveit_setup_assistant, 
+ *    gets the "arm" move group to move the robotic arm and moves it in the initial_pose position
+ *    
+ **/
 int main(int argc, char **argv)
 {
 

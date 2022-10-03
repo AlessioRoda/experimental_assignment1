@@ -1,13 +1,28 @@
-"""
-/go_to_point.py
-/It's performed as the node that permits the robot to move: it contains all the functions to set the velocity and the orientation of the robot
-based on the target it has to reach via the ActionGoal that was sent from the /state_machine node. When the target to reach is 
-received, the go_to_point function provides to perform the motion of the robot 
-/author Alessio Roda
-/date June 2022
-"""
-
 #! /usr/bin/env python3
+
+"""
+.. module:: go_to_point
+   :platform: Unix
+   :synopsis: Node implementing an algorithm to move the robot
+	
+.. moduleauthor:: Alessio Roda alessioroda98@gmail.com
+
+This node drive the robot to the desired position received
+
+Subscriber:
+    /odom 
+Publisher:
+	/cmd_vel 
+
+ActionServer:
+    go_to_point_action: action server to receive the coordinates of the place to reach 
+ 
+ It's performed as the node that permits the robot to move: it contains all the functions to set the velocity and the orientation of the robot
+ based on the target it has to reach via the ActionGoal that was sent from the gotoWaypoint node. In order to do this, when a new target is 
+ generated the robot aligns its orientation, then moves to the target. Once the target is reached, the node sets the target action as succeeded, then waits until a new 
+ target is sent.
+
+"""
 
 import rospy
 import actionlib
@@ -19,7 +34,7 @@ import math
 
 
 
-    # robot state variables
+# robot state variables
 position_ = Point()
 yaw_ = 0
 position_ = 0
@@ -27,7 +42,13 @@ state_ = 0
 pub_ = None
 
 ang_coef=2
+''' int: coefficient to increase manage the angular velocity of the robot during the motion
+
+'''
 lin_coef=1.7
+''' int: coefficient to increase manage the linear velocity of the robot during the motion
+
+'''
 
 # parameters for control
 yaw_precision_ = math.pi / 9  # +/- 20 degree allowed
@@ -44,6 +65,13 @@ server=None
 
 ## Callback to get the current odom position of the robot 
 def clbk_odom(msg):
+    '''
+    Callback to get the odometry of the robot 
+
+    Args: 
+        msg(Odom): odometry of the robot with its x, y, z coordinates and orientation
+            
+    '''
     global position_
     global yaw_
 
@@ -61,17 +89,38 @@ def clbk_odom(msg):
 
 
 def change_state(state):
+    '''
+    Function to change the state of th FSM in the go_to_point function
+
+    Args: 
+        state(int): new state of the FSM
+            
+    '''
     global state_
     state_ = state
     print ('State changed to [%s]' % state_)
 
 
 def normalize_angle(angle):
+    '''
+    Function to normalize the angle of the rotation that the robot must perform
+
+    Args: 
+        angle(float): angle of the rotation to perform
+
+    '''
     if(math.fabs(angle) > math.pi):
         angle = angle - (2 * math.pi * angle) / (math.fabs(angle))
     return angle
 
 def fix_yaw(des_pos):
+    '''
+    Function to direct the robot towards the target rotation
+
+    Args: 
+        des_pos(float): desired position to reach
+
+    '''
     desired_yaw = math.atan2(des_pos.y - position_.y, des_pos.x - position_.x)
     err_yaw = normalize_angle(desired_yaw - yaw_)
     rospy.loginfo(err_yaw)
@@ -91,6 +140,13 @@ def fix_yaw(des_pos):
 
 
 def go_straight_ahead(des_pos):
+    '''
+    Function to move the robot straight ahead to a certain destination respect to its actual position
+
+    Args: 
+        des_pos(Pose): object containing the x and y coordinates of the position to reach
+
+    '''
     desired_yaw = math.atan2(des_pos.y - position_.y, des_pos.x - position_.x)
     err_yaw = desired_yaw - yaw_
     err_pos = math.sqrt(pow(des_pos.y - position_.y, 2) +
@@ -119,6 +175,14 @@ def go_straight_ahead(des_pos):
         change_state(0)
 
 def fix_final_yaw(des_yaw):
+    '''
+    Function to fix the orientation of the robot on the basis of the desired orientation
+
+    Args: 
+        msg(MoveGoal): action goal to get the coordinates of the position to reach
+
+    '''
+
     err_yaw = normalize_angle(des_yaw - yaw_)
     rospy.loginfo(err_yaw)
     twist_msg = Twist()
@@ -138,17 +202,27 @@ def fix_final_yaw(des_yaw):
         change_state(3)
         
 def done():
+    '''
+    Function to stop the robot by setting its linear and angular velocity to zero
+
+    '''
+
     twist_msg = Twist()
     twist_msg.linear.x = 0
     twist_msg.angular.z = 0
     pub_.publish(twist_msg)
 
-"""
- /go_to_point function gets the goal position to reach and, based on that, calls the functions to perform the motion of the robot.
- It checks if the goal has't been cancelled; in this case it sets the state_ variable to 3 in order to terminate the process to move 
- to reach a certain position
-"""
+
 def go_to_point(goal):
+    """
+    Function that gets the goal position to reach and, based on that, calls the functions to perform the motion of the robot.
+    It checks if the goal has't been cancelled; in this case it sets the state_ variable to 3 in order to terminate the process to move 
+    to reach a certain position
+
+    Args: 
+        msg(MoveGoal): action goal to get the coordinates of the position to reach
+ 
+    """
     global server, state_
     result=MoveActionResult()
     desired_position = Point()
@@ -174,16 +248,19 @@ def go_to_point(goal):
     result.result.reached=True
     server.set_succeeded(result.result)
     
-    #return True
 
 
 ## In the main there are the initialization of the publisher, th subscriber and the SimpleActionServer
 def main():
+    '''
+    Main function that performs the initialization of the node itself and initializes all the services and subscribers.
+
+    '''
     global pub_, server
     rospy.init_node('go_to_point')
     pub_ = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
     sub_odom = rospy.Subscriber('/odom', Odometry, clbk_odom)
-    server = actionlib.SimpleActionServer('reaching_goal', MoveAction, execute_cb = go_to_point, auto_start=False)
+    server = actionlib.SimpleActionServer('go_to_point_action', MoveAction, execute_cb = go_to_point, auto_start=False)
     server.start()
     
     rospy.spin()
