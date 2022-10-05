@@ -95,7 +95,7 @@ rosrun armor execute it.emarolab.armor.ARMORMainService
 rosrun erl2 init
 ```
 ```
-rosrun erl2 ontology_interface.py _ontology:=(your_ros_workspace)/exp_assignment1/erl2/cluedo_ontology.owl
+rosrun erl2 ontology_interface.py _ontology:=(your_ros_workspace)/src/exp_assignment1/erl2/cluedo_ontology.owl
 ```
 ```
 rosrun erl2 go_to_point.py
@@ -116,5 +116,10 @@ Here you can find the video recording about the whole simulation https://unigeit
 ![gazebo](https://user-images.githubusercontent.com/48511957/194016837-2c03bf00-d3d3-44d4-bdec-a47cd8b7f8b6.png)
 
 
+## System features and limitations
+The system is optimized to find the best plan to reduce the time of the entire simulation, since each moving operation adds a cost to a function that depends on the distance between the rooms. For this reason the robot moves along the perimeter of the map instead of crossing it, that wold requiere a little more time. Despite of it, the entire simulation is quite long, due to the reduced velocity of the robot and the big amount of hints that are required before a complete and consistent hypothesis is found. In order to overcome to this problem, the linear and angular velocity of the robot were increased in the go_to_point.py file, respect to the original ones; this of course makes the simulation faster, but, since the arm of the robot is streatched in the default position while it moves, the robot sometimes swings while it moves from a room to another. Another limitation that may occur is that the robotic arm doesn't come back to the default position after having reached the marker; these kind of issue doesn't represent a problem for the simulation since the robot can move even if the arm postion is not the default position and when the robot reaches a new position, and the move command is generated, it usally moves in the correct position and the marker is reached. Similarly, another issue that may occur is that  the arm doesn't move at all, in that case ,as in the previous one, when the robot reaches a new position and a new movearm command is received, the arm stats moving again. 
+
+## Author informations and contacts
+I'm Alessio Roda, I'm a robotics engineering student in the University of Genoa, if you have some issues you can contact me via mail: alessioroda98@gmail.com.
 
 
