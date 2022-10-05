@@ -109,4 +109,12 @@ roslaunch erl2 planning.launch
 ```
 
 ## Simulation recording
-Here you can find the video recording about the whole simulation (). Above there are some screenshots from the Gazebo and Rviz simulation.
+Here you can find the video recording about the whole simulation https://unigeit-my.sharepoint.com/:v:/g/personal/s4458313_studenti_unige_it/Ed1zH-aaicZDuqy1-qnX81QB9XzlwxRgDBhAbw1-LA275A?e=1GZrCt (I recommend to skip patrs of the video, since the simulation is quite long). Above there are some screenshots from the Gazebo and Rviz simulation.
+
+![rviz](https://user-images.githubusercontent.com/48511957/194016679-724f04ae-2233-4410-aab1-181a5abd1afb.png)
+
+![gazebo](https://user-images.githubusercontent.com/48511957/194016837-2c03bf00-d3d3-44d4-bdec-a47cd8b7f8b6.png)
+
+
+
+
