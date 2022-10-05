@@ -53,4 +53,60 @@ Here there's the rqt_graph to have a better idea of how the nodes interact betwe
 The general behaviou of the architecture can be described as the flowchart: at the beginning a plan is generated from the doamin and problem file, then it is dispatched with the nodes previously described that allow to perform the actions of the plan and finally, if one of the complete and consistent hypothesis found in the check_consitency action is correct, the game ends, otherwise the plan is generated again with the same informations regarding the domain and the porblem and the plan in disaptched.
 
 ### Temporal diagram
+![temporal_diagram](https://user-images.githubusercontent.com/48511957/194004636-da1eddef-41b1-4404-b962-80a0ad12c4ba.png)
 
+As you can see in the diagram, the first step is to initialize the plan, then the first action that is executed is the go_to_waypoint one, to move the robot from the oracle room, where the simulation starts, to one of the four rooms. Notice that, since in the problem file the doistance between the rooms is different in order to make the simulaiton more realistic, the robot will move from a room to another by following the shortest path. Once the room is reached, the robot performs the movearm action, to reach the marker with the arm; after that it moves to another room and repeat the same procedure until every room is visted. After that the marker of the fourth room is reached, the robot moves to the oracle room, then performs the update_ontology operation to ass all the new hints to the ontology and then it also performs the checK_consistency action to find complete and consistent hypotheses and use them as possible solutions. If the solution is found the game ends, otherwise the simulation starts again from the initialization phase.
+
+## How to run the code
+
+This project was developed and tested on Ubuntu 20.04 with ROS noetic, in order to install all the necessary dependencies make sure you have installed in your system:
+
+* ROSPlan (here the link: https://github.com/KCL-Planning/ROSPlan)
+* ARMOR (https://github.com/EmaroLab/armor)
+* Moveit
+
+After that, clone the repository in your ros workspace, enter in it and move to the second_assignment branch with the git command 
+
+```
+git checkout second_assignment
+```
+compile the repository with 
+
+```
+catkin_make
+```
+Then the best way to run the code is to go inside erl2 folder, then launch the simulation by running in your terminal
+
+```
+./launch_simulation.sh
+```
+
+### Run the nodes separately
+
+If you want to have a view of all the nodes that are running with all the logs that they print, you can run them separately; in order to do so, please follow the commands above
+
+```
+roslaunch erl2 simulation.launch
+```
+```
+rosrun armor execute it.emarolab.armor.ARMORMainService
+```
+```
+rosrun erl2 init
+```
+```
+rosrun erl2 ontology_interface.py _ontology:=(your_ros_workspace)/exp_assignment1/erl2/cluedo_ontology.owl
+```
+```
+rosrun erl2 go_to_point.py
+```
+```
+rosrun erl2 simulation
+```
+Then I recomend to use the planning.launch to manage the ROSPlan part by launching 
+```
+roslaunch erl2 planning.launch
+```
+
+## Simulation recording
+Here you can find the video recording about the whole simulation (). Above there are some screenshots from the Gazebo and Rviz simulation.
