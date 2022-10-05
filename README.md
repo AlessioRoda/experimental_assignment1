@@ -86,7 +86,7 @@ Then the best way to run the code is to go inside erl2 folder, then launch the s
 If you want to have a view of all the nodes that are running with all the logs that they print, you can run them separately; in order to do so, please follow the commands above
 
 ```
-roslaunch erl2 simulation.launch
+roslaunch erl2 assignment.launch
 ```
 ```
 rosrun armor execute it.emarolab.armor.ARMORMainService
