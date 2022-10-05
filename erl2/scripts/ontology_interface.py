@@ -9,18 +9,18 @@
 
 This node allows to modify the ontology and perform queries
 	                                                                                                                            
-Service:
-    /check_consistency service to send a request to the oracle_interface to find the complete and consistent hypothesis in the ontology and
+Services:
+    /check_consistency service to ask for complete and consistent hypothesis in the ontology and
                         to use them as possible solutions to the cluedo game
 
-    /update_request service to send the request to the oracle_interface node for updating the ontology by adding the hints to the ontology and by performing the "REASON" command
+    /update_request service to update the ontology by adding the hints to the ontology and by performing the "REASON" command
  
  It's the node that allows to initialize the ontology, add items and asking queries; it receives the hints from the /oracle_hint service,
  then add them in a list. It also updates the ontology when a request is received: it loads all the new hints in the ontology and performs the REASON operation; 
  then it searches for complete and consistent hypotheses when /check_consistency is called, removes the inconsistent ones from the ontology and  
  compares the complete and consistent ones with the solution ID provided by the /oracle_solution service. If the solution is correct it 
- also queries the person, the place and the weapon of the solution and prints them sends the ResetRequest with the finish parameter equal to True;
- otherwise it removes the incorrect IDs and returns the sends the ResetRequest with the finish parameter equal to False 
+ also queries the person, the place and the weapon of the solution and prints them, then sends the ResetRequest with the "finish" parameter equal to True;
+ otherwise it removes the incorrect IDs and returns the ResetRequest with the "finish" parameter equal to False 
 
 '''
 
@@ -57,7 +57,7 @@ value=[]
 
 '''
 ask_solution=None
-''' Initialize value /oracle_solution service client
+''' Initialize /oracle_solution service client
 
 '''
 update_service=None
@@ -65,11 +65,11 @@ update_service=None
 
 '''
 consistency_service=None
-''' Initialize value /consistency_request service server
+''' Initialize /consistency_request service server
 
 '''
 reset_client=None
-''' Initialize value /reset_planning service client
+''' Initialize /reset_planning service client
 
 '''
 
@@ -130,10 +130,10 @@ def init_scene():
 
 def receive_hint(hint):
     '''
-    Callback to get the hints from the state_machine node; each element of the hint is appended in a list 
+    Callback to get the hints from the simulation node; each element of the hint is appended in a list 
 
     Args: 
-        hint(Hint): is the hint received from the state_machine node
+        hint(Hint): is the hint received from the simulation node
 
     '''
     global ID, key, value
@@ -174,7 +174,7 @@ def update_ontology(msg):
         
 def try_solution(msg):
     '''
-    Callback to find complete and consistent hypothesis when the /check_consistency is called, it also removes
+    Callback to find complete and consistent hypothesis when the /check_consistency service is called, it also removes
     inconsistent IDs. It also uses the complete and consistent hypothesis as possible solutions, by comparing their IDs with the 
     solution ID provided by the /oracle_solution service; in case one of them corresponds to the solution ID, it 
     queries the place, the person and the weapon of the solution and sets the ResetRequest to True, 

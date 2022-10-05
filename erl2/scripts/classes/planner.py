@@ -22,8 +22,8 @@ Service:
 
 This class implements the operations to interact with the ROSPlan knowledge base.  
 
-This class is created to update in a more comfortable way the ROSPlan knowledge base, providing some methods that already create and
-sends the correct messages to the ROSPlan services. 
+This class is created to update in a more comfortable way the ROSPlan knowledge base, providing some methods that create and
+send the correct messages to the ROSPlan services. 
 
 '''
 
@@ -86,6 +86,7 @@ class Planner(object):
             res(KnowledgeUpdateServiceResponse): the response received from rosplan_knowledge_base/update service
 
         '''
+
         rospy.wait_for_service('rosplan_knowledge_base/update')
         req=KnowledgeUpdateServiceRequest()
         req.knowledge.instance_name=name
@@ -189,10 +190,7 @@ class Planner(object):
         
     def clear_planner():
         '''
-        Function to remover the current model from the knowledge base
-
-        Returns:
-            res(KnowledgeUpdateServiceResponse): the response received from rosplan_knowledge_base/update service
+        Function to remove the current model from the knowledge base
 
         '''
 
@@ -204,9 +202,6 @@ class Planner(object):
         '''
         Function to generate the problem
 
-        Returns:
-            res(KnowledgeUpdateServiceResponse): the response received from rosplan_knowledge_base/update service
-
         '''
 
         rospy.wait_for_service('rosplan_problem_interface/problem_generation_server')
@@ -217,9 +212,6 @@ class Planner(object):
         '''
         Function to generate the plan
 
-        Returns:
-            res(KnowledgeUpdateServiceResponse): the response received from rosplan_knowledge_base/update service
-
         '''
 
         rospy.wait_for_service('rosplan_planner_interface/planning_server')
@@ -229,9 +221,6 @@ class Planner(object):
     def parse_plan():
         '''
         Function to parse the plan
-
-        Returns:
-            res(KnowledgeUpdateServiceResponse): the response received from rosplan_knowledge_base/update service
 
         '''
 
@@ -244,7 +233,7 @@ class Planner(object):
         Function to dispatch the plan
 
         Returns:
-            res(KnowledgeUpdateServiceResponse): the response received from rosplan_knowledge_base/update service
+            res(DispatchServiceResponse): the response received from rosplan_knowledge_base/dispatch_plan service
 
         '''
 

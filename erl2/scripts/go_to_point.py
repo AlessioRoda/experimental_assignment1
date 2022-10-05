@@ -7,7 +7,7 @@
 	
 .. moduleauthor:: Alessio Roda alessioroda98@gmail.com
 
-This node drive the robot to the desired position received
+This node drives the robot to the desired position received
 
 Subscriber:
     /odom 
@@ -17,10 +17,10 @@ Publisher:
 ActionServer:
     go_to_point_action: action server to receive the coordinates of the place to reach 
  
- It's performed as the node that permits the robot to move: it contains all the functions to set the velocity and the orientation of the robot
- based on the target it has to reach via the ActionGoal that was sent from the gotoWaypoint node. In order to do this, when a new target is 
- generated the robot aligns its orientation, then moves to the target. Once the target is reached, the node sets the target action as succeeded, then waits until a new 
- target is sent.
+ It's performed as the node that allows the robot to move: it contains all the functions to set the velocity and the orientation of the robot
+ basing on the target it has to reach via the ActionGoal that was sent from the gotoWaypoint node. In order to do this, when a new target is 
+ generated the robot aligns its orientation respect to the target position one, then moves to the target. Once the target is reached, the node 
+ sets the target action as succeeded, then waits until a new target position is sent.
 
 """
 
@@ -42,11 +42,11 @@ state_ = 0
 pub_ = None
 
 ang_coef=2
-''' int: coefficient to increase manage the angular velocity of the robot during the motion
+''' int: coefficient to manage the angular velocity of the robot during the motion
 
 '''
 lin_coef=1.7
-''' int: coefficient to increase manage the linear velocity of the robot during the motion
+''' int: coefficient to manage the linear velocity of the robot during the motion
 
 '''
 
@@ -141,7 +141,7 @@ def fix_yaw(des_pos):
 
 def go_straight_ahead(des_pos):
     '''
-    Function to move the robot straight ahead to a certain destination respect to its actual position
+    Function to move the robot straight ahead from its actual position to a certain destination
 
     Args: 
         des_pos(Pose): object containing the x and y coordinates of the position to reach
@@ -179,7 +179,7 @@ def fix_final_yaw(des_yaw):
     Function to fix the orientation of the robot on the basis of the desired orientation
 
     Args: 
-        msg(MoveGoal): action goal to get the coordinates of the position to reach
+        des_yaw(float): desired yaw angle
 
     '''
 
@@ -215,7 +215,7 @@ def done():
 
 def go_to_point(goal):
     """
-    Function that gets the goal position to reach and, based on that, calls the functions to perform the motion of the robot.
+    Function that gets the goal position to reach and, basing on that, calls the functions to perform the motion of the robot.
     It checks if the goal has't been cancelled; in this case it sets the state_ variable to 3 in order to terminate the process to move 
     to reach a certain position
 

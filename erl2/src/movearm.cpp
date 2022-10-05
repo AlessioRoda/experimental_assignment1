@@ -33,7 +33,7 @@
 
 //Initialize the /check_state_validity ServiceClient
 ros::ServiceClient validity_service;
-//Initialize the /check_state_validity ServiceClient
+//Initialize the /get_planning_scene ServiceClient
 ros::ServiceClient planning_scene_service;
 
 namespace KCL_rosplan {

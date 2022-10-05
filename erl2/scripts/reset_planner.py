@@ -7,15 +7,15 @@
 	
 .. moduleauthor:: Alessio Roda alessioroda98@gmail.com
 
-This node manages the creation of the ROSPlan plan given a certain problem
+This node manages the creation of the ROSPlan plan starting from a certain problem
 
 Service:
     /reset_planning to know if the solution was found or not 
  
  It's the main node in the architecture: it defines the problem to solve and generates a plan by calling the rosplan_knowledge_base
  services with the Planner class methods; once the problem was solved it checks if the solution was found (the /reset_planning message
- returns finished=True) and in that case the simulation ends, otherwise it clears the knowledge base, defines the problem again and
- executes it.
+ returns "finished"=True) and in that case the simulation ends, otherwise it clears the knowledge base, defines the problem again and
+ executes it until the solution isn't found.
 
 '''
 
@@ -27,7 +27,7 @@ from classes.planner import Planner
 
 solution_correct=False
 '''
-bool: defines if the solution to the cluedo game was found or not 
+bool: defines if the solution of the cluedo game was found or not 
 
 '''
 
@@ -53,7 +53,7 @@ def replan():
     '''
     Function to mange the creation of the ROSPlan plan: it clears the knowledge base, than defines the problem by adding all the
     instances, the functions, the attributes and the goals thanks to the Planner class methods. Finally it generates the new problem, the 
-    new plan, parse it and dispatch it
+    new plan, parse the plan and dispatch it
 
     '''
 
@@ -157,7 +157,7 @@ def replan():
 def main():
     '''
     Main function that performs the initialization of the node itself and initializes all the services. It also provides a loop 
-    for the generation of the ROSPlan plan, until the correct solution of the cluedo gamer is found
+    for the generation of the ROSPlan plan, until the correct solution of the cluedo game is found
 
     '''
     global solution_correct
