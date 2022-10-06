@@ -16,7 +16,7 @@ Inside the erl2 folder you can find:
 * docs folder with the sphinx code documentation (to visualize use docs/_build/html/index.html)
 * launch folder in which there are the launch files for running all the nodes of the simulation
 * msg folder containing the ErlOracle.msg for defining the hint messages
-* PDDL folder containing the domain.pdl and problem.pddl files that describes respectively the domain and the problem of the cluedo simulation
+* PDDL folder containing the domain.pddl and problem.pddl files that describes respectively the domain and the problem of the cluedo simulation
 * scripts folder containing the go_to_point.py script to implement a simple behavior for moving the robot from a position to another in the simulation, the ontology_interface.py script to manage the queries for the ARMOR ontology and the reset_planner.py script that manages the ROSPlan behavior, dispatching the problem until a solution is found. It also contains a sub folder with the MyArmor and Planner classes.
 * src folder with the init.cpp file that allows to move the robotic arm in the initial configuration and the check_consistency.cpp, goToWaypoint.cpp and movearm.cpp files that represent the Action Interfaces nodes for performing the actions described in the PDDL domain file. The folder also contains the simulation.cpp file that manages the simulation node for generating the hints when a marker is reached with the arm 
 * srv folder with all the service custom messages
