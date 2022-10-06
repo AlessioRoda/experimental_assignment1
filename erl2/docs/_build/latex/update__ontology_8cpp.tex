@@ -1,0 +1,72 @@
+\hypertarget{update__ontology_8cpp}{}\doxysection{src/update\+\_\+ontology.cpp File Reference}
+\label{update__ontology_8cpp}\index{src/update\_ontology.cpp@{src/update\_ontology.cpp}}
+
+
+Node to perform the Update\+Ontology\+Action\+Interface action of the P\+D\+DL domain.  
+
+
+{\ttfamily \#include \char`\"{}erl2/update\+\_\+ontology.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$actionlib/client/simple\+\_\+action\+\_\+client.\+h$>$}\newline
+{\ttfamily \#include $<$actionlib/client/terminal\+\_\+state.\+h$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$erl2/\+Update.\+h$>$}\newline
+Include dependency graph for update\+\_\+ontology.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{update__ontology_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{update__ontology_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char $\ast$$\ast$argv)
+\begin{DoxyCompactList}\small\item\em Main function of the node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{update__ontology_8cpp_acb7ca7f163790d74254cefc6c3de0ebe}\label{update__ontology_8cpp_acb7ca7f163790d74254cefc6c3de0ebe}} 
+ros\+::\+Service\+Client {\bfseries client\+\_\+update}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Node to perform the Update\+Ontology\+Action\+Interface action of the P\+D\+DL domain. 
+
+\begin{DoxyVersion}{Version}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyAuthor}{Author}
+Alessio Roda 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+October 2022
+\end{DoxyDate}
+description\+: This node implements the R\+O\+S\+Plan Update\+Ontology\+Action\+Interface\+: the corresponding behaviour for the update\+\_\+ontology action in the P\+D\+Dl file 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{update__ontology_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\label{update__ontology_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}} 
+\index{update\_ontology.cpp@{update\_ontology.cpp}!main@{main}}
+\index{main@{main}!update\_ontology.cpp@{update\_ontology.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$$\ast$}]{argv }\end{DoxyParamCaption})}
+
+
+
+Main function of the node. 
+
+int main(argc, argv)
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & the number of argument passed as parameters\\
+\hline
+{\em argv} & the vector of string containing each argument\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 when the program ends
+\end{DoxyReturn}
+description\+: The main function, initializes the client for the /update\+\_\+request service, declares the Update\+Ontology\+Action\+Interface and runs it 

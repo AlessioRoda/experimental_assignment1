@@ -1,0 +1,71 @@
+\hypertarget{init_8cpp}{}\doxysection{src/init.cpp File Reference}
+\label{init_8cpp}\index{src/init.cpp@{src/init.cpp}}
+
+
+Node to move the arm in the correct initial position.  
+
+
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$actionlib/client/simple\+\_\+action\+\_\+client.\+h$>$}\newline
+{\ttfamily \#include $<$actionlib/client/terminal\+\_\+state.\+h$>$}\newline
+{\ttfamily \#include $<$ros/ros.\+h$>$}\newline
+{\ttfamily \#include $<$moveit/move\+\_\+group\+\_\+interface/move\+\_\+group\+\_\+interface.\+h$>$}\newline
+{\ttfamily \#include $<$moveit/robot\+\_\+model\+\_\+loader/robot\+\_\+model\+\_\+loader.\+h$>$}\newline
+{\ttfamily \#include $<$moveit/robot\+\_\+model/robot\+\_\+model.\+h$>$}\newline
+{\ttfamily \#include $<$moveit/robot\+\_\+state/robot\+\_\+state.\+h$>$}\newline
+{\ttfamily \#include $<$geometry\+\_\+msgs/\+Pose.\+h$>$}\newline
+{\ttfamily \#include $<$moveit\+\_\+msgs/\+Get\+State\+Validity.\+h$>$}\newline
+{\ttfamily \#include $<$moveit\+\_\+msgs/\+Get\+Planning\+Scene.\+h$>$}\newline
+Include dependency graph for init.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{init_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{init_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char $\ast$$\ast$argv)
+\begin{DoxyCompactList}\small\item\em Main function of the node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Node to move the arm in the correct initial position. 
+
+\begin{DoxyVersion}{Version}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyAuthor}{Author}
+Alessio Roda 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+October 2022
+\end{DoxyDate}
+description\+: This node moves the robotic arm to the initial\+\_\+pose defined with the moveit setup assistant 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{init_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\label{init_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}} 
+\index{init.cpp@{init.cpp}!main@{main}}
+\index{main@{main}!init.cpp@{init.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$$\ast$}]{argv }\end{DoxyParamCaption})}
+
+
+
+Main function of the node. 
+
+int main(argc, argv)
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & the number of argument passed as parameters\\
+\hline
+{\em argv} & the vector of string containing each argument\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 when the program ends
+\end{DoxyReturn}
+description\+: The main function, initializes the node, loads the arm model of the robot described with the moveit\+\_\+setup\+\_\+assistant, gets the \char`\"{}arm\char`\"{} move group to move the robotic arm and moves it in the initial\+\_\+pose position 

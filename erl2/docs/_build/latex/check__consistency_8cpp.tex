@@ -1,0 +1,73 @@
+\hypertarget{check__consistency_8cpp}{}\doxysection{src/check\+\_\+consistency.cpp File Reference}
+\label{check__consistency_8cpp}\index{src/check\_consistency.cpp@{src/check\_consistency.cpp}}
+
+
+Node to perform the check\+\_\+consistency action of the P\+D\+DL domain.  
+
+
+{\ttfamily \#include \char`\"{}erl2/check\+\_\+consistency.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$erl2/\+Consistency.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$actionlib/client/simple\+\_\+action\+\_\+client.\+h$>$}\newline
+{\ttfamily \#include $<$actionlib/client/terminal\+\_\+state.\+h$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$ros/ros.\+h$>$}\newline
+Include dependency graph for check\+\_\+consistency.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{check__consistency_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{check__consistency_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char $\ast$$\ast$argv)
+\begin{DoxyCompactList}\small\item\em Main function of the node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{check__consistency_8cpp_ac35fab8574a24f12caf66f6c9dce647a}\label{check__consistency_8cpp_ac35fab8574a24f12caf66f6c9dce647a}} 
+ros\+::\+Service\+Client {\bfseries client\+\_\+consistency}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Node to perform the check\+\_\+consistency action of the P\+D\+DL domain. 
+
+\begin{DoxyVersion}{Version}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyAuthor}{Author}
+Alessio Roda 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+October 2022
+\end{DoxyDate}
+description\+: This node implements the R\+O\+S\+Plan Check\+Consistency\+Action\+Interface\+: the corresponding behaviour for the check\+\_\+consistency action in the P\+D\+Dl file 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{check__consistency_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\label{check__consistency_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}} 
+\index{check\_consistency.cpp@{check\_consistency.cpp}!main@{main}}
+\index{main@{main}!check\_consistency.cpp@{check\_consistency.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$$\ast$}]{argv }\end{DoxyParamCaption})}
+
+
+
+Main function of the node. 
+
+int main(argc, argv)
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & the number of argument passed as parameters\\
+\hline
+{\em argv} & the vector of string containing each argument\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 when the program ends
+\end{DoxyReturn}
+description\+: The main function, initializes the client for the /consistency\+\_\+request service, declares the Check\+Consistency\+Action\+Interface and runs it 

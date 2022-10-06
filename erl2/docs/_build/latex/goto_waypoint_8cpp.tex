@@ -1,0 +1,80 @@
+\hypertarget{goto_waypoint_8cpp}{}\doxysection{src/goto\+Waypoint.cpp File Reference}
+\label{goto_waypoint_8cpp}\index{src/gotoWaypoint.cpp@{src/gotoWaypoint.cpp}}
+
+
+Node to perform the go\+\_\+to\+\_\+waypoint action of the P\+D\+DL domain.  
+
+
+{\ttfamily \#include \char`\"{}erl2/go\+\_\+to\+\_\+waypoint.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$actionlib/client/simple\+\_\+action\+\_\+client.\+h$>$}\newline
+{\ttfamily \#include $<$actionlib/client/terminal\+\_\+state.\+h$>$}\newline
+{\ttfamily \#include $<$cmath$>$}\newline
+{\ttfamily \#include $<$erl2/\+Move\+Action.\+h$>$}\newline
+{\ttfamily \#include $<$erl2/\+Move\+Action\+Result.\+h$>$}\newline
+{\ttfamily \#include $<$math.\+h$>$}\newline
+Include dependency graph for goto\+Waypoint.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{goto_waypoint_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{goto_waypoint_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char $\ast$$\ast$argv)
+\begin{DoxyCompactList}\small\item\em Main function of the node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{goto_waypoint_8cpp_a4fc5847e0489f256f9b1b70c21a55a3f}\label{goto_waypoint_8cpp_a4fc5847e0489f256f9b1b70c21a55a3f}} 
+float {\bfseries pose\+\_\+x}
+\item 
+\mbox{\Hypertarget{goto_waypoint_8cpp_af567015bd8ee79bcfbb2c8c3d95dfb1c}\label{goto_waypoint_8cpp_af567015bd8ee79bcfbb2c8c3d95dfb1c}} 
+float {\bfseries pose\+\_\+y}
+\item 
+\mbox{\Hypertarget{goto_waypoint_8cpp_a0e3266fc15309697502533db62b682af}\label{goto_waypoint_8cpp_a0e3266fc15309697502533db62b682af}} 
+float {\bfseries orientation}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Node to perform the go\+\_\+to\+\_\+waypoint action of the P\+D\+DL domain. 
+
+\begin{DoxyVersion}{Version}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyAuthor}{Author}
+Alessio Roda 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+October 2022
+\end{DoxyDate}
+description\+: This node implements the R\+O\+S\+Plan Go\+To\+Waypoint\+Action\+Interface\+: the corresponding behaviour for the go\+\_\+to\+\_\+waypoint action in the P\+D\+Dl file 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{goto_waypoint_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\label{goto_waypoint_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}} 
+\index{gotoWaypoint.cpp@{gotoWaypoint.cpp}!main@{main}}
+\index{main@{main}!gotoWaypoint.cpp@{gotoWaypoint.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$$\ast$}]{argv }\end{DoxyParamCaption})}
+
+
+
+Main function of the node. 
+
+int main(argc, argv)
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & the number of argument passed as parameters\\
+\hline
+{\em argv} & the vector of string containing each argument\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 when the program ends
+\end{DoxyReturn}
+description\+: The main function, declares the Go\+To\+Waypoint\+Action\+Interface and runs it 

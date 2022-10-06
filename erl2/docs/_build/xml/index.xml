@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.17">
+  <compound refid="namespace_k_c_l__rosplan" kind="namespace"><name>KCL_rosplan</name>
+  </compound>
+  <compound refid="check__consistency_8cpp" kind="file"><name>check_consistency.cpp</name>
+    <member refid="check__consistency_8cpp_1ac35fab8574a24f12caf66f6c9dce647a" kind="variable"><name>client_consistency</name></member>
+    <member refid="check__consistency_8cpp_1a3c04138a5bfe5d72780bb7e82a18e627" kind="function"><name>main</name></member>
+  </compound>
+  <compound refid="goto_waypoint_8cpp" kind="file"><name>gotoWaypoint.cpp</name>
+    <member refid="goto_waypoint_8cpp_1a525335710b53cb064ca56b936120431e" kind="define"><name>_USE_MATH_DEFINES</name></member>
+    <member refid="goto_waypoint_8cpp_1a4fc5847e0489f256f9b1b70c21a55a3f" kind="variable"><name>pose_x</name></member>
+    <member refid="goto_waypoint_8cpp_1af567015bd8ee79bcfbb2c8c3d95dfb1c" kind="variable"><name>pose_y</name></member>
+    <member refid="goto_waypoint_8cpp_1a0e3266fc15309697502533db62b682af" kind="variable"><name>orientation</name></member>
+    <member refid="goto_waypoint_8cpp_1a3c04138a5bfe5d72780bb7e82a18e627" kind="function"><name>main</name></member>
+  </compound>
+  <compound refid="init_8cpp" kind="file"><name>init.cpp</name>
+    <member refid="init_8cpp_1a3c04138a5bfe5d72780bb7e82a18e627" kind="function"><name>main</name></member>
+  </compound>
+  <compound refid="movearm_8cpp" kind="file"><name>movearm.cpp</name>
+    <member refid="movearm_8cpp_1a525335710b53cb064ca56b936120431e" kind="define"><name>_USE_MATH_DEFINES</name></member>
+    <member refid="movearm_8cpp_1aa786921102be9dc936a971f736bf069e" kind="variable"><name>validity_service</name></member>
+    <member refid="movearm_8cpp_1a26969c8ee16b235db0c1ee52d9188c8f" kind="variable"><name>planning_scene_service</name></member>
+    <member refid="movearm_8cpp_1a3c04138a5bfe5d72780bb7e82a18e627" kind="function"><name>main</name></member>
+  </compound>
+  <compound refid="simulation_8cpp" kind="file"><name>simulation.cpp</name>
+    <member refid="simulation_8cpp_1a32812fe000700d7aa8988d74e59471c7" kind="variable"><name>oracle_pub</name></member>
+    <member refid="simulation_8cpp_1a36b0204cd96e3dc326a2adfa3d1dceda" kind="variable"><name>markx</name></member>
+    <member refid="simulation_8cpp_1a0bc4146f286fe42bd5e8fa1e53826447" kind="variable"><name>marky</name></member>
+    <member refid="simulation_8cpp_1a8d90002e6a9c50028f184b22c380efc4" kind="variable"><name>markz</name></member>
+    <member refid="simulation_8cpp_1a412ed4d68a81f370cdcd20e3019db982" kind="variable"><name>lastmarkx</name></member>
+    <member refid="simulation_8cpp_1a174c0dfc727a92493b03f7b0573f4f3e" kind="variable"><name>lastmarky</name></member>
+    <member refid="simulation_8cpp_1a0049a8a39c319bf1470f36c9e0f75abd" kind="variable"><name>key</name></member>
+    <member refid="simulation_8cpp_1a68fa6a0c7a1208892294604263e23d92" kind="variable"><name>person</name></member>
+    <member refid="simulation_8cpp_1a4368e40a20e72e62974037baf19dba80" kind="variable"><name>object</name></member>
+    <member refid="simulation_8cpp_1a5e5bd50ead53d20df3f8ede527f47ce7" kind="variable"><name>place</name></member>
+    <member refid="simulation_8cpp_1a37d4a0b625b8b9583adf9362f5aae971" kind="variable"><name>uIDs</name></member>
+    <member refid="simulation_8cpp_1a90c5d03e068ddae91702223f47eff712" kind="variable"><name>winID</name></member>
+    <member refid="simulation_8cpp_1ac8241cdb5162da1999f5377e7e209201" kind="variable"><name>oracle_msgs</name></member>
+    <member refid="simulation_8cpp_1a7e333af55a708cf53de07126dcd3006b" kind="function"><name>distfromtarget</name></member>
+    <member refid="simulation_8cpp_1ae1a3f65d934a3c4a938e85d5071dfaa5" kind="function"><name>oracleService</name></member>
+    <member refid="simulation_8cpp_1a876a1245db85a2bb87c08ae086f1eafa" kind="function"><name>oracleCallback</name></member>
+    <member refid="simulation_8cpp_1a3c04138a5bfe5d72780bb7e82a18e627" kind="function"><name>main</name></member>
+  </compound>
+  <compound refid="update__ontology_8cpp" kind="file"><name>update_ontology.cpp</name>
+    <member refid="update__ontology_8cpp_1acb7ca7f163790d74254cefc6c3de0ebe" kind="variable"><name>client_update</name></member>
+    <member refid="update__ontology_8cpp_1a3c04138a5bfe5d72780bb7e82a18e627" kind="function"><name>main</name></member>
+  </compound>
+  <compound refid="dir_68267d1309a1af8e8297ef4c3efbcdba" kind="dir"><name>src</name>
+  </compound>
+</doxygenindex>

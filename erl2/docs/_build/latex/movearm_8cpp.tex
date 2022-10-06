@@ -1,0 +1,81 @@
+\hypertarget{movearm_8cpp}{}\doxysection{src/movearm.cpp File Reference}
+\label{movearm_8cpp}\index{src/movearm.cpp@{src/movearm.cpp}}
+
+
+Node to perform the movearm action of the P\+D\+DL domain.  
+
+
+{\ttfamily \#include \char`\"{}erl2/movearm.\+h\char`\"{}}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$actionlib/client/simple\+\_\+action\+\_\+client.\+h$>$}\newline
+{\ttfamily \#include $<$actionlib/client/terminal\+\_\+state.\+h$>$}\newline
+{\ttfamily \#include $<$ros/ros.\+h$>$}\newline
+{\ttfamily \#include $<$moveit/move\+\_\+group\+\_\+interface/move\+\_\+group\+\_\+interface.\+h$>$}\newline
+{\ttfamily \#include $<$moveit/robot\+\_\+model\+\_\+loader/robot\+\_\+model\+\_\+loader.\+h$>$}\newline
+{\ttfamily \#include $<$moveit/robot\+\_\+model/robot\+\_\+model.\+h$>$}\newline
+{\ttfamily \#include $<$moveit/robot\+\_\+state/robot\+\_\+state.\+h$>$}\newline
+{\ttfamily \#include $<$geometry\+\_\+msgs/\+Pose.\+h$>$}\newline
+{\ttfamily \#include $<$moveit\+\_\+msgs/\+Get\+State\+Validity.\+h$>$}\newline
+{\ttfamily \#include $<$moveit\+\_\+msgs/\+Get\+Planning\+Scene.\+h$>$}\newline
+Include dependency graph for movearm.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{movearm_8cpp__incl}
+\end{center}
+\end{figure}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{movearm_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char $\ast$$\ast$argv)
+\begin{DoxyCompactList}\small\item\em Main function of the node. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{movearm_8cpp_aa786921102be9dc936a971f736bf069e}\label{movearm_8cpp_aa786921102be9dc936a971f736bf069e}} 
+ros\+::\+Service\+Client {\bfseries validity\+\_\+service}
+\item 
+\mbox{\Hypertarget{movearm_8cpp_a26969c8ee16b235db0c1ee52d9188c8f}\label{movearm_8cpp_a26969c8ee16b235db0c1ee52d9188c8f}} 
+ros\+::\+Service\+Client {\bfseries planning\+\_\+scene\+\_\+service}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Node to perform the movearm action of the P\+D\+DL domain. 
+
+\begin{DoxyVersion}{Version}
+1.\+0 
+\end{DoxyVersion}
+\begin{DoxyAuthor}{Author}
+Alessio Roda 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+October 2022
+\end{DoxyDate}
+description\+: This node implements the R\+O\+S\+Plan Movearm\+Action\+Interface\+: the corresponding behaviour for the movearm action in the P\+D\+Dl file 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{movearm_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}\label{movearm_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}} 
+\index{movearm.cpp@{movearm.cpp}!main@{main}}
+\index{main@{main}!movearm.cpp@{movearm.cpp}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$$\ast$}]{argv }\end{DoxyParamCaption})}
+
+
+
+Main function of the node. 
+
+int main(argc, argv)
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & the number of argument passed as parameters\\
+\hline
+{\em argv} & the vector of string containing each argument\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 when the program ends
+\end{DoxyReturn}
+description\+: The main function, initializes the client for the /check\+\_\+state\+\_\+validity and /get\+\_\+planning\+\_\+scene services, declares the Movearm\+Action\+Interface and runs it 

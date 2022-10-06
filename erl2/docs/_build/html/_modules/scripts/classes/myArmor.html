@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>scripts.classes.myArmor &mdash; Second_assignment 1.0 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/graphviz.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> Second_assignment
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Second_assignment</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>scripts.classes.myArmor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for scripts.classes.myArmor</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">.. module:: myArmor</span>
+<span class="sd">   :platform: Unix</span>
+<span class="sd">   :synopsis: Class implementing the main operations to use ARMOR</span>
+<span class="sd">	</span>
+<span class="sd">.. moduleauthor:: Alessio Roda alessioroda98@gmail.com</span>
+
+<span class="sd">Service: </span>
+<span class="sd">    /armor_interface_srv service to send the messages to ARMOR</span>
+
+<span class="sd">This class implements the ARMOR operations to use during the Cluedo game.  </span>
+
+<span class="sd">This class is created to use in a more comfortable way the ARMOR commands, providing some methods that already create and</span>
+<span class="sd">sends the correct messages to the armor_interface_srv service.</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span> <span class="nn">posixpath</span> <span class="kn">import</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">realpath</span>
+<span class="kn">from</span> <span class="nn">armor_msgs.srv</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">armor_msgs.msg</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">rospy.impl.tcpros_service</span> <span class="kn">import</span> <span class="n">ServiceProxy</span>
+
+<span class="n">armor_interface</span><span class="o">=</span><span class="n">ServiceProxy</span><span class="p">(</span><span class="s1">&#39;/armor_interface_srv&#39;</span><span class="p">,</span> <span class="n">ArmorDirective</span><span class="p">)</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Defines the armor_interface_srv service to send the messages to ARMOR</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="MyArmor"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor">[docs]</a><span class="k">class</span> <span class="nc">MyArmor</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Simple class to use in a more comfortable way the ARMOR commands, providing some methods that already create and</span>
+<span class="sd">    send the correct messages to the armor_interface_srv service.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Initialize the class</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Class initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MyArmor.load"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Load the ontology from file</span>
+
+<span class="sd">            Args: </span>
+<span class="sd">                path(string): the path in which there&#39;s the file with the ontology to load</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                response(ArmorDirectiveRes): the response received from ARMOR</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">request</span><span class="o">=</span><span class="n">ArmorDirectiveReq</span><span class="p">()</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">client_name</span><span class="o">=</span><span class="s1">&#39;tutorial&#39;</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">reference_name</span><span class="o">=</span><span class="s1">&#39;ontoTest&#39;</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">command</span><span class="o">=</span><span class="s1">&#39;LOAD&#39;</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">primary_command_spec</span><span class="o">=</span><span class="s1">&#39;FILE&#39;</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">secondary_command_spec</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;http://www.emarolab.it/cluedo-ontology&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">,</span> <span class="s1">&#39;PELLET&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">]</span>
+        <span class="n">response</span><span class="o">=</span><span class="n">armor_interface</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">response</span></div>
+
+<div class="viewcode-block" id="MyArmor.add_hypothesis"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor.add_hypothesis">[docs]</a>    <span class="k">def</span> <span class="nf">add_hypothesis</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add the hypothesis to the ontology</span>
+
+<span class="sd">            Args: type(string): the type of element to add (what, where or who)</span>
+<span class="sd">                  ID(string): the ID of the hypothesis</span>
+<span class="sd">                  arg(string): the name of the place/weapon/person to add to the ontology</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                res(ArmorDirectiveRes): the response received from ARMOR</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">req</span><span class="o">=</span><span class="n">ArmorDirectiveReq</span><span class="p">()</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">client_name</span><span class="o">=</span><span class="s1">&#39;tutorial&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">reference_name</span><span class="o">=</span><span class="s1">&#39;ontoTest&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">command</span><span class="o">=</span><span class="s1">&#39;ADD&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">primary_command_spec</span><span class="o">=</span><span class="s1">&#39;OBJECTPROP&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">secondary_command_spec</span><span class="o">=</span><span class="s1">&#39;IND&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="nb">type</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">arg</span><span class="p">]</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">armor_interface</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MyArmor.reason"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor.reason">[docs]</a>    <span class="k">def</span> <span class="nf">reason</span><span class="p">():</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Perform reason to update the ontology</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                res(ArmorDirectiveRes): the response received from ARMOR</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">req</span><span class="o">=</span><span class="n">ArmorDirectiveReq</span><span class="p">()</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">client_name</span><span class="o">=</span> <span class="s1">&#39;tutorial&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">reference_name</span><span class="o">=</span> <span class="s1">&#39;ontoTest&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">command</span><span class="o">=</span> <span class="s1">&#39;REASON&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">primary_command_spec</span><span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">secondary_command_spec</span><span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">args</span><span class="o">=</span> <span class="p">[]</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">armor_interface</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MyArmor.ask_complete"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor.ask_complete">[docs]</a>    <span class="k">def</span> <span class="nf">ask_complete</span><span class="p">():</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Asks to the ontology for completed hypothesis</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                res(ArmorDirectiveRes): the response received from ARMOR</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">req</span><span class="o">=</span><span class="n">ArmorDirectiveReq</span><span class="p">()</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">client_name</span><span class="o">=</span> <span class="s1">&#39;tutorial&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">reference_name</span><span class="o">=</span> <span class="s1">&#39;ontoTest&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">command</span><span class="o">=</span> <span class="s1">&#39;QUERY&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">primary_command_spec</span><span class="o">=</span> <span class="s1">&#39;IND&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">secondary_command_spec</span><span class="o">=</span> <span class="s1">&#39;CLASS&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">args</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;COMPLETED&#39;</span><span class="p">]</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">armor_interface</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="MyArmor.ask_inconsistent"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor.ask_inconsistent">[docs]</a>    <span class="k">def</span> <span class="nf">ask_inconsistent</span><span class="p">():</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Asks to the ontology for inconsistent hypothesis</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                res(ArmorDirectiveRes): the response received from ARMOR</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">req</span><span class="o">=</span><span class="n">ArmorDirectiveReq</span><span class="p">()</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">client_name</span><span class="o">=</span> <span class="s1">&#39;tutorial&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">reference_name</span><span class="o">=</span> <span class="s1">&#39;ontoTest&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">command</span><span class="o">=</span> <span class="s1">&#39;QUERY&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">primary_command_spec</span><span class="o">=</span> <span class="s1">&#39;IND&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">secondary_command_spec</span><span class="o">=</span> <span class="s1">&#39;CLASS&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">args</span><span class="o">=</span> <span class="p">[</span><span class="s1">&#39;INCONSISTENT&#39;</span><span class="p">]</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">armor_interface</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MyArmor.remove"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor.remove">[docs]</a>    <span class="k">def</span> <span class="nf">remove</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Remove a hypothesis from the ontology</span>
+
+<span class="sd">            Args: </span>
+<span class="sd">                name(string): the name of the hypothesis to remove</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                res(ArmorDirectiveRes): the response received from ARMOR</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">req</span><span class="o">=</span><span class="n">ArmorDirectiveReq</span><span class="p">()</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">client_name</span><span class="o">=</span> <span class="s1">&#39;tutorial&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">reference_name</span><span class="o">=</span> <span class="s1">&#39;ontoTest&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">command</span><span class="o">=</span> <span class="s1">&#39;REMOVE&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">primary_command_spec</span><span class="o">=</span> <span class="s1">&#39;IND&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">secondary_command_spec</span><span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">args</span><span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">armor_interface</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MyArmor.ask_item"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor.ask_item">[docs]</a>    <span class="k">def</span> <span class="nf">ask_item</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">ID</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Ask the name of a certain element of a hypothesis</span>
+
+<span class="sd">            Args: </span>
+<span class="sd">                type(string): the type of the element (what, where or who)</span>
+<span class="sd">                ID(string): the ID of the hypothesis</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                res(ArmorDirectiveRes): the response received from ARMOR</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">req</span><span class="o">=</span><span class="n">ArmorDirectiveReq</span><span class="p">()</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">client_name</span><span class="o">=</span> <span class="s1">&#39;tutorial&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">reference_name</span><span class="o">=</span> <span class="s1">&#39;ontoTest&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">command</span><span class="o">=</span> <span class="s1">&#39;QUERY&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">primary_command_spec</span><span class="o">=</span> <span class="s1">&#39;OBJECTPROP&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">secondary_command_spec</span><span class="o">=</span> <span class="s1">&#39;IND&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">args</span><span class="o">=</span> <span class="p">[</span><span class="nb">type</span><span class="p">,</span><span class="n">ID</span><span class="p">]</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">armor_interface</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MyArmor.add_item"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor.add_item">[docs]</a>    <span class="k">def</span> <span class="nf">add_item</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add an element to the ontology</span>
+
+<span class="sd">            Args: </span>
+<span class="sd">                name(string): the name of the element </span>
+<span class="sd">                type(string): the type of the element (PERSON/PLACE/WEAPON)</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                res(ArmorDirectiveRes): the response received from ARMOR</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">req</span><span class="o">=</span><span class="n">ArmorDirectiveReq</span><span class="p">()</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">client_name</span><span class="o">=</span> <span class="s1">&#39;tutorial&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">reference_name</span><span class="o">=</span> <span class="s1">&#39;ontoTest&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">command</span><span class="o">=</span> <span class="s1">&#39;ADD&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">primary_command_spec</span><span class="o">=</span> <span class="s1">&#39;IND&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">secondary_command_spec</span><span class="o">=</span> <span class="s1">&#39;CLASS&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">args</span><span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">]</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">armor_interface</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+<div class="viewcode-block" id="MyArmor.disjoint"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor.disjoint">[docs]</a>    <span class="k">def</span> <span class="nf">disjoint</span><span class="p">(</span><span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Disjoint two elements to notify the otology that they are different</span>
+
+<span class="sd">            Args: </span>
+<span class="sd">                ind1(string): the name of the first element </span>
+<span class="sd">                ind1(string): the name of the second element </span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                res(ArmorDirectiveRes): the response received from ARMOR</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">req</span><span class="o">=</span><span class="n">ArmorDirectiveReq</span><span class="p">()</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">client_name</span><span class="o">=</span> <span class="s1">&#39;tutorial&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">reference_name</span><span class="o">=</span> <span class="s1">&#39;ontoTest&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">command</span><span class="o">=</span> <span class="s1">&#39;DISJOINT&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">primary_command_spec</span><span class="o">=</span> <span class="s1">&#39;IND&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">secondary_command_spec</span><span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">args</span><span class="o">=</span> <span class="p">[</span><span class="n">ind1</span><span class="p">,</span> <span class="n">ind2</span><span class="p">]</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">armor_interface</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div>
+
+
+<div class="viewcode-block" id="MyArmor.save"><a class="viewcode-back" href="../../../index.html#scripts.classes.myArmor.MyArmor.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">():</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Save the current ontology</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                res(ArmorDirectiveReq): the response received from ARMOR</span>
+<span class="sd">                </span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">req</span><span class="o">=</span><span class="n">ArmorDirectiveReq</span><span class="p">()</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">15</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;solution_cluedo_ontology.owl&quot;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">client_name</span><span class="o">=</span> <span class="s1">&#39;tutorial&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">reference_name</span><span class="o">=</span> <span class="s1">&#39;ontoTest&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">command</span><span class="o">=</span> <span class="s1">&#39;SAVE&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">primary_command_spec</span><span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">secondary_command_spec</span><span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">args</span><span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
+        <span class="n">res</span><span class="o">=</span><span class="n">armor_interface</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Alessio Roda.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

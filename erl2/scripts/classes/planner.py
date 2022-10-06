@@ -66,6 +66,10 @@ Initialize the service to generate the plan
 
 
 class Planner(object):
+    '''
+    Simple class to update in a more comfortable way the ROSPlan knowledge base
+
+    '''
 
     def __init__(self):
         '''
